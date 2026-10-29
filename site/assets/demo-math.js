@@ -81,3 +81,23 @@ export const svmDistance = (m, x, z) => Math.abs(svmScore(m, x, z)) / Math.hypot
 
 /** z on the line w·(x, z) + b = level, for drawing the boundary (level 0) and the margins (±1). */
 export const svmLineZ = (m, x, level = 0) => (level - m.b - m.w[0] * x) / m.w[1];
+
+/** x on the same line at a given z, for placing labels along it. */
+export const svmLineX = (m, z, level = 0) => (level - m.b - m.w[1] * z) / m.w[0];
+
+/** The corners of the part of the plot where the score has this sign (+1 or −1), for shading each side. */
+export function svmSide(m, sign) {
+  const [lo, hi] = m.range;
+  const corners = [[lo, lo], [hi, lo], [hi, hi], [lo, hi]];
+  const f = ([x, z]) => sign * svmScore(m, x, z);
+  const out = [];
+  corners.forEach((p, i) => {
+    const q = corners[(i + 1) % corners.length];
+    if (f(p) >= 0) out.push(p);
+    if (f(p) >= 0 !== f(q) >= 0) {
+      const t = f(p) / (f(p) - f(q));
+      out.push([p[0] + t * (q[0] - p[0]), p[1] + t * (q[1] - p[1])]);
+    }
+  });
+  return out;
+}

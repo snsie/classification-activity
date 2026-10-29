@@ -1,8 +1,24 @@
 // Small illustrative demos for the Models page. All numbers are made up (see demo-math.js),
 // never the activity's data. Both probes move with a pointer (drag or tap) or the arrow keys.
-import { KNN_DEMO, SVM_DEMO, knnPoints, knnPredict, svmDistance, svmLineZ, svmScore } from "./demo-math.js";
+import { KNN_DEMO, SVM_DEMO, knnPoints, knnPredict, svmDistance, svmLineX, svmLineZ, svmScore, svmSide } from "./demo-math.js";
 
 const W = 420, H = 320, PAD = 40;
+
+// The new patient is a white diamond everywhere on the page, so it can't be mistaken for a ring.
+const diamond = (x, y, r = 10) => `M${x},${y - r}L${x + r},${y}L${x},${y + r}L${x - r},${y}Z`;
+
+// Legend keys use the same SVG classes as the charts, so each symbol always matches its label.
+const KEYS = {
+  pos: `<circle class="pos" cx="11" cy="11" r="5"/>`,
+  neg: `<circle class="neg-ring" cx="11" cy="11" r="5"/>`,
+  probe: `<path class="probe" d="${diamond(11, 11, 8)}"/>`,
+  ring: `<line class="nbr" x1="-6" y1="11" x2="2" y2="11"/><circle class="ring" cx="11" cy="11" r="8"/>`,
+  sv: `<circle class="sv" cx="11" cy="11" r="8"/>`,
+  boundary: `<line class="boundary" x1="0" x2="22" y1="11" y2="11"/>`,
+  margin: `<line class="margin" x1="0" x2="22" y1="11" y2="11"/>`,
+};
+const legend = (items) => `<ul class="legend">${items
+  .map(([key, label]) => `<li><svg class="key" viewBox="0 0 22 22" aria-hidden="true">${KEYS[key]}</svg>${label}</li>`).join("")}</ul>`;
 
 // Pointer dragging is attached once per chart; the probe is redrawn, so its keys are bound per render.
 function draggable(svg, toData, onMove) {
@@ -14,10 +30,16 @@ function draggable(svg, toData, onMove) {
     const p = pt.matrixTransform(svg.getScreenCTM().inverse());
     onMove(toData(p.x, p.y));
   };
-  svg.addEventListener("pointerdown", (e) => { dragging = true; svg.setPointerCapture(e.pointerId); move(e); });
+  svg.addEventListener("pointerdown", (e) => {
+    e.preventDefault(); // no text selection, so a second drag can't pick up the selected labels
+    dragging = true;
+    svg.setPointerCapture(e.pointerId);
+    move(e);
+  });
   svg.addEventListener("pointermove", (e) => dragging && move(e));
   svg.addEventListener("pointerup", () => (dragging = false));
   svg.addEventListener("pointercancel", () => (dragging = false));
+  svg.addEventListener("dragstart", (e) => e.preventDefault());
   svg.style.touchAction = "none";
 }
 
@@ -41,34 +63,36 @@ function knnDemo(root) {
   const sy = (b) => H - PAD - ((b - fb.min) / (fb.max - fb.min)) * (H - 2 * PAD);
   root.innerHTML = `
     <p class="demo-intro"><span class="tag illustrative">Illustrative example: made-up numbers</span></p>
-    <p>Sixty made-up training patients: filled dots had the outcome, rings didn't. Feature A runs from 0 to 200, Feature B from 0 to 2. Drag the white probe, or focus it and use the arrow keys.</p>
+    <p><strong>Demo: adjustable k; activity: fixed k = 25.</strong></p>
+    <p>Sixty made-up training patients. Feature A runs from 0 to 200, Feature B from 0 to 2. Drag the new patient (the white diamond), or focus it and use the arrow keys.</p>
     <div class="demo-controls">
       <label>k (number of neighbours): <output id="knn-k-out">${st.k}</output>
         <input type="range" id="knn-k" min="0" max="${KNN_DEMO.kValues.length - 1}" step="1" value="${KNN_DEMO.kValues.indexOf(st.k)}"></label>
       <label><span><input type="checkbox" id="knn-scale" checked> Scale both features first</span></label>
     </div>
-    <ul class="legend"><li><span class="swatch dot" style="background:var(--up)"></span>had the outcome</li><li><span class="swatch ring" style="border-color:var(--down)"></span>didn't</li><li><span class="swatch ring" style="border-color:var(--text)"></span>one of the k nearest</li></ul>
+    ${legend([["pos", "training patient: had the outcome"], ["neg", "training patient: didn't"], ["probe", "new patient"], ["ring", "one of the k nearest (outlined, dashed line)"]])}
     <svg class="chart" viewBox="0 0 ${W} ${H}" id="knn-svg" role="group" aria-label="Scatter plot of 60 made-up patients by Feature A and Feature B, with a movable new patient and lines to its k nearest neighbours" aria-describedby="knn-read"></svg>
     <div class="demo-readout" aria-live="polite" id="knn-read"></div>`;
   const svg = root.querySelector("#knn-svg");
   const axes = `<line class="axis" x1="${PAD}" x2="${W - PAD}" y1="${H - PAD}" y2="${H - PAD}"/><line class="axis" x1="${PAD}" x2="${PAD}" y1="${PAD - 10}" y2="${H - PAD}"/>
     ${[0, 50, 100, 150, 200].map((t) => `<text x="${sx(t)}" y="${H - PAD + 16}" text-anchor="middle">${t}</text>`).join("")}
     ${[0, 0.5, 1, 1.5, 2].map((t) => `<text x="${PAD - 6}" y="${sy(t) + 4}" text-anchor="end">${t}</text>`).join("")}
-    <text x="${W / 2}" y="${H - 4}" text-anchor="middle">Feature A (0 to 200)</text>
-    <text transform="translate(12 ${H / 2}) rotate(-90)" text-anchor="middle">Feature B (0 to 2)</text>`;
+    <text x="${W / 2}" y="${H - 4}" text-anchor="middle">Feature A (original units, 0 to 200)</text>
+    <text transform="translate(15 ${H / 2}) rotate(-90)" text-anchor="middle">Feature B (original units, 0 to 2)</text>`;
   const render = () => {
     const r = knnPredict(pts, probe, st.k, st.scaled);
     const nb = new Set(r.neighbours);
+    const px = sx(probe.a), py = sy(probe.b);
     svg.innerHTML = `${axes}
-      ${r.neighbours.map((i) => `<line class="nbr" x1="${sx(probe.a)}" y1="${sy(probe.b)}" x2="${sx(pts[i].a)}" y2="${sy(pts[i].b)}"/>`).join("")}
+      ${r.neighbours.map((i) => `<line class="nbr" x1="${px}" y1="${py}" x2="${sx(pts[i].a)}" y2="${sy(pts[i].b)}"/>`).join("")}
       ${pts.map((p, i) => `<circle class="${p.y ? "pos" : "neg-ring"}" cx="${sx(p.a)}" cy="${sy(p.b)}" r="5"/>${nb.has(i) ? `<circle class="ring" cx="${sx(p.a)}" cy="${sy(p.b)}" r="9"/>` : ""}`).join("")}
-      <circle class="probe" id="knn-probe" tabindex="0" role="slider" aria-label="New patient: Feature A ${Math.round(probe.a)}, Feature B ${probe.b.toFixed(2)}" aria-valuetext="A ${Math.round(probe.a)}, B ${probe.b.toFixed(2)}" cx="${sx(probe.a)}" cy="${sy(probe.b)}" r="9"/>`;
+      <path class="probe" id="knn-probe" tabindex="0" role="slider" aria-label="New patient: Feature A ${Math.round(probe.a)}, Feature B ${probe.b.toFixed(2)}" aria-valuetext="A ${Math.round(probe.a)}, B ${probe.b.toFixed(2)}" d="${diamond(px, py)}"/>`;
     root.querySelector("#knn-k-out").textContent = st.k;
     root.querySelector("#knn-read").innerHTML = `
       <p><strong>New patient:</strong> A = ${Math.round(probe.a)}, B = ${probe.b.toFixed(2)}.
         ${r.positives} of its ${st.k} nearest neighbours had the outcome, so kNN's probability is ${r.positives} ÷ ${st.k} = <strong>${r.probability.toFixed(2)}</strong>.</p>
       <p>${st.scaled
-        ? "Both features count: a step of one SD in A matters as much as one SD in B."
+        ? "Distances are worked out on scaled values (each feature divided by its standard deviation), so neither feature's units dominate: a step of one SD in A counts as much as one SD in B. The axes still show the original units."
         : "Unscaled, a difference of 1 in A counts as much as a difference of 1 in B, which is half of B's whole range. A decides almost alone, so the neighbours form a narrow vertical band."}
       ${st.k === 1 ? " With k = 1 the answer is always 0 or 1: it follows a single patient." : st.k >= 15 ? " A large k smooths: the answer changes slowly as you move." : ""}</p>`;
     arrowKeys(svg.querySelector("#knn-probe"), move);
@@ -88,7 +112,7 @@ function knnDemo(root) {
   render();
 }
 
-// ---- SVM: the widest gap, and a raw score that isn't a probability -----------------------
+// ---- SVM: the widest margin, and a raw score that isn't a probability -----------------------
 function svmDemo(root) {
   const m = SVM_DEMO;
   const [lo, hi] = m.range;
@@ -96,27 +120,41 @@ function svmDemo(root) {
   const sx = (x) => PAD + ((x - lo) / (hi - lo)) * (W - 2 * PAD);
   const sy = (z) => H - PAD - ((z - lo) / (hi - lo)) * (H - 2 * PAD);
   const line = (level, cls) => `<line class="${cls}" x1="${sx(lo)}" y1="${sy(svmLineZ(m, lo, level))}" x2="${sx(hi)}" y2="${sy(svmLineZ(m, hi, level))}"/>`;
+  const region = (sign, cls) => `<polygon class="${cls}" points="${svmSide(m, sign).map(([x, z]) => `${sx(x)},${sy(z)}`).join(" ")}"/>`;
+  // The line labels sit in a band above the plot, over the top end of each line, so they never cover a patient.
+  const TOP = 24;
+  const xAt = (level, y) => sx(svmLineX(m, lo + ((H - PAD - y) / (H - 2 * PAD)) * (hi - lo), level));
+  const topLabel = (level, y, text, cls = "", anchor = "middle") => `<text class="${cls}" x="${xAt(level, y + 4) - (anchor === "start" ? 4 : 0)}" y="${y}" text-anchor="${anchor}">${text}</text>`;
   root.innerHTML = `
     <p class="demo-intro"><span class="tag illustrative">Illustrative example: made-up numbers</span></p>
-    <p>Sixteen made-up training patients, two features. The solid line is the SVM's boundary; the dashed lines mark the gap it keeps as wide as possible. Drag the white probe, or focus it and use the arrow keys.</p>
-    <ul class="legend"><li><span class="swatch dot" style="background:var(--up)"></span>had the outcome</li><li><span class="swatch ring" style="border-color:var(--down)"></span>didn't</li><li><span class="swatch ring" style="border-color:var(--text)"></span>support vector: fixes the boundary</li></ul>
-    <svg class="chart" viewBox="0 0 ${W} ${H}" id="svm-svg" role="group" aria-label="Scatter plot of 16 made-up patients with the SVM boundary, its margins and a movable new patient" aria-describedby="svm-read"></svg>
+    <p>Sixteen made-up training patients, two features, chosen so a straight line separates them cleanly (real data rarely does). Drag the new patient (the white diamond), or focus it and use the arrow keys.</p>
+    ${legend([["pos", "had the outcome"], ["neg", "didn't"], ["probe", "new patient"], ["sv", "support vector (outlined)"], ["boundary", "decision boundary: score = 0"], ["margin", "margins: score = +1 and −1"]])}
+    <svg class="chart" viewBox="0 ${-TOP} ${W} ${H + TOP}" id="svm-svg" role="group" aria-label="Scatter plot of 16 made-up patients with the SVM decision boundary, its margins, the positive-score and negative-score sides, and a movable new patient" aria-describedby="svm-read"></svg>
     <div class="demo-readout" aria-live="polite" id="svm-read"></div>`;
   const svg = root.querySelector("#svm-svg");
   const sv = new Set(m.supportVectors);
-  const render = () => {
-    svg.innerHTML = `<defs><clipPath id="svm-clip"><rect x="${PAD}" y="${PAD - 10}" width="${W - 2 * PAD}" height="${H - 2 * PAD + 10}"/></clipPath></defs>
+  const frame = `<defs><clipPath id="svm-clip"><rect x="${PAD}" y="${PAD - 10}" width="${W - 2 * PAD}" height="${H - 2 * PAD + 10}"/></clipPath>
+        <clipPath id="svm-clip-top"><rect x="${PAD}" y="-6" width="${W - 2 * PAD}" height="${H - PAD + 6}"/></clipPath></defs>
+      <g clip-path="url(#svm-clip)">${region(1, "region-pos")}${region(-1, "region-neg")}</g>
       <line class="axis" x1="${PAD}" x2="${W - PAD}" y1="${H - PAD}" y2="${H - PAD}"/><line class="axis" x1="${PAD}" x2="${PAD}" y1="${PAD - 10}" y2="${H - PAD}"/>
       ${[0, 2, 4, 6].map((t) => `<text x="${sx(t)}" y="${H - PAD + 16}" text-anchor="middle">${t}</text><text x="${PAD - 6}" y="${sy(t) + 4}" text-anchor="end">${t}</text>`).join("")}
       <text x="${W / 2}" y="${H - 4}" text-anchor="middle">Feature 1 (made up)</text>
-      <text transform="translate(12 ${H / 2}) rotate(-90)" text-anchor="middle">Feature 2 (made up)</text>
-      <g clip-path="url(#svm-clip)">${line(0, "boundary")}${line(1, "margin")}${line(-1, "margin")}</g>
+      <text transform="translate(15 ${H / 2}) rotate(-90)" text-anchor="middle">Feature 2 (made up)</text>
+      <text class="strong" x="${W - PAD - 6}" y="${PAD + 6}" text-anchor="end">Positive score</text>
+      <text class="strong" x="${PAD + 6}" y="${H - PAD - 8}">Negative score</text>
+      <g clip-path="url(#svm-clip)">${line(1, "margin")}${line(-1, "margin")}</g>
+      <g clip-path="url(#svm-clip-top)">${line(0, "boundary")}</g>
+      ${topLabel(0, -TOP + 14, "Decision boundary: score = 0", "strong", "start")}
+      ${topLabel(-1, PAD - 14, "Margin")}${topLabel(1, PAD - 14, "Margin")}`;
+  const render = () => {
+    svg.innerHTML = `${frame}
       ${m.points.map((p, i) => `<circle class="${p.y > 0 ? "pos" : "neg-ring"}" cx="${sx(p.x)}" cy="${sy(p.z)}" r="5"/>${sv.has(i) ? `<circle class="sv" cx="${sx(p.x)}" cy="${sy(p.z)}" r="9"/>` : ""}`).join("")}
-      <circle class="probe" id="svm-probe" tabindex="0" role="slider" aria-label="New patient: feature 1 ${probe.x.toFixed(1)}, feature 2 ${probe.z.toFixed(1)}" aria-valuetext="${probe.x.toFixed(1)}, ${probe.z.toFixed(1)}" cx="${sx(probe.x)}" cy="${sy(probe.z)}" r="9"/>`;
+      <path class="probe" id="svm-probe" tabindex="0" role="slider" aria-label="New patient: feature 1 ${probe.x.toFixed(1)}, feature 2 ${probe.z.toFixed(1)}" aria-valuetext="${probe.x.toFixed(1)}, ${probe.z.toFixed(1)}" d="${diamond(sx(probe.x), sy(probe.z))}"/>`;
     const s = svmScore(m, probe.x, probe.z);
     root.querySelector("#svm-read").innerHTML = `
-      <p><strong>Raw score: ${s >= 0 ? "+" : "−"}${Math.abs(s).toFixed(2)}</strong>, on the ${s >= 0 ? "outcome" : "no-outcome"} side, ${svmDistance(m, probe.x, probe.z).toFixed(2)} units from the boundary.</p>
-      <p>Higher means more likely to have the outcome, but this number is <strong>not a probability</strong>: it can be above 1 or below 0, and a score of +2 isn't twice as likely as +1. In the activity, the supplied <code>with_probabilities()</code> helper turns these scores into probabilities.</p>`;
+      <p><strong>Raw score: ${s >= 0 ? "+" : "−"}${Math.abs(s).toFixed(2)}</strong>: a ${s >= 0 ? "positive score, on the outcome side" : "negative score, on the no-outcome side"} of the boundary.
+        Geometric distance from the boundary: ${svmDistance(m, probe.x, probe.z).toFixed(2)} feature units (the score ÷ the length of the weights).</p>
+      <p>Higher means more likely to have the outcome, but the score is <strong>not a probability</strong>: it can be above 1 or below 0, and a score of +2 isn't twice as likely as +1. In the activity, the supplied <code>with_probabilities()</code> helper learns how to turn scores into probabilities from the training rows. Its probability of 0.5 need not fall exactly at score 0.</p>`;
     arrowKeys(svg.querySelector("#svm-probe"), move);
   };
   const move = (p, d) => {

@@ -37,55 +37,101 @@
 <article class="card model-card" id="baseline">
   <p class="eyebrow">Supplied</p>
   <h3>Prevalence baseline {{help prevalence-baseline}}</h3>
-  <p><strong>Core idea:</strong> every patient gets the same probability: the share of positives in the training rows.</p>
-  <div class="illus"><svg viewBox="0 0 320 90" role="img" aria-label="Ten made-up patients, with and without the outcome, all given the same probability: a flat line">
-    <line class="axis" x1="20" x2="300" y1="70" y2="70"/>
-    <line class="ink" x1="20" x2="300" y1="40" y2="40"/>
-    <circle class="pos" cx="40" cy="40" r="5"/><circle class="neg-ring" cx="68" cy="40" r="5"/><circle class="neg-ring" cx="96" cy="40" r="5"/><circle class="neg-ring" cx="124" cy="40" r="5"/><circle class="pos" cx="152" cy="40" r="5"/>
-    <circle class="neg-ring" cx="180" cy="40" r="5"/><circle class="neg-ring" cx="208" cy="40" r="5"/><circle class="neg-ring" cx="236" cy="40" r="5"/><circle class="neg-ring" cx="264" cy="40" r="5"/><circle class="neg-ring" cx="292" cy="40" r="5"/>
-    <text x="20" y="25">everyone: the same probability</text><text x="20" y="86">patients (made up)</text>
-  </svg></div>
+  <p><strong>Core idea:</strong> every new patient gets the same probability: the share of training patients who had the outcome.</p>
+  <div class="illus illus-row">
+    <svg viewBox="0 0 300 125" role="img" aria-label="Ten made-up training patients whose outcomes are known: 2 had the outcome and 8 didn't, so the prevalence is 2 divided by 10, or 0.20">
+      <text class="strong" x="10" y="18">1. Training patients: outcome known</text>
+      <circle class="neg-ring" cx="30" cy="48" r="7"/><circle class="pos" cx="56" cy="48" r="7"/><circle class="neg-ring" cx="82" cy="48" r="7"/><circle class="neg-ring" cx="108" cy="48" r="7"/><circle class="neg-ring" cx="134" cy="48" r="7"/>
+      <circle class="neg-ring" cx="160" cy="48" r="7"/><circle class="pos" cx="186" cy="48" r="7"/><circle class="neg-ring" cx="212" cy="48" r="7"/><circle class="neg-ring" cx="238" cy="48" r="7"/><circle class="neg-ring" cx="264" cy="48" r="7"/>
+      <text x="10" y="82">2 of 10 had the outcome, so</text>
+      <text class="strong" x="10" y="104">prevalence = 2 ÷ 10 = 0.20</text>
+    </svg>
+    <svg viewBox="0 0 300 180" role="img" aria-label="Five new patients, outcome not yet known, each given a predicted probability of 0.20 on a probability axis from 0 to 1">
+      <text class="strong" x="10" y="18">2. New patients: predictions</text>
+      <line class="axis" x1="62" x2="62" y1="35" y2="145"/><line class="axis" x1="62" x2="292" y1="145" y2="145"/>
+      <text x="56" y="39" text-anchor="end">1</text><text x="56" y="94" text-anchor="end">0.5</text><text class="strong" x="56" y="127" text-anchor="end">0.20</text><text x="56" y="149" text-anchor="end">0</text>
+      <text transform="translate(18 90) rotate(-90)" text-anchor="middle">Predicted probability</text>
+      <line class="threshold" x1="62" x2="292" y1="123" y2="123"/>
+      <path class="probe" d="M100,115L108,123L100,131L92,123Z"/><path class="probe" d="M145,115L153,123L145,131L137,123Z"/><path class="probe" d="M190,115L198,123L190,131L182,123Z"/><path class="probe" d="M235,115L243,123L235,131L227,123Z"/><path class="probe" d="M280,115L288,123L280,131L272,123Z"/>
+      <text x="92" y="104">0.20 for every new patient</text>
+      <text x="165" y="168" text-anchor="middle">new patients (outcome not yet known)</text>
+    </svg>
+  </div>
+  <ul class="legend">
+    <li><svg class="key" viewBox="0 0 22 22" aria-hidden="true"><circle class="pos" cx="11" cy="11" r="5"/></svg>training patient: had the outcome</li>
+    <li><svg class="key" viewBox="0 0 22 22" aria-hidden="true"><circle class="neg-ring" cx="11" cy="11" r="5"/></svg>training patient: didn't</li>
+    <li><svg class="key" viewBox="0 0 22 22" aria-hidden="true"><path class="probe" d="M11,3L19,11L11,19L3,11Z"/></svg>new patient: prediction only</li>
+  </ul>
   <p><strong>Limitation:</strong> it ranks no one above anyone else, so its AUROC is 0.5. It is the yardstick, not a model to use.</p>
 </article>
 
 <article class="card model-card" id="logreg">
   <p class="eyebrow">Supplied · worked example · lecture §12</p>
   <h3>Logistic regression {{help logistic-regression}}</h3>
-  <p><strong>Core idea:</strong> a weighted sum of the features, squeezed into a probability between 0 and 1 by an S-shaped curve.</p>
-  <div class="illus"><svg viewBox="0 0 320 120" role="img" aria-label="An S-shaped curve rising from near 0 to near 1 as the weighted sum of features increases">
-    <line class="axis" x1="30" x2="300" y1="100" y2="100"/><line class="axis" x1="30" x2="30" y1="10" y2="100"/>
-    <path class="ink" d="M30,98 C120,97 140,96 165,55 C190,14 210,13 300,12"/>
-    <text x="34" y="20">1</text><text x="34" y="96">0</text><text x="120" y="116">weighted sum of features →</text>
-  </svg></div>
+  <p><strong>Core idea:</strong> a weighted sum of the features plus an intercept gives each patient a score. An S-shaped curve (the sigmoid) maps that score to a probability between 0 and 1.</p>
+  <div class="illus illus-row">
+    <svg viewBox="0 0 300 205" role="img" aria-label="An S-shaped curve: as the model score rises from minus 6 to plus 6, the predicted probability rises from near 0 to near 1, crossing the dashed 0.5 threshold at a score of 0">
+      <line class="axis" x1="60" x2="285" y1="160" y2="160"/><line class="axis" x1="60" x2="60" y1="20" y2="160"/>
+      <line class="threshold" x1="60" x2="285" y1="90" y2="90"/>
+      <path class="ink" d="M60.0,159.7 L64.7,159.6 L69.4,159.4 L74.1,159.3 L78.8,159.1 L83.4,158.8 L88.1,158.5 L92.8,158.0 L97.5,157.5 L102.2,156.8 L106.9,155.9 L111.6,154.8 L116.2,153.4 L120.9,151.6 L125.6,149.4 L130.3,146.7 L135.0,143.3 L139.7,139.3 L144.4,134.5 L149.1,128.8 L153.8,122.3 L158.4,115.1 L163.1,107.1 L167.8,98.7 L172.5,90.0 L177.2,81.3 L181.9,72.9 L186.6,64.9 L191.2,57.7 L195.9,51.2 L200.6,45.5 L205.3,40.7 L210.0,36.7 L214.7,33.3 L219.4,30.6 L224.1,28.4 L228.8,26.6 L233.4,25.2 L238.1,24.1 L242.8,23.2 L247.5,22.5 L252.2,22.0 L256.9,21.5 L261.6,21.2 L266.2,20.9 L270.9,20.7 L275.6,20.6 L280.3,20.4 L285.0,20.3"/>
+      <text x="54" y="24" text-anchor="end">1</text><text x="54" y="94" text-anchor="end">0.5</text><text x="54" y="164" text-anchor="end">0</text>
+      <text x="60" y="176" text-anchor="middle">−6</text><text x="116" y="176" text-anchor="middle">−3</text><text x="172.5" y="176" text-anchor="middle">0</text><text x="229" y="176" text-anchor="middle">3</text><text x="285" y="176" text-anchor="middle">6</text>
+      <text x="282" y="84" text-anchor="end">threshold 0.5</text>
+      <text x="165" y="196" text-anchor="middle">Model score: weighted sum + intercept</text>
+      <text transform="translate(16 90) rotate(-90)" text-anchor="middle">Predicted probability</text>
+      <text transform="translate(31 90) rotate(-90)" text-anchor="middle">of the outcome</text>
+    </svg>
+    <svg viewBox="0 0 300 205" role="img" aria-label="Twelve made-up patients on two features, split by a straight diagonal decision boundary where the predicted probability is 0.5 (score 0); one patient on each side is on the wrong side">
+      <polygon class="region-pos" points="50,20 285,20 285,160"/><polygon class="region-neg" points="50,20 285,160 50,160"/>
+      <line class="axis" x1="50" x2="285" y1="160" y2="160"/><line class="axis" x1="50" x2="50" y1="20" y2="160"/>
+      <line class="threshold" x1="50" x2="285" y1="20" y2="160"/>
+      <circle class="pos" cx="214.5" cy="76" r="5"/><circle class="pos" cx="238" cy="104" r="5"/><circle class="pos" cx="191" cy="48" r="5"/><circle class="pos" cx="261.5" cy="62" r="5"/><circle class="pos" cx="250" cy="132" r="5"/><circle class="pos" cx="132" cy="104" r="5"/>
+      <circle class="neg-ring" cx="85.25" cy="118" r="5"/><circle class="neg-ring" cx="120.5" cy="104" r="5"/><circle class="neg-ring" cx="73.5" cy="90" r="5"/><circle class="neg-ring" cx="155.75" cy="125" r="5"/><circle class="neg-ring" cx="85" cy="62" r="5"/><circle class="neg-ring" cx="203" cy="90" r="5"/>
+      <text class="strong" x="279" y="36" text-anchor="end">predicted ≥ 0.5</text>
+      <text class="strong" x="56" y="153">predicted &lt; 0.5</text>
+      <text transform="translate(70 31.9) rotate(30.8)" dy="-5">decision boundary</text>
+      <text x="167.5" y="178" text-anchor="middle">Feature 1 (made up)</text>
+      <text transform="translate(36 90) rotate(-90)" text-anchor="middle">Feature 2 (made up)</text>
+    </svg>
+  </div>
+  <ul class="legend">
+    <li><svg class="key" viewBox="0 0 22 22" aria-hidden="true"><line class="threshold" x1="0" x2="22" y1="11" y2="11"/></svg>probability = 0.5: the threshold (left) and the decision boundary it makes (right)</li>
+    <li><svg class="key" viewBox="0 0 22 22" aria-hidden="true"><circle class="pos" cx="11" cy="11" r="5"/></svg>had the outcome</li>
+    <li><svg class="key" viewBox="0 0 22 22" aria-hidden="true"><circle class="neg-ring" cx="11" cy="11" r="5"/></svg>didn't</li>
+  </ul>
+  <p class="small"><span class="tag illustrative">Illustrative</span> Made-up numbers. The curve only converts scores into probabilities. Because the score is a weighted sum of the features, all the patients with probability 0.5 lie on a straight line (a flat surface, with more features): the activity's model has a straight decision boundary in its input feature space.</p>
   <p><strong>Limitation:</strong> it misses curved or combined effects unless you add them as features.</p>
 </article>
 
 <article class="card model-card" id="knn">
   <p class="eyebrow">New · you write the pipeline</p>
   <h3>k-nearest neighbours (kNN) {{help knn}}</h3>
-  <p><strong>Core idea:</strong> a new patient's probability is the share of positives among the k most similar training patients. Here k = 25.</p>
+  <p><strong>Core idea:</strong> a new patient's probability is the share of positives among the k most similar training patients. In the activity, k is fixed at 25.</p>
   <dl>
     <dt>Why scaling matters</dt>
-    <dd>“Similar” means close in distance across all features. A feature measured in large units (length of stay in days, lab counts in the dozens) would swamp one measured in small units (a 0/1 flag). Scaling puts every feature on the same footing, so each one counts.</dd>
+    <dd>“Similar” means close in distance across all features. Without scaling, a feature measured in large units (length of stay in days, lab counts in the dozens) would swamp one measured in small units (a 0/1 flag). Scaling changes how distances are calculated so that no feature's units dominate. It does not make every feature equally informative: a feature that doesn't matter still adds noise to the distance.</dd>
     <dt>The effect of k</dt>
     <dd>A small k follows individual training patients closely, so its probabilities jump around. A large k averages more patients, so its probabilities are smoother but blur real differences. With k = 25, every probability is a multiple of 1/25 = 0.04.</dd>
   </dl>
   <details class="demo" open>
     <summary>Try it: drag a new patient and watch its neighbours</summary>
-    <div class="details-body"><div id="demo-knn"></div></div>
+    <div class="details-body"><div id="demo-knn"></div>
+      <p class="small">With scaling on, distances use scaled values, but the plot still shows each feature in its original units.</p></div>
   </details>
-  <p><strong>Limitation:</strong> it memorises the training patients rather than learning a formula, so it must search them all for every prediction, and it is easily misled by features that don't matter.</p>
+  <p><strong>Limitation:</strong> it keeps the training patients rather than learning a formula, so it must find nearby training patients for each prediction, and it is easily misled by features that don't matter.</p>
 </article>
 
 <article class="card model-card" id="svm">
   <p class="eyebrow">New · you write the pipeline</p>
   <h3>Support vector machine (SVM) {{help svm}}</h3>
-  <p><strong>Core idea:</strong> draw the straight boundary that separates the two classes with the widest possible gap. A few training patients right at the edge of the gap, the support vectors, fix where it goes.</p>
+  <p><strong>Core idea:</strong> draw a straight boundary between the two classes with as wide a margin as possible. The training patients on or inside the margins, the support vectors, fix where it goes.</p>
   <dl>
-    <dt>The separating boundary</dt>
-    <dd>Patients on one side are scored as more likely positive, on the other side less likely. <code>LinearSVC</code> draws a straight boundary (a flat one, with more than two features), like logistic regression, but chooses it by the gap rather than by probabilities.</dd>
-    <dt>Its raw score is not a probability</dt>
-    <dd>An SVM outputs a raw score {{help raw-score}}: how far a patient is from the boundary, and on which side. Higher means more likely positive, but you can't read it as a chance. The supplied <code>with_probabilities()</code> helper converts it into a probability, so your SVM can be compared with the others.</dd>
+    <dt>The decision boundary</dt>
+    <dd>Each patient gets a score: a weighted sum of the features plus an intercept. The boundary is where the score is 0; patients on one side get positive scores (more likely positive), on the other negative scores. <code>LinearSVC</code> draws a straight boundary (a flat one, with more than two features), like logistic regression, but chooses it by the margin rather than by probabilities.</dd>
+    <dt>When the classes overlap</dt>
+    <dd>Real datasets usually overlap, so no straight line separates them perfectly. The SVM balances a wide margin against classification errors on the training patients. Support vectors can then lie on the margins or inside them, including patients on the wrong side of the boundary. The demo's made-up patients separate cleanly, so its support vectors sit exactly on the margins.</dd>
+    <dt>Score, distance and probability are different numbers</dt>
+    <dd>The raw score {{help raw-score}} says which side a patient is on and how strongly. The geometric distance from the boundary is the score divided by the length of the weights. Neither is a probability. The supplied <code>with_probabilities()</code> helper learns how to turn scores into calibrated probabilities from the training rows, so your SVM can be compared with the others. A score of 0 need not become a probability of exactly 0.5.</dd>
   </dl>
   <details class="demo" open>
     <summary>Try it: a boundary on two features</summary>
@@ -97,25 +143,43 @@
 <article class="card model-card" id="rf">
   <p class="eyebrow">Supplied · lecture §11</p>
   <h3>Random forest {{help random-forest}}</h3>
-  <p><strong>Core idea:</strong> many decision trees, each grown on a different sample of patients; the probability is the average of the trees' probabilities.</p>
-  <div class="illus"><svg viewBox="0 0 320 110" role="img" aria-label="Three small trees give probabilities 0.20, 0.40 and 0.30 for one patient; the forest averages them to 0.30">
-    <g transform="translate(20 10)"><circle class="soft" cx="40" cy="10" r="8"/><circle class="soft" cx="20" cy="40" r="8"/><circle class="soft" cx="60" cy="40" r="8"/><line class="axis" x1="40" y1="18" x2="20" y2="32"/><line class="axis" x1="40" y1="18" x2="60" y2="32"/><text x="22" y="72">0.20</text></g>
-    <g transform="translate(110 10)"><circle class="soft" cx="40" cy="10" r="8"/><circle class="soft" cx="20" cy="40" r="8"/><circle class="soft" cx="60" cy="40" r="8"/><line class="axis" x1="40" y1="18" x2="20" y2="32"/><line class="axis" x1="40" y1="18" x2="60" y2="32"/><text x="22" y="72">0.40</text></g>
-    <g transform="translate(200 10)"><circle class="soft" cx="40" cy="10" r="8"/><circle class="soft" cx="20" cy="40" r="8"/><circle class="soft" cx="60" cy="40" r="8"/><line class="axis" x1="40" y1="18" x2="20" y2="32"/><line class="axis" x1="40" y1="18" x2="60" y2="32"/><text x="22" y="72">0.30</text></g>
-    <text x="20" y="104">average of the trees (made up): (0.20 + 0.40 + 0.30) ÷ 3 = 0.30</text>
-  </svg></div>
-  <p><strong>Limitation:</strong> it nearly memorises its training patients (training AUROC close to 1), and one prediction is hard to explain.</p>
+  <p><strong>Core idea:</strong> many decision trees; the probability is the average of the trees' probabilities. Each tree is grown on a resample of the training patients (drawn with replacement), and each split considers only a random subset of the candidate features, so the trees differ.</p>
+  <p class="small"><svg class="key-inline" viewBox="0 0 22 22" width="18" height="18" aria-hidden="true"><path class="probe" d="M11,3L19,11L11,19L3,11Z"/></svg> <strong>One new patient (made up):</strong> age 62, BMI 33, systolic blood pressure (BP) 128. The highlighted path is the route this patient takes through each tree.</p>
+  <div class="illus illus-row trees">
+    <svg viewBox="0 0 200 205" role="img" aria-label="Tree 1: age 62 is 55 or over (yes), then systolic BP 128 is under 140 (no). Leaf probability 0.20."><path class="probe" d="M100,3L107,10L100,17L93,10Z"/><line class="edge on" x1="100" y1="17" x2="100" y2="32"/><line class="edge" x1="100" y1="58" x2="45" y2="92"/><text x="66.5" y="79" text-anchor="end">no</text><rect class="node" x="23" y="92" width="44" height="26" rx="6"/><text class="node-text" x="45" y="109" text-anchor="middle">0.05</text><line class="edge on" x1="100" y1="58" x2="140" y2="92"/><text x="126" y="79" text-anchor="start">yes</text><line class="edge on" x1="140" y1="118" x2="110" y2="152"/><text x="119" y="139" text-anchor="end">no</text><rect class="node on" x="88" y="152" width="44" height="26" rx="6"/><text class="node-text strong" x="110" y="169" text-anchor="middle">0.20</text><line class="edge" x1="140" y1="118" x2="172" y2="152"/><text x="162" y="139" text-anchor="start">yes</text><rect class="node" x="150" y="152" width="44" height="26" rx="6"/><text class="node-text" x="172" y="169" text-anchor="middle">0.55</text><rect class="node on" x="92" y="92" width="96" height="26" rx="6"/><text class="node-text strong" x="140" y="109" text-anchor="middle">BP ≥ 140?</text><rect class="node on" x="52" y="32" width="96" height="26" rx="6"/><text class="node-text strong" x="100" y="49" text-anchor="middle">Age ≥ 55?</text><text class="strong" x="100" y="198" text-anchor="middle">Tree 1: 0.20</text></svg>
+    <svg viewBox="0 0 200 205" role="img" aria-label="Tree 2: BMI 33 is 30 or over (yes), then age 62 is under 70 (no). Leaf probability 0.40."><path class="probe" d="M100,3L107,10L100,17L93,10Z"/><line class="edge on" x1="100" y1="17" x2="100" y2="32"/><line class="edge" x1="100" y1="58" x2="52" y2="92"/><text x="70" y="79" text-anchor="end">no</text><line class="edge" x1="52" y1="118" x2="27" y2="152"/><text x="33.5" y="139" text-anchor="end">no</text><rect class="node" x="5" y="152" width="44" height="26" rx="6"/><text class="node-text" x="27" y="169" text-anchor="middle">0.05</text><line class="edge" x1="52" y1="118" x2="76" y2="152"/><text x="70" y="139" text-anchor="start">yes</text><rect class="node" x="54" y="152" width="44" height="26" rx="6"/><text class="node-text" x="76" y="169" text-anchor="middle">0.15</text><rect class="node" x="8" y="92" width="88" height="26" rx="6"/><text class="node-text" x="52" y="109" text-anchor="middle">Age ≥ 45?</text><line class="edge on" x1="100" y1="58" x2="148" y2="92"/><text x="130" y="79" text-anchor="start">yes</text><line class="edge on" x1="148" y1="118" x2="124" y2="152"/><text x="130" y="139" text-anchor="end">no</text><rect class="node on" x="102" y="152" width="44" height="26" rx="6"/><text class="node-text strong" x="124" y="169" text-anchor="middle">0.40</text><line class="edge" x1="148" y1="118" x2="173" y2="152"/><text x="166.5" y="139" text-anchor="start">yes</text><rect class="node" x="151" y="152" width="44" height="26" rx="6"/><text class="node-text" x="173" y="169" text-anchor="middle">0.65</text><rect class="node on" x="104" y="92" width="88" height="26" rx="6"/><text class="node-text strong" x="148" y="109" text-anchor="middle">Age ≥ 70?</text><rect class="node on" x="52" y="32" width="96" height="26" rx="6"/><text class="node-text strong" x="100" y="49" text-anchor="middle">BMI ≥ 30?</text><text class="strong" x="100" y="198" text-anchor="middle">Tree 2: 0.40</text></svg>
+    <svg viewBox="0 0 200 205" role="img" aria-label="Tree 3: BMI 33 is under 35 (no), then systolic BP 128 is 120 or over (yes). Leaf probability 0.30."><path class="probe" d="M100,3L107,10L100,17L93,10Z"/><line class="edge on" x1="100" y1="17" x2="100" y2="32"/><line class="edge on" x1="100" y1="58" x2="60" y2="92"/><text x="74" y="79" text-anchor="end">no</text><line class="edge" x1="60" y1="118" x2="28" y2="152"/><text x="38" y="139" text-anchor="end">no</text><rect class="node" x="6" y="152" width="44" height="26" rx="6"/><text class="node-text" x="28" y="169" text-anchor="middle">0.10</text><line class="edge on" x1="60" y1="118" x2="92" y2="152"/><text x="82" y="139" text-anchor="start">yes</text><rect class="node on" x="70" y="152" width="44" height="26" rx="6"/><text class="node-text strong" x="92" y="169" text-anchor="middle">0.30</text><rect class="node on" x="12" y="92" width="96" height="26" rx="6"/><text class="node-text strong" x="60" y="109" text-anchor="middle">BP ≥ 120?</text><line class="edge" x1="100" y1="58" x2="160" y2="92"/><text x="136" y="79" text-anchor="start">yes</text><rect class="node" x="138" y="92" width="44" height="26" rx="6"/><text class="node-text" x="160" y="109" text-anchor="middle">0.70</text><rect class="node on" x="52" y="32" width="96" height="26" rx="6"/><text class="node-text strong" x="100" y="49" text-anchor="middle">BMI ≥ 35?</text><text class="strong" x="100" y="198" text-anchor="middle">Tree 3: 0.30</text></svg>
+  </div>
+  <p class="small"><span class="tag illustrative">Illustrative</span> <strong>Forest probability</strong> = average of the trees = (0.20 + 0.40 + 0.30) ÷ 3 = <strong>0.30</strong>. The activity's forest averages 300 trees.</p>
+  <p><strong>Limitation:</strong> can overfit; compare training and validation performance. One prediction is hard to explain.</p>
 </article>
 
 <article class="card model-card" id="lgbm">
   <p class="eyebrow">Supplied · lecture §11</p>
   <h3>Gradient boosting {{help gradient-boosting}}</h3>
-  <p><strong>Core idea:</strong> trees added in sequence, each one fixing the errors the earlier trees left.</p>
-  <div class="illus"><svg viewBox="0 0 320 110" role="img" aria-label="A bar chart: a starting guess, then three small corrections that move the prediction step by step">
-    <line class="axis" x1="20" x2="300" y1="90" y2="90"/>
-    <rect class="bar" x="30" y="60" width="50" height="30"/><rect class="bar" x="100" y="48" width="50" height="42" opacity="0.8"/><rect class="bar" x="170" y="40" width="50" height="50" opacity="0.65"/><rect class="bar" x="240" y="36" width="50" height="54" opacity="0.5"/>
-    <text x="30" y="106">start</text><text x="100" y="106">+ tree 1</text><text x="170" y="106">+ tree 2</text><text x="240" y="106">+ tree 3</text>
-  </svg></div>
+  <p><strong>Core idea:</strong> trees added in sequence. Each new tree learns a correction intended to reduce the current model's loss (how wrong its predictions are on the training patients). The corrections add up on the score scale, and the final score becomes a probability.</p>
+  <div class="illus">
+    <svg viewBox="0 0 320 230" role="img" aria-label="Waterfall chart of one made-up patient's model score in log-odds: start at minus 1.39 (probability 0.20), tree 1 adds 0.80, tree 2 subtracts 0.35, tree 3 adds 0.45, final score minus 0.49 (probability 0.38)">
+      <line class="axis" x1="62" x2="62" y1="40" y2="190"/><line class="axis" x1="62" x2="312" y1="60" y2="60"/>
+      <text x="58" y="64" text-anchor="end">0</text><text x="58" y="104" text-anchor="end">−0.5</text><text x="58" y="144" text-anchor="end">−1</text><text x="58" y="184" text-anchor="end">−1.5</text>
+      <text transform="translate(18 115) rotate(-90)" text-anchor="middle">Model score (log-odds)</text>
+      <rect class="bar" x="79" y="60" width="32" height="111.2"/>
+      <rect class="bar-up" x="124" y="107.2" width="32" height="64"/>
+      <rect class="bar-down" x="169" y="107.2" width="32" height="28"/>
+      <rect class="bar-up" x="214" y="99.2" width="32" height="36"/>
+      <rect class="bar" x="259" y="60" width="32" height="39.2"/>
+      <line class="step" x1="111" x2="124" y1="171.2" y2="171.2"/><line class="step" x1="156" x2="169" y1="107.2" y2="107.2"/><line class="step" x1="201" x2="214" y1="135.2" y2="135.2"/><line class="step" x1="246" x2="259" y1="99.2" y2="99.2"/>
+      <text class="strong" x="95" y="185" text-anchor="middle">−1.39</text><text class="strong" x="140" y="101" text-anchor="middle">+0.80</text><text class="strong" x="185" y="149" text-anchor="middle">−0.35</text><text class="strong" x="230" y="93" text-anchor="middle">+0.45</text><text class="strong" x="275" y="113" text-anchor="middle">−0.49</text>
+      <text x="95" y="206" text-anchor="middle">start</text><text x="140" y="206" text-anchor="middle">tree 1</text><text x="185" y="206" text-anchor="middle">tree 2</text><text x="230" y="206" text-anchor="middle">tree 3</text><text x="275" y="206" text-anchor="middle">final</text>
+      <text x="95" y="224" text-anchor="middle">p = 0.20</text><text class="strong" x="275" y="224" text-anchor="middle">p = 0.38</text>
+    </svg>
+  </div>
+  <ul class="legend">
+    <li><svg class="key" viewBox="0 0 22 22" aria-hidden="true"><rect class="bar" x="5" y="3" width="12" height="16"/></svg>starting and final score</li>
+    <li><svg class="key" viewBox="0 0 22 22" aria-hidden="true"><rect class="bar-up" x="5" y="3" width="12" height="16"/></svg>tree raises the score</li>
+    <li><svg class="key" viewBox="0 0 22 22" aria-hidden="true"><rect class="bar-down" x="5" y="3" width="12" height="16"/></svg>tree lowers the score</li>
+  </ul>
+  <p class="small"><span class="tag illustrative">Illustrative</span> One made-up patient. The start is the log-odds of the training prevalence, 0.20: ln(0.20 ÷ 0.80) = −1.39. Final score: −1.39 + 0.80 − 0.35 + 0.45 = −0.49, so the probability is 1 ÷ (1 + e<sup>0.49</sup>) = <strong>0.38</strong>. Each correction is on the log-odds scale, not a probability, and a tree can lower a patient's prediction as well as raise it.</p>
   <p><strong>Limitation:</strong> with many trees it can fit noise in the training patients; it has several settings, all left at LightGBM's defaults here.</p>
 </article>
 

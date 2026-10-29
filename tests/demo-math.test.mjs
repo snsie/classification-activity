@@ -1,7 +1,7 @@
 // Checks the Models page demos' math (node --test tests/). All demo data is made up.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { KNN_DEMO, SVM_DEMO, distance, knnPoints, knnPredict, scaler, svmDistance, svmLineZ, svmScore } from "../site/assets/demo-math.js";
+import { KNN_DEMO, SVM_DEMO, distance, knnPoints, knnPredict, scaler, svmDistance, svmLineX, svmLineZ, svmScore, svmSide } from "../site/assets/demo-math.js";
 
 test("kNN points are deterministic and contain both classes", () => {
   const a = knnPoints(), b = knnPoints();
@@ -54,4 +54,15 @@ test("SVM helpers: the boundary line has score 0, distance is |score| ÷ ‖w‖
   for (const x of [0, 2.5, 6]) assert.ok(Math.abs(svmScore(m, x, svmLineZ(m, x))) < 1e-9);
   assert.ok(Math.abs(svmScore(m, 1, svmLineZ(m, 1, 1)) - 1) < 1e-9);
   assert.equal(svmDistance(m, 0, 0), Math.abs(m.b) / Math.hypot(...m.w));
+  for (const z of [0, 3, 6]) assert.ok(Math.abs(svmLineZ(m, svmLineX(m, z, -1), -1) - z) < 1e-9);
+});
+
+test("SVM sides: each shaded region has the right sign and together they cover the plot", () => {
+  const m = SVM_DEMO;
+  const area = (poly) => Math.abs(poly.reduce((s, [x, z], i) => { const [x2, z2] = poly[(i + 1) % poly.length]; return s + x * z2 - x2 * z; }, 0)) / 2;
+  const pos = svmSide(m, 1), neg = svmSide(m, -1);
+  for (const [x, z] of pos) assert.ok(svmScore(m, x, z) >= -1e-9);
+  for (const [x, z] of neg) assert.ok(svmScore(m, x, z) <= 1e-9);
+  const [lo, hi] = m.range;
+  assert.ok(Math.abs(area(pos) + area(neg) - (hi - lo) ** 2) < 1e-9);
 });

@@ -170,31 +170,31 @@
   "random-forest": {
     "term": "Random forest",
     "group": "Models",
-    "short": "Many decision trees, each grown on a different sample of patients; the probability is the average of the trees' probabilities.",
+    "short": "Many decision trees, each grown on a resample of the patients and choosing each split from a random subset of features; the probability is the average of the trees' probabilities.",
     "more": "Lecture §11. Here: 300 trees, at least 3 training patients per leaf."
   },
   "gradient-boosting": {
     "term": "Gradient boosting",
     "group": "Models",
-    "short": "Trees added in sequence, each one fixing the errors the earlier trees left.",
-    "more": "Lecture §11. Here: LightGBM with its default settings, as in the lecture."
+    "short": "Trees added in sequence, each one learning a correction to the current model's score that reduces its loss.",
+    "more": "Corrections add up on the log-odds scale and can lower a prediction as well as raise it; the final score becomes a probability. Lecture §11. Here: LightGBM with its default settings, as in the lecture."
   },
   "knn": {
     "term": "k-nearest neighbours (kNN)",
     "group": "Models",
     "short": "A patient's probability is the share of positives among the k most similar training patients. Here k = 25.",
-    "more": "“Similar” means close in distance across all features, so features must be on the same scale. Small k follows individual patients closely; large k smooths."
+    "more": "“Similar” means close in distance across all features, so features are scaled first: scaling stops a feature's units from dominating the distance, but doesn't make every feature equally informative. Small k follows individual patients closely; large k smooths."
   },
   "svm": {
     "term": "Support vector machine (SVM)",
     "group": "Models",
-    "short": "Draws the boundary that separates the two classes with the widest possible gap. A patient's raw score is their signed distance from that boundary.",
-    "more": "The raw score is not a probability. Higher means “more likely positive”, but you can't read it as a chance; the supplied helper converts it. Lecture §1 warns about scores like this."
+    "short": "Draws a straight boundary between the two classes with as wide a margin as possible. A patient's raw score is positive on one side of the boundary and negative on the other.",
+    "more": "The raw score is not a probability, and it isn't the geometric distance either (that is the score divided by the length of the weights). Higher means “more likely positive”, but you can't read it as a chance; the supplied helper converts it. Lecture §1 warns about scores like this."
   },
   "raw-score": {
     "term": "Raw score",
     "group": "Models",
-    "short": "A number a model outputs that ranks patients but is not a probability, such as an SVM's distance from its boundary.",
+    "short": "A number a model outputs that ranks patients but is not a probability, such as an SVM's score (0 on its boundary).",
     "more": "Higher still means “more likely”, but don't read it as a chance. Lecture §1."
   },
   "pipeline": {
