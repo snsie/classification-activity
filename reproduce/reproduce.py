@@ -65,10 +65,10 @@ def compare(built: Path, committed: Path) -> list[str]:
 
 
 def check_reference(ref: dict) -> list[str]:
-    """check.py's REFERENCE_LOGREG must equal the reference run."""
+    """check.py's REFERENCE_TEST_AUROC must equal the reference run."""
     text = (STARTER / "check.py").read_text(encoding="utf-8")
-    got = json.loads(re.search(r"REFERENCE_LOGREG = (\{.*?\})", text).group(1).replace("'", '"'))
-    return [] if got == ref else [f"check.py REFERENCE_LOGREG {got} differs from the reference run {ref}"]
+    got = json.loads(re.search(r"REFERENCE_TEST_AUROC = (\{.*?\}\})", text, flags=re.S).group(1).replace("'", '"'))
+    return [] if got == ref else [f"check.py REFERENCE_TEST_AUROC {got} differs from the reference run {ref}"]
 
 
 def main() -> None:
@@ -86,12 +86,12 @@ def main() -> None:
             shutil.copytree(STARTER, target, ignore=shutil.ignore_patterns("__pycache__"))
         print("2. Datasets, dictionary and manifest")
         make_data.make_data(a.raw, target / "data", raw_files)
-        print("3. Baseline-only results and the logreg reference run")
+        print("3. Baseline-only results and the reference run")
         build_results.baseline_results(target)
         ref = build_results.reference_run(target)
         problems = check_reference(ref)
         if not a.check:
-            (HERE / "reference.json").write_text(json.dumps({"logreg_test_auroc": ref, "tolerance": 0.005}, indent=2) + "\n")
+            (HERE / "reference.json").write_text(json.dumps({"test_auroc": ref, "tolerance": 0.005}, indent=2) + "\n")
             print(f"Rebuilt {len(GENERATED) + 1} files in {STARTER}.")
             if problems:
                 print("Update check.py: " + problems[0])

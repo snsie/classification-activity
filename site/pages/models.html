@@ -1,38 +1,34 @@
-<!--meta {"title":"Models","description":"Four classifiers plus a baseline: one core idea, a tiny illustration and one practical limitation each. kNN is new.","scripts":["demos.js"]} -->
+<!--meta {"title":"Models","description":"Four classifiers plus a baseline, built by your AI agent to a fixed spec: one core idea, a tiny illustration and one practical limitation each. kNN is new.","scripts":["demos.js"]} -->
 <p class="eyebrow">The work</p>
 <h1>Models</h1>
-<p class="lead">Four classifiers plus a baseline, all fixed. Everyone compares the same models with the same settings: you don't tune anything. Logistic regression, random forest and gradient boosting are from the lecture. kNN is new, and you write its pipeline {{help pipeline}}.</p>
+<p class="lead">Four classifiers plus a baseline, all fixed. Everyone compares the same models with the same settings: nothing is tuned. Logistic regression, random forest and gradient boosting are from the lecture; kNN is new. Your agent writes all five pipelines {{help pipeline}} to this spec.</p>
 
 <div class="table-wrap"><table>
-  <thead><tr><th scope="col">Key</th><th scope="col">Model</th><th scope="col">Pipeline</th><th scope="col">Written by</th></tr></thead>
+  <thead><tr><th scope="col">Key</th><th scope="col">Model</th><th scope="col">Pipeline</th></tr></thead>
   <tbody>
-    <tr><td><code>baseline</code></td><td>Prevalence baseline</td><td><code>DummyClassifier(strategy="prior")</code></td><td>Supplied</td></tr>
-    <tr><td><code>logreg</code></td><td>Logistic regression</td><td>impute → scale → <code>LogisticRegression(max_iter=5000)</code></td><td>Supplied (worked example)</td></tr>
-    <tr><td><code>knn</code></td><td>k-nearest neighbours</td><td>impute → scale → <code>KNeighborsClassifier(n_neighbors=25)</code></td><td><strong>You</strong></td></tr>
-    <tr><td><code>rf</code></td><td>Random forest</td><td>impute → <code>RandomForestClassifier(n_estimators=300, min_samples_leaf=3, random_state=0)</code></td><td>Supplied</td></tr>
-    <tr><td><code>lgbm</code></td><td>Gradient boosting</td><td>LightGBM with the lecture's settings: <code>LGBMClassifier(random_state=0)</code>, defaults otherwise</td><td>Supplied</td></tr>
+    <tr><td><code>baseline</code></td><td>Prevalence baseline</td><td><code>DummyClassifier(strategy="prior")</code></td></tr>
+    <tr><td><code>logreg</code></td><td>Logistic regression</td><td>encode → impute → scale → <code>LogisticRegression(max_iter=5000)</code></td></tr>
+    <tr><td><code>knn</code></td><td>k-nearest neighbours</td><td>encode → impute → scale → <code>KNeighborsClassifier(n_neighbors=25)</code></td></tr>
+    <tr><td><code>rf</code></td><td>Random forest</td><td>encode → impute → <code>RandomForestClassifier(n_estimators=300, min_samples_leaf=3, random_state=0)</code></td></tr>
+    <tr><td><code>lgbm</code></td><td>Gradient boosting</td><td>encode → LightGBM with the lecture's settings: <code>LGBMClassifier(random_state=0)</code>, defaults otherwise</td></tr>
   </tbody>
 </table></div>
-<p class="small">Every pipeline starts with the supplied <code>encode()</code> step, which turns each text category into 0/1 columns, learned from the training rows only. “Impute” fills each missing value with the training median {{help imputation}}; “scale” puts every feature on the same scale {{help scaling}}.</p>
+<p class="small">“Encode” is the supplied <code>encode()</code> step, which turns each text category into 0/1 columns, learned from the training rows only. “Impute” fills each missing value with the training median {{help imputation}}; “scale” puts every feature on the same scale {{help scaling}}. <code>AGENT_BRIEF.md</code> gives your agent the exact code-level spec.</p>
 
-<h2>Write your pipeline</h2>
-<p>Open <code>analysis/models.py</code>. Copy the shape of <code>logreg()</code>:</p>
-<pre><code>def logreg():
-    return make_pipeline(
-        encode(),                              # 1. text categories → 0/1 columns
-        SimpleImputer(strategy="median"),      # 2. fill missing values with the training median
-        StandardScaler(),                      # 3. put every feature on the same scale
-        LogisticRegression(max_iter=5000),     # 4. the classifier
-    )</code></pre>
+<h2 id="write">Have your agent write the models</h2>
+<div class="callout agent-task">
+  <p class="callout-title">Ask your agent</p>
+  <p>Write <code>analysis/models.py</code> to the Models spec in <code>AGENT_BRIEF.md</code>, reusing <code>encode()</code> and the existing workflow. Then explain each pipeline, and how the workflow runs them, in a few sentences.</p>
+</div>
 <ul>
-  <li><strong>kNN:</strong> the same four steps, ending in <code>KNeighborsClassifier(n_neighbors=25)</code>.</li>
-  <li><strong>Keep scaling inside the pipeline.</strong> Never scale the whole dataset first: the scaler would learn from the test rows. <code>python check.py --stage results</code> checks this.</li>
+  <li><strong>Check the explanation against the table above:</strong> every step that learns from data (encoding, imputation, scaling) sits inside the pipeline, so it learns from the training rows only.</li>
+  <li><strong>Commit <code>Before results</code> first.</strong> The agent runs the models in the next step, <a href="analysis.html">Analysis</a>, and <code>python check.py --stage results</code> then checks every pipeline and setting.</li>
 </ul>
 
 <h2>The four classifiers plus a baseline</h2>
 
 <article class="card model-card" id="baseline">
-  <p class="eyebrow">Supplied</p>
+  <p class="eyebrow">The yardstick</p>
   <h3>Prevalence baseline {{help prevalence-baseline}}</h3>
   <p><strong>Core idea:</strong> every new patient gets the same probability: the share of training patients who had the outcome.</p>
   <div class="illus illus-row">
@@ -63,7 +59,7 @@
 </article>
 
 <article class="card model-card" id="logreg">
-  <p class="eyebrow">Supplied · worked example</p>
+  <p class="eyebrow">From the lecture</p>
   <h3>Logistic regression {{help logistic-regression}}</h3>
   <p><strong>Core idea:</strong> a weighted sum of the features plus an intercept gives each patient a score. An S-shaped curve (the sigmoid) maps that score to a probability between 0 and 1.</p>
   <p class="equation" role="math" aria-label="p equals 1 over 1 plus e to the minus z, where z equals b 0 plus b 1 x 1 plus b 2 x 2 and so on up to b k x k">
@@ -109,7 +105,7 @@
 </article>
 
 <article class="card model-card" id="knn">
-  <p class="eyebrow">New · you write the pipeline</p>
+  <p class="eyebrow">New</p>
   <h3>k-nearest neighbours (kNN) {{help knn}}</h3>
   <p><strong>Core idea:</strong> a new patient's probability is the share of positives among the k most similar training patients. In the activity, k is fixed at 25.</p>
   <dl>
@@ -127,7 +123,7 @@
 </article>
 
 <article class="card model-card" id="rf">
-  <p class="eyebrow">Supplied</p>
+  <p class="eyebrow">From the lecture</p>
   <h3>Random forest {{help random-forest}}</h3>
   <p><strong>Core idea:</strong> many decision trees; the probability is the average of the trees' probabilities. Each tree is grown on a resample of the training patients (drawn with replacement), and each split considers only a random subset of the candidate features, so the trees differ.</p>
   <p class="small"><svg class="key-inline" viewBox="0 0 22 22" width="18" height="18" aria-hidden="true"><path class="probe" d="M11,3L19,11L11,19L3,11Z"/></svg> <strong>One new patient (made up):</strong> age 62, BMI 33, systolic blood pressure (BP) 128. The highlighted path is the route this patient takes through each tree.</p>
@@ -141,7 +137,7 @@
 </article>
 
 <article class="card model-card" id="lgbm">
-  <p class="eyebrow">Supplied</p>
+  <p class="eyebrow">From the lecture</p>
   <h3>Gradient boosting {{help gradient-boosting}}</h3>
   <p><strong>Core idea:</strong> trees added in sequence. Each new tree learns a correction intended to reduce the current model's loss (how wrong its predictions are on the training patients). The corrections add up on the score scale, and the final score becomes a probability.</p>
   <div class="illus">
@@ -170,7 +166,7 @@
 </article>
 
 <h2>Common questions</h2>
-<details><summary>Why can't I tune k?</summary><div class="details-body">
+<details><summary>Why can't my agent tune k?</summary><div class="details-body">
   <p>Everyone compares the same fixed models, so differences come from the data and the comparison, not from tuning effort. Tuning is outside this activity.</p></div></details>
-<details><summary>My pipeline runs, but <code>check.py</code> says scaling isn't inside it.</summary><div class="details-body">
-  <p>Return one <code>make_pipeline(...)</code> with <code>encode()</code>, <code>SimpleImputer</code> and <code>StandardScaler</code> as steps before the classifier. Don't transform <code>X</code> yourself before training.</p></div></details>
+<details><summary><code>check.py</code> says a model doesn't match the spec.</summary><div class="details-body">
+  <p>Give your agent the failure line: it names the steps and settings that model must have. The fix belongs in <code>analysis/models.py</code>, as one pipeline per model; nothing may transform the data before training.</p></div></details>

@@ -1,57 +1,66 @@
-<!--meta {"title":"Overview","description":"A take-home activity: run a supplied Python workflow on two health datasets, train on a training set and evaluate on a test set, and build one app that helps a clinical lead judge whether any classifier is fit for each job."} -->
+<!--meta {"title":"Overview","description":"A take-home activity: with an AI agent writing the code, train classifiers on two health datasets, evaluate them on a test set, and build one app that helps a clinical lead judge whether any classifier is fit for each job."} -->
 <p class="eyebrow">M11 take-home activity</p>
 <h1>Judge the Model</h1>
-<p class="lead">Run a supplied Python workflow that trains four classifiers plus a baseline on two health datasets and evaluates them on a test set. Then build one app, in Streamlit or Node.js, that helps a clinical lead {{help clinical-lead}} decide whether any model is fit for each job.</p>
+<p class="lead">Train four classifiers plus a baseline on two health datasets, evaluate them on a test set, and build one app, in Streamlit or Node.js, that helps a clinical lead {{help clinical-lead}} decide whether any model is fit for each job. An AI agent writes the code; you make the decisions.</p>
 
 <p class="core-question">Which classifier would you trust for this job, at what threshold, and with what limits?</p>
 
 <h2>At a glance</h2>
 <dl class="facts">
   <dt>Who</dt><dd>Individual, take-home</dd>
-  <dt>Analyze</dt><dd>Run a supplied Python workflow that fits each model on a training set {{help training-set}} and evaluates it on a test set {{help test-set}}. You write one model pipeline {{help pipeline}}. <a href="analysis.html">Analysis</a></dd>
-  <dt>Build</dt><dd>One app with four sections, in Streamlit (Python) or Node.js (JavaScript), that helps a clinical lead judge whether any model is fit for each job. It reads the results your Python analysis exports {{help results-files}}.</dd>
+  <dt>Analyze</dt><dd>A supplied Python workflow fits each model on a training set {{help training-set}} and evaluates it on a test set {{help test-set}}. Your agent writes the model pipelines {{help pipeline}} to a fixed spec. <a href="analysis.html">Analysis</a></dd>
+  <dt>Build</dt><dd>One app with four sections, in Streamlit (Python) or Node.js (JavaScript), that helps a clinical lead judge whether any model is fit for each job. It reads the results your Python analysis exports {{help results-files}}. Your agent writes the code; you run the app and check it.</dd>
   <dt>Host</dt><dd>Streamlit Community Cloud or GitHub Pages, with your code in a public GitHub repository. <a href="hosting.html">Setup &amp; publish</a></dd>
   <dt>Data</dt><dd>Readmission and diabetes, supplied as CSVs with a fixed train/test split. <a href="data.html">Data &amp; files</a></dd>
   <dt>Submit</dt><dd>Your public GitHub repository link (app link on the first line of the README), plus five Canvas answers. <a href="submit.html">Submit</a></dd>
   <dt>Audience</dt><dd>A clinical lead who knows the clinical problem but not the metrics, and who must decide whether to use a model</dd>
 </dl>
 
+<h2 id="agent">How you work with your agent</h2>
+<ul>
+  <li><strong>Your agent writes the code:</strong> the environment setup, the model-training module, a script that launches your app, and the app's four sections. It reads <code>AGENT_BRIEF.md</code>, which holds its spec and rules.</li>
+  <li><strong>You make the clinical decisions:</strong> what matters for each job, which model and threshold you would recommend, and what your app shows the clinical lead.</li>
+  <li><strong>You verify:</strong> you run the checks and the app yourself, and test every section with its reviewer task.</li>
+  <li><strong>You write your own responses:</strong> <code>DECISIONS.md</code> and the Canvas answers are yours, not the agent's.</li>
+</ul>
+<p>Start your agent with the <a href="hosting.html#start-prompt">starting prompt</a>. Each later page has a short task to give it.</p>
+
 <h2 id="start">Start here</h2>
 <ol class="steps">
   <li><strong>Set up</strong>
     <ul>
-      <li>Download the starter, create a public GitHub repository {{help github-backup}}, use <code>uv</code> to create a virtual environment with the requirements, and run <code>python check.py --stage setup</code>.</li>
-      <li>Choose <a href="hosting.html#choose">Streamlit or Node.js</a> and publish the untouched starter. It shows baseline-only results.</li>
+      <li>Download the starter, create a public GitHub repository {{help github-backup}}, and give your agent the <a href="hosting.html#start-prompt">starting prompt</a>. It sets up the environment.</li>
+      <li>Have it write <code>run_app.sh</code> for <a href="hosting.html#choose">Streamlit or Node.js</a>, then run <code>bash run_app.sh</code> yourself. Publish the untouched starter. It shows baseline-only results.</li>
     </ul>
-    <span class="done-when"><strong>Done when:</strong> the check passes and your app link loads in a private window.</span></li>
+    <span class="done-when"><strong>Done when:</strong> <code>python check.py --stage setup</code> passes, the app runs on your computer, and your app link loads in a private window.</span></li>
   <li><strong>Decide what matters</strong>
     <ul>
       <li>Read both dataset scenarios: <a href="data.html#readmission">30-day readmission</a> and <a href="data.html#diabetes">diabetes screening</a>.</li>
-      <li>Then, before you look at any results, fill in <code>Before results</code> in <code>DECISIONS.md</code> {{help decisions-md}}: the positive class for each job, and which error matters more. Commit and push.</li>
+      <li>Then, before you look at any results, fill in <code>Before results</code> in <code>DECISIONS.md</code> {{help decisions-md}} yourself: the positive class for each job, and which error matters more. Commit and push.</li>
     </ul>
     <span class="done-when"><strong>Done when:</strong> the commit is on GitHub.</span></li>
-  <li><strong>Write the kNN pipeline and run the analysis</strong>
+  <li><strong>Train the models and run the analysis</strong>
     <ul>
-      <li>Complete the kNN <code>TODO</code> in <code>analysis/models.py</code>, following the logistic regression example. <a href="models.html">Models</a></li>
-      <li>Run <code>python -m analysis</code>. <a href="analysis.html">Analysis</a></li>
+      <li>Have your agent write <code>analysis/models.py</code> to the spec. <a href="models.html">Models</a></li>
+      <li>Have it run <code>python -m analysis</code>, fix any error and explain the results. <a href="analysis.html">Analysis</a></li>
     </ul>
-    <span class="done-when"><strong>Done when:</strong> <code>python check.py --stage results</code> passes. Commit and push <code>results/</code>.</span></li>
+    <span class="done-when"><strong>Done when:</strong> you run <code>python check.py --stage results</code> and it passes. Commit and push <code>results/</code>.</span></li>
   <li><strong>Build your app</strong>
     <ul>
-      <li>Build the four sections to their required minimums for a clinical lead.</li>
-      <li>Commit and push, then test in a private window.</li>
+      <li>Give your agent each section's task, so it builds the four sections to their required minimums.</li>
+      <li>Run the app yourself and do each section's reviewer task. Commit and push, then test in a private window.</li>
     </ul>
     <span class="done-when"><strong>Done when:</strong> every section works for both datasets and the four classifiers plus a baseline.</span></li>
   <li><strong>Write your recommendations</strong>
     <ul>
-      <li>Fill in <code>Recommendations</code> in <code>DECISIONS.md</code>: for each job, a model and threshold, or “none is adequate”, with a reason.</li>
+      <li>Fill in <code>Recommendations</code> in <code>DECISIONS.md</code> yourself: for each job, a model and threshold, or “none is adequate”, with a reason.</li>
       <li>Fill in <code>Design choice and AI use</code>: one thing you chose to show or leave out for your clinical lead, and one AI suggestion you turned down.</li>
-      <li>Run <code>python -m analysis</code> again so your app shows them, then commit and push.</li>
+      <li>Rerun <code>python -m analysis</code> (or have your agent do it) so your app shows them, then commit and push.</li>
     </ul>
     <span class="done-when"><strong>Done when:</strong> <code>python check.py</code> passes.</span></li>
   <li><strong>Answer the Canvas questions</strong>
     <ul>
-      <li>Five answers of 100–150 words each, citing numbers from your app. The questions are on Canvas.</li>
+      <li>Five answers of 100–150 words each, in your own words, citing numbers from your app. The questions are on Canvas.</li>
       <li>Submit your repository link.</li>
     </ul></li>
 </ol>
@@ -98,11 +107,10 @@
 </ul>
 <h3>AI use</h3>
 <ul>
-  <li>You may use an AI agent to write app code, debug, explain the starter, and help with the kNN pipeline.</li>
+  <li>Your agent writes and debugs the code. <code>AGENT_BRIEF.md</code> keeps it to the protocol and tells it to leave your decisions and answers to you.</li>
   <li>You make every decision in <code>DECISIONS.md</code> yourself, and you write your Canvas answers in your own words.</li>
-  <li>Check what the agent gives you. When you submit, say which AI tools you used, or “none”.</li>
+  <li>Check what the agent gives you: run the checks and the app yourself. When you submit, say which AI tools you used.</li>
   <li>Ask your agent for options, not answers. In <code>DECISIONS.md</code> you record one AI suggestion you turned down, and your design choice must be your own idea.</li>
   <li>Follow the course AI policy for anything not covered here.</li>
   <li>Optional and ungraded: save your prompts in <code>prompts/</code>, one file per session.</li>
 </ul>
-<p>Have your agent read <code>AGENT_BRIEF.md</code> first. It holds the rules that keep the analysis fair and the numbers right.</p>

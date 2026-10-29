@@ -26,6 +26,7 @@ PAGES = ["", "models.html", "analysis.html", "beyond-accuracy.html", "threshold.
          "train-vs-test.html", "data.html", "hosting.html", "submit.html", "glossary.html"]
 AXE_URL = "https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.2/axe.min.js"
 CACHE = Path(__file__).resolve().parent / ".cache"
+STARTER = Path(__file__).resolve().parent.parent / "starter"  # the downloadable zip must match it
 failures: list[str] = []
 
 
@@ -83,11 +84,16 @@ with sync_playwright() as p:
         if t.endswith(".zip"):
             z = zipfile.ZipFile(io.BytesIO(body))
             names = z.namelist()
-            need = ["judge-the-model/check.py", "judge-the-model/DECISIONS.md", "judge-the-model/analysis/models.py",
+            need = ["judge-the-model/check.py", "judge-the-model/DECISIONS.md", "judge-the-model/AGENT_BRIEF.md", "judge-the-model/analysis/data.py",
                     "judge-the-model/m11.py", "judge-the-model/streamlit_app.py", "judge-the-model/web/app.js", "judge-the-model/package.json",
                     "judge-the-model/results/diabetes.json", "judge-the-model/data/manifest.json", "judge-the-model/README.md"]
             check(z.testzip() is None and all(n in names for n in need), f"starter zip valid with {len(names)} files")
             check(not any("__pycache__" in n or "solution" in n or "reproduce" in n for n in names), "starter zip holds no caches or instructor files")
+            check(not any(n.endswith(("analysis/models.py", "run_app.sh")) for n in names), "starter zip leaves models.py and run_app.sh to the agent")
+            source = {f"judge-the-model/{p.relative_to(STARTER).as_posix()}": p for p in STARTER.rglob("*")
+                      if p.is_file() and "__pycache__" not in p.parts and ".venv" not in p.parts and p.name != ".DS_Store"}
+            check(set(names) == set(source) and all(z.read(n) == source[n].read_bytes() for n in names),
+                  "starter zip matches starter/ file for file")
             readme = z.read("judge-the-model/README.md").decode()
             check("paste your public app link" in readme.splitlines()[0], "starter README has the app-link placeholder on line 1")
     for a in sorted(anchors):
@@ -224,7 +230,17 @@ with sync_playwright() as p:
     page.locator("#sub-3").check()
     page.reload()
     check(page.locator("#sub-1").is_checked() and page.locator("#sub-3").is_checked(), "ticks survive a reload")
-    check("2 of 5 done" in page.locator('.checklist-status[data-for="submit"]').inner_text(), "progress count shown")
+    check("2 of 6 done" in page.locator('.checklist-status[data-for="submit"]').inner_text(), "progress count shown")
+
+    # ---- the starting prompt can be copied
+    print("Starting prompt")
+    c = browser.new_context(permissions=["clipboard-read", "clipboard-write"])
+    v = c.new_page()
+    v.goto(BASE + "hosting.html#start-prompt")
+    v.get_by_role("button", name="Copy prompt").click()
+    copied = v.evaluate("navigator.clipboard.readText()")
+    check(copied.startswith("Read AGENT_BRIEF.md") and "check.py --stage setup" in copied, "Copy prompt copies the starting prompt")
+    c.close()
 
     # ---- automated accessibility scan
     print("Accessibility (axe-core, WCAG 2 A/AA)")

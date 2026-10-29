@@ -1,6 +1,6 @@
 // Starter Node app: four plain sections that read results/ and show correct numbers.
 //
-// Run locally:  npm start   (then open http://localhost:8766/)
+// Run locally:  bash run_app.sh   (your agent writes it; it runs node web/server.mjs, then open http://localhost:8766/)
 // Build each section up to its required minimum (see the activity website). Keep every number
 // coming from m11.js, and label every table and plot "Training" or "Test".
 import * as m11 from "./m11.js";
@@ -17,7 +17,7 @@ const cache = {};
 
 async function load(name) {
   if (!(name in cache)) {
-    // ../results/ is next to web/ on GitHub Pages; npm start serves it at the same address.
+    // ../results/ is next to web/ on GitHub Pages; web/server.mjs serves it at the same address.
     const r = await fetch(`../results/${name}.json`);
     cache[name] = r.ok ? await r.json() : null;
   }

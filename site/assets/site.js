@@ -1,4 +1,4 @@
-// Site behaviour: mobile menu, help buttons (?) and saved checklists.
+// Site behaviour: mobile menu, help buttons (?), saved checklists and prompt copy buttons.
 import { TERMS } from "./terms.js";
 
 // ---- menu
@@ -114,4 +114,23 @@ document.querySelectorAll("ul.checklist[data-store]").forEach((list) => {
     });
   });
   update();
+});
+
+// ---- copy button under each agent prompt
+document.querySelectorAll("pre.prompt").forEach((pre) => {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "copy";
+  btn.textContent = "Copy prompt";
+  btn.setAttribute("aria-live", "polite");
+  btn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(pre.innerText.trim());
+      btn.textContent = "Copied";
+    } catch {
+      btn.textContent = "Select the text above to copy it";
+    }
+    setTimeout(() => { btn.textContent = "Copy prompt"; }, 2500);
+  });
+  pre.after(btn);
 });

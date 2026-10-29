@@ -4,8 +4,8 @@
 
 For each dataset it fits every model on the training rows, predicts the training and test rows,
 and writes results/<dataset>.json. It also copies your DECISIONS.md answers to
-results/decisions.json, so rerun it after you edit DECISIONS.md. It refuses to run until the
-kNN TODO in analysis/models.py is complete.
+results/decisions.json, so rerun it after you edit DECISIONS.md. The models come from
+analysis/models.py, which your AI agent writes to the spec in AGENT_BRIEF.md.
 """
 
 from __future__ import annotations
@@ -18,7 +18,6 @@ from importlib.metadata import version
 
 import m11
 from analysis import data, evaluate, export
-from analysis.models import MODELS
 
 RESULTS = export.RESULTS
 
@@ -57,11 +56,21 @@ def train_and_test(key: str, models: dict, created: str | None = None, versions_
     return out
 
 
-def main() -> None:
+def models() -> dict:
+    """MODELS from analysis/models.py: name → a function that builds that model's pipeline."""
     try:
-        MODELS["knn"]()
-    except NotImplementedError:
-        stop("Complete the knn() TODO in analysis/models.py first, following the logreg() example.")
+        from analysis.models import MODELS
+    except ModuleNotFoundError as e:
+        if e.name != "analysis.models":
+            raise
+        stop("analysis/models.py is missing; ask your agent to write it to the spec in AGENT_BRIEF.md.")
+    if list(MODELS) != m11.MODELS:
+        stop(f"MODELS in analysis/models.py must have exactly these keys, in this order: {', '.join(m11.MODELS)}.")
+    return MODELS
+
+
+def main() -> None:
+    MODELS = models()
     try:
         decisions = export.read()
     except export.DecisionsError as e:

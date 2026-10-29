@@ -2,7 +2,7 @@
 
 **Website: <https://snsie.github.io/classification-activity/>**
 
-Students run a supplied Python workflow that trains four classifiers (plus a prevalence baseline) on the training rows of two health datasets and scores them on the test rows, write their decisions in `DECISIONS.md`, and build one app with four sections, in Streamlit or Node.js (their choice), that helps a clinical lead judge whether any model is fit for each job. They submit a public GitHub repository (app link on the README's first line) and five Canvas answers.
+Students work with an AI coding agent: the agent writes the model-training module (`analysis/models.py`, to a fixed spec in `AGENT_BRIEF.md`), a Bash launcher (`run_app.sh`) and the app code; the students make the clinical decisions in `DECISIONS.md`, run the checks and the app themselves, and write their own answers. A supplied Python workflow trains four classifiers (plus a prevalence baseline) on the training rows of two health datasets and scores them on the test rows, and the app, with four sections in Streamlit or Node.js (their choice), helps a clinical lead judge whether any model is fit for each job. They submit a public GitHub repository (app link on the README's first line) and five Canvas answers.
 
 **Central question:** Which classifier would you trust for this job, at what threshold, and with what limits?
 
@@ -11,12 +11,12 @@ Modelled on the M10 activity ([regression-activity](https://github.com/snsie/reg
 ## What's here
 | Folder | What it is |
 |---|---|
-| [`starter/`](starter) | **The student starter**, also downloadable as a zip from the website: the two datasets with a fixed train/test split and their dictionary (`data/`), the workflow (`analysis/`), the shared metric helpers (`m11.py`), the app twice (Streamlit `streamlit_app.py`; Node `web/` + `package.json`, no npm dependencies, hosted as static files on GitHub Pages), baseline-only `results/`, `DECISIONS.md`, `AGENT_BRIEF.md`, `SETUP.md` and `check.py`. |
-| [`reproduce/`](reproduce) | Instructor only (not linked from the site). Rebuilds `starter/data/` and `starter/results/` from the raw UCI and CDC files, with SHA-256 checks, and runs the logistic-regression reference run that `check.py` compares against. |
+| [`starter/`](starter) | **The student starter**, also downloadable as a zip from the website: the two datasets with a fixed train/test split and their dictionary (`data/`), the workflow (`analysis/`), the shared metric helpers (`m11.py`), the app twice (Streamlit `streamlit_app.py`; Node `web/` + `package.json`, no npm dependencies, hosted as static files on GitHub Pages), baseline-only `results/`, `DECISIONS.md`, `AGENT_BRIEF.md` (the agent's spec and rules), `SETUP.md` and `check.py`. No `analysis/models.py` or `run_app.sh`: the student's agent writes them. |
+| [`reproduce/`](reproduce) | Instructor only (not linked from the site). Rebuilds `starter/data/` and `starter/results/` from the raw UCI and CDC files, with SHA-256 checks, and runs the reference run (every classifier, `reference_models.py`) that `check.py` compares against. |
 | [`site/`](site) | Website source: page fragments (`pages/`), `layout.html`, the glossary (`terms.json`), and styles, behaviour and demos (`assets/`). |
 | [`scripts/`](scripts) | `build.mjs` builds the site into `dist/` and zips the starter; `serve.mjs` previews it under the GitHub Pages subpath. |
-| [`tests/`](tests) | `m11.py` fixtures, `check.py` known-good and known-bad fixtures, both starter apps, the demos, and an end-to-end site check with an accessibility scan. |
-| `instructor/` | **Git-ignored, never pushed.** The private full solution (`make_solution.py` builds it), `EXPECTED.md` with expected values, and the solution app. |
+| [`tests/`](tests) | `m11.py` fixtures, `check.py` known-good and known-bad fixtures, both starter apps, both expected launchers, the demos, and an end-to-end site check (including starter zip = `starter/`) with an accessibility scan. |
+| `instructor/` | **Git-ignored, never pushed.** The private full solution (`make_solution.py` builds it), `EXPECTED.md` with expected values, the expected agent-written `models.py` and launchers, and the solution app. |
 
 ## Build and preview the site
 Requires Node 20 or later; there are no npm dependencies.
@@ -33,7 +33,7 @@ uv venv --python 3.11 .venv && uv pip install --python .venv/bin/python -r repro
 .venv/bin/python -m playwright install chromium
 .venv/bin/python reproduce/reproduce.py --check       # data and baseline results reproduce; check.py's reference matches
 .venv/bin/python instructor/make_solution.py           # private full solution (instructor machines only)
-.venv/bin/python -m pytest tests/                      # m11, check.py fixtures, both apps (Streamlit, Node), demos
+.venv/bin/python -m pytest tests/                      # m11, check.py fixtures, both apps and launchers (Streamlit, Node), demos
 npm run build && node scripts/serve.mjs 4174 &
 .venv/bin/python tests/e2e.py http://localhost:4174/classification-activity/   # links, downloads, keyboard, dark mode, axe
 ```

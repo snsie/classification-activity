@@ -1,7 +1,7 @@
 <!--meta {"title":"Analysis","description":"The Python workflow: the train/test protocol, the one command, the DECISIONS.md template, and the files it exports."} -->
 <p class="eyebrow">The work</p>
 <h1>Analysis</h1>
-<p class="lead">You run a supplied Python workflow from the command line. There is no notebook. One command fits every model on the training rows, scores it on the test rows, and writes the results your app reads.</p>
+<p class="lead">A supplied Python workflow runs from the command line; there is no notebook. One command fits every model on the training rows, scores it on the test rows, and writes the results your app reads. Your agent runs it and fixes errors; you check the results.</p>
 
 <h2 id="protocol">The protocol</h2>
 <p>Each dataset is split once, before anything else: 80% training {{help training-set}} and 20% test {{help test-set}}, stratified. The split is the <code>split</code> column in each CSV, and every model uses it.</p>
@@ -27,18 +27,28 @@
   <li>It also copies <code>DECISIONS.md</code> to <code>results/decisions.json</code>, so rerun it after you write your recommendations.</li>
 </ol>
 
+<h2 id="run">Run it with your agent</h2>
+<div class="callout agent-task">
+  <p class="callout-title">Ask your agent</p>
+  <p>I've committed <code>Before results</code>. Run <code>python -m analysis</code> with my <code>analysis/models.py</code>, and fix any error at its cause without changing the spec, the data or <code>results/</code> by hand. Then run <code>python check.py --stage results</code> and explain what was exported: which numbers are training results and which are test results.</p>
+</div>
+<ul>
+  <li><strong>Run <code>python check.py --stage results</code> yourself</strong> and read every line. It passes only when every line says <code>ok</code>. If one fails, give the agent that line.</li>
+  <li>Commit and push <code>results/</code>.</li>
+</ul>
+
 <h2 id="commands">The commands</h2>
 <p>Run them from the starter folder, with your environment active.</p>
 <div class="table-wrap"><table>
   <thead><tr><th scope="col">Command</th><th scope="col">Does</th></tr></thead>
   <tbody>
-    <tr><td><code>python -m analysis</code></td><td>Fits the four classifiers plus a baseline on the training rows and writes, for each dataset, every row's training and test probability and each model's training and test AUROC to <code>results/&lt;key&gt;.json</code>. Copies your <code>DECISIONS.md</code> answers to <code>results/decisions.json</code>. Refuses to run until the kNN <code>TODO</code> is complete.</td></tr>
+    <tr><td><code>python -m analysis</code></td><td>Fits the four classifiers plus a baseline on the training rows and writes, for each dataset, every row's training and test probability and each model's training and test AUROC to <code>results/&lt;key&gt;.json</code>. Copies your <code>DECISIONS.md</code> answers to <code>results/decisions.json</code>. Stops with a message if <code>analysis/models.py</code> is missing or doesn't list the five models.</td></tr>
     <tr><td><code>python check.py</code></td><td>Runs the integrity checks below. Add <code>--stage setup</code> or <code>--stage results</code> to check only up to that step.</td></tr>
   </tbody>
 </table></div>
 
 <h2 id="decisions">The <code>DECISIONS.md</code> template</h2>
-<p>Fixed headings, read by the workflow. Write each answer after its label, and keep the headings and labels exactly as they are. <strong>Limit:</strong> 150 words for <code>Before results</code>.</p>
+<p>You write every answer yourself; your agent never edits this file. Fixed headings, read by the workflow. Write each answer after its label, and keep the headings and labels exactly as they are. <strong>Limit:</strong> 150 words for <code>Before results</code>.</p>
 <pre><code>## Before results
 For each dataset: positive class; which error matters more for the job (missed positive or false alarm) and why.
 - readmission:
@@ -84,10 +94,11 @@ print(m11.auroc_summary(res)["rf"])           # {"train", "test", "gap"}</code><
 <ul>
   <li>The data files match their fingerprints in <code>data/manifest.json</code>.</li>
   <li>Your results cover exactly the supplied training and test rows, so no model was fitted on test rows.</li>
-  <li><code>knn</code> is a <code>Pipeline</code> object, with scaling inside, and no model's settings have changed.</li>
+  <li><code>analysis/models.py</code> builds every model as one <code>Pipeline</code> with exactly the spec's steps and settings, so preprocessing stays inside.</li>
   <li>No outcome or ID column is used as a predictor.</li>
-  <li>The default <code>logreg</code> test AUROC matches the reference within ±0.005.</li>
+  <li>Every classifier's test AUROC matches the instructor's reference run within ±0.005.</li>
   <li>Every exported AUROC matches the one recomputed with <code>m11</code>.</li>
   <li>All three sections of <code>DECISIONS.md</code> are complete, exported and committed.</li>
+  <li>A Bash launcher such as <code>run_app.sh</code> that starts your app is committed.</li>
 </ul>
 <p>Every failure says what to fix in one sentence. Fix the first one, then run it again.</p>

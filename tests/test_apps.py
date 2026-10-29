@@ -4,15 +4,21 @@
 
 tests/streamlit_smoke.py runs every section × dataset × model with Streamlit's AppTest, and
 tests/web_smoke.py does the same for the Node app in headless Chromium. Each runs in a separate
-process per folder so each folder's m11 and results/ stay apart.
+process per folder so each folder's m11 and results/ stay apart. test_launcher runs the expected
+agent-written Bash launcher for each route the way a student does: bash run_app.sh, then Ctrl+C.
 """
 
 from __future__ import annotations
 
 import json
+import os
 import shutil
+import signal
+import socket
 import subprocess
 import sys
+import time
+import urllib.request
 from pathlib import Path
 
 import pytest
@@ -39,6 +45,46 @@ def test_app(which, app, tmp_path):
     assert not out["unlabelled"], out["unlabelled"][:5]
     if which == "solution":
         assert out["slider"] is True
+
+
+def free_port() -> int:
+    with socket.socket() as s:
+        s.bind(("127.0.0.1", 0))
+        return s.getsockname()[1]
+
+
+@pytest.mark.parametrize("route,probe", [("streamlit", "_stcore/health"), ("node", "results/diabetes.json")])
+def test_launcher(route, probe, tmp_path):
+    """bash run_app.sh starts the chosen app from any folder, serves it on localhost, and stops on Ctrl+C."""
+    folder = FOLDERS["solution"]
+    if not folder.exists():
+        pytest.skip("run instructor/make_solution.py first")
+    if route == "node" and not shutil.which("node"):
+        pytest.skip("node not installed")
+    copy = tmp_path / "repo"
+    shutil.copytree(folder, copy, ignore=shutil.ignore_patterns(".git", "__pycache__"))
+    shutil.copy(ROOT / "instructor" / "solution_files" / "launchers" / f"{route}.sh", copy / "run_app.sh")
+    port = free_port()
+    env = {**os.environ, "PATH": f"{Path(sys.executable).parent}{os.pathsep}{os.environ['PATH']}"}  # an activated environment
+    proc = subprocess.Popen(["bash", str(copy / "run_app.sh"), str(port)], cwd=tmp_path, env=env,
+                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, start_new_session=True)
+    try:
+        for _ in range(120):
+            try:
+                with urllib.request.urlopen(f"http://localhost:{port}/{probe}", timeout=2) as r:
+                    assert r.status == 200
+                    break
+            except OSError:
+                assert proc.poll() is None, proc.stdout.read()
+                time.sleep(0.5)
+        else:
+            pytest.fail(f"{route} app never answered on port {port}")
+        with urllib.request.urlopen(f"http://localhost:{port}/", timeout=5) as r:
+            assert r.status == 200
+    finally:
+        os.killpg(proc.pid, signal.SIGINT)  # Ctrl+C in the student's terminal
+        out = proc.communicate(timeout=30)[0]
+    assert f"http://localhost:{port}/" in out, out
 
 
 def close(a, b, tol: float = 1e-12) -> bool:

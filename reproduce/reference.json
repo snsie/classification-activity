@@ -1,7 +1,17 @@
 {
-  "logreg_test_auroc": {
-    "readmission": 0.6396,
-    "diabetes": 0.8266
+  "test_auroc": {
+    "readmission": {
+      "logreg": 0.6396,
+      "knn": 0.5832,
+      "rf": 0.651,
+      "lgbm": 0.6322
+    },
+    "diabetes": {
+      "logreg": 0.8266,
+      "knn": 0.8124,
+      "rf": 0.8232,
+      "lgbm": 0.8069
+    }
   },
   "tolerance": 0.005
 }

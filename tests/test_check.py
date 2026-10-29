@@ -72,7 +72,7 @@ def test_untouched_starter_passes_setup(tmp_path):
     r = check(dest, "--stage", "setup")
     assert r.returncode == 0, r.stdout
     r = check(dest, "--stage", "results")
-    assert r.returncode != 0 and any("TODO" in f for f in fails(r)), r.stdout
+    assert r.returncode != 0 and any(f.startswith("analysis/models.py is missing") for f in fails(r)), r.stdout
 
 
 def test_rerun_passes(tmp_path):
@@ -94,7 +94,38 @@ def test_preprocessing_outside_pipeline(tmp_path):
     commit(repo, "kNN without a pipeline")
     r = check(repo)
     assert r.returncode == 1
-    assert any(f.startswith("knn() must return one Pipeline") for f in fails(r)), r.stdout
+    assert any(f.startswith("knn() must build encode() → SimpleImputer") for f in fails(r)), r.stdout
+
+
+def test_missing_imputer(tmp_path):
+    repo = clone(tmp_path)
+    p = repo / "analysis" / "models.py"
+    p.write_text(p.read_text().replace('        SimpleImputer(strategy="median"),\n        RandomForestClassifier', "        RandomForestClassifier"))
+    commit(repo, "Forest without imputation")
+    r = check(repo)
+    assert r.returncode == 1 and any(f.startswith("rf() must build encode() → SimpleImputer") for f in fails(r)), r.stdout
+
+
+def test_missing_model(tmp_path):
+    repo = clone(tmp_path)
+    p = repo / "analysis" / "models.py"
+    p.write_text(p.read_text().replace(', "lgbm": lgbm}', "}"))
+    commit(repo, "Drop a model")
+    r = check(repo)
+    assert r.returncode == 1 and any(f.startswith("MODELS in analysis/models.py must have exactly the keys") for f in fails(r)), r.stdout
+    r = run(repo, PY, "-m", "analysis", ok=False)
+    assert "must have exactly these keys" in r.stdout
+
+
+def test_off_spec_model_misses_reference(tmp_path):
+    """A setting the structure check doesn't name still moves the test AUROC away from the reference."""
+    repo = clone(tmp_path)
+    p = repo / "analysis" / "models.py"
+    p.write_text(p.read_text().replace("LGBMClassifier(random_state=SEED,", "LGBMClassifier(max_depth=2, random_state=SEED,"))
+    run(repo, PY, "-m", "analysis", ok=True)
+    commit(repo, "Shallow boosting")
+    r = check(repo)
+    assert r.returncode == 1 and any("lgbm test AUROC" in f and "make lgbm() match the spec" in f for f in fails(r)), r.stdout
 
 
 def test_trained_on_test_rows(tmp_path):
@@ -117,7 +148,7 @@ def test_changed_model_setting(tmp_path):
     p.write_text(p.read_text().replace("KNeighborsClassifier(n_neighbors=25)", "KNeighborsClassifier(n_neighbors=5)"))
     commit(repo, "Tune k")
     r = check(repo)
-    assert r.returncode == 1 and any(f.startswith("knn() must end with KNeighborsClassifier(n_neighbors=25)") for f in fails(r)), r.stdout
+    assert r.returncode == 1 and any(f.startswith("knn() must build") and "KNeighborsClassifier(n_neighbors=25)" in f for f in fails(r)), r.stdout
 
 
 def test_hand_edited_auroc(tmp_path):
@@ -161,6 +192,14 @@ def test_incomplete_design_choice(tmp_path):
     assert r.returncode == 1 and any('Fill in "Design choice and AI use"' in f and "AI suggestion" in f for f in fails(r)), r.stdout
 
 
+def test_no_launcher(tmp_path):
+    repo = clone(tmp_path)
+    (repo / "run_app.sh").unlink()
+    commit(repo, "Drop the launcher")
+    r = check(repo)
+    assert r.returncode == 1 and any(f.startswith("Commit a Bash launcher") for f in fails(r)), r.stdout
+
+
 def test_uncommitted_results(tmp_path):
     repo = clone(tmp_path)
     (repo / "results" / "decisions.json").write_text((repo / "results" / "decisions.json").read_text() + "\n")
@@ -169,11 +208,11 @@ def test_uncommitted_results(tmp_path):
 
 
 # ---------------------------------------------------------------- the workflow's guard
-def test_guard_knn_todo(tmp_path):
+def test_guard_no_models(tmp_path):
     dest = tmp_path / "s"
     shutil.copytree(STARTER, dest, ignore=shutil.ignore_patterns("__pycache__"))
     r = run(dest, PY, "-m", "analysis", ok=False)
-    assert "Complete the knn() TODO" in r.stdout
+    assert "analysis/models.py is missing; ask your agent" in r.stdout
 
 
 def test_every_failure_is_one_sentence(tmp_path):

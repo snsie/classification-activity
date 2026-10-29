@@ -1,11 +1,12 @@
-"""Write the starter's baseline-only results and the logistic regression reference run.
+"""Write the starter's baseline-only results and the reference run.
 
   * starter/results/<key>.json: the prevalence baseline only, so the starter app runs from the start.
   * starter/results/decisions.json: the untouched DECISIONS.md template, exported.
-  * reproduce/reference.json: the default logreg's test AUROC per dataset. check.py holds the same
-    numbers (REFERENCE_LOGREG) and allows ±0.005; reproduce.py --check confirms they agree.
+  * reproduce/reference.json: every classifier's test AUROC per dataset. check.py holds the same
+    numbers (REFERENCE_TEST_AUROC) and allows ±0.005; reproduce.py --check confirms they agree.
 
-Both use the starter's own code (analysis/, m11.py), so they are exactly what students run.
+Both use the starter's own workflow (analysis/, m11.py) with the reference models (reference_models.py),
+so they are exactly what students run once their agent has written analysis/models.py.
 """
 
 from __future__ import annotations
@@ -20,10 +21,11 @@ STARTER = ROOT / "starter"
 
 def _import_starter(starter: Path):
     sys.path.insert(0, str(starter))
-    for mod in [m for m in sys.modules if m == "m11" or m.startswith("analysis")]:
+    for mod in [m for m in sys.modules if m in ("m11", "reference_models") or m.startswith("analysis")]:
         del sys.modules[mod]
     import m11  # noqa: F401
-    from analysis import __main__ as workflow, data, evaluate, export, models
+    import reference_models as models
+    from analysis import __main__ as workflow, data, evaluate, export
     return workflow, data, evaluate, export, models
 
 
@@ -42,13 +44,17 @@ def reference_run(starter: Path = STARTER) -> dict:
     _, data, evaluate, _, models = _import_starter(starter)
     ref = {}
     for key in data.DATASETS:
-        r = evaluate.fit_and_score(models.logreg, *data.rows(key, "train"), *data.rows(key, "test"))
-        ref[key] = round(r["test_auroc"], 4)
-        print(f"  logreg {key}: test AUROC {ref[key]}")
+        ref[key] = {}
+        for name, build in models.MODELS.items():
+            if name == "baseline":
+                continue
+            r = evaluate.fit_and_score(build, *data.rows(key, "train"), *data.rows(key, "test"))
+            ref[key][name] = round(r["test_auroc"], 4)
+            print(f"  {name} {key}: test AUROC {ref[key][name]}")
     return ref
 
 
 if __name__ == "__main__":
     baseline_results()
     ref = reference_run()
-    (ROOT / "reproduce" / "reference.json").write_text(json.dumps({"logreg_test_auroc": ref, "tolerance": 0.005}, indent=2) + "\n")
+    (ROOT / "reproduce" / "reference.json").write_text(json.dumps({"test_auroc": ref, "tolerance": 0.005}, indent=2) + "\n")

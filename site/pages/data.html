@@ -32,7 +32,7 @@
 <p>The full dictionary, with every category and missing-value count, is {{dl data/README.md}}. Sources, licences, versions, row counts and SHA-256 fingerprints are in {{dl data/manifest.json}}.</p>
 
 <h2 id="starter">Using the starter</h2>
-<p>The starter has the same plain app twice; you build <a href="hosting.html#choose">one of them</a>. Either way it reads <code>results/</code> through the metric helpers. Have your AI agent read {{dl AGENT_BRIEF.md}} first.</p>
+<p>The starter has the same plain app twice; you build <a href="hosting.html#choose">one of them</a>. Either way it reads <code>results/</code> through the metric helpers. Your agent reads {{dl AGENT_BRIEF.md}} first: the <a href="hosting.html#start-prompt">starting prompt</a> tells it to. The starter has no <code>analysis/models.py</code> or <code>run_app.sh</code>: your agent writes them.</p>
 
 <h2 id="files">All files</h2>
 {{files}}

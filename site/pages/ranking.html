@@ -16,12 +16,18 @@
   <li><input type="checkbox" id="s3-r3"><div class="item-body"><label for="s3-r3">Every table and plot labelled <span class="partition">Test</span>, with labelled axes.</label></div></li>
 </ul>
 
+<div class="callout agent-task">
+  <p class="callout-title">Ask your agent</p>
+  <p>Build Section 3, Ranking vs. Being Right, to this required minimum: &lt;paste the list above&gt;. Use <code>m11.roc</code> on the test probabilities, give every plot a text equivalent, and describe AUROC as ranking, never accuracy. Offer me two or three layouts first; build the one I choose.</p>
+</div>
+
 <h2>Done when</h2>
 <p class="checklist-status" data-for="s3-done"></p>
 <ul class="checklist" data-store="s3-done">
   <li><input type="checkbox" id="s3-d1"><div class="item-body"><label for="s3-d1">It works for every dataset and every model, on your public link.</label></div></li>
   <li><input type="checkbox" id="s3-d2"><div class="item-body"><label for="s3-d2">AUROC is described as ranking, with no threshold, and never as accuracy.</label></div></li>
   <li><input type="checkbox" id="s3-d3"><div class="item-body"><label for="s3-d3">Every plot has a text equivalent: a table, or a sentence with its numbers.</label></div></li>
+  <li><input type="checkbox" id="s3-d5"><div class="item-body"><label for="s3-d5">You ran the app with <code>bash run_app.sh</code> and did the reviewer task below yourself.</label></div></li>
   <li><input type="checkbox" id="s3-d4"><div class="item-body"><label for="s3-d4">Someone who hasn't seen your app can do the reviewer task below without help.</label></div></li>
 </ul>
 
@@ -46,14 +52,6 @@
   <li>Mark the 0.50 point on each ROC curve, so the lead sees where Section 1's matrix sits.</li>
 </ul>
 <p class="small muted">Accurate, readable tables meet every required minimum. Custom visuals are optional.</p>
-
-<h2>Where your numbers come from</h2>
-<p class="small">Building the Node app? The same functions are in <code>web/m11.js</code>, with camelCase names (<code>m11.majorityAccuracy</code>, <code>m11.aurocSummary</code>) and <code>null</code> where Python has <code>None</code>.</p>
-<ul>
-  <li><code>m11.roc(p, y)</code>: <code>fpr</code>, <code>tpr</code>, <code>thr</code> (one point per distinct threshold) and <code>auroc</code>.</li>
-  <li><code>m11.calibration(p, y)</code>: 10 equal-size groups, each with <code>mean_pred</code>, <code>observed</code> and <code>n</code>.</li>
-  <li>Use the test probabilities from <code>m11.preds(res, model)</code>. Section 4 compares them with the training ones.</li>
-</ul>
 
 <h2>Common questions</h2>
 <details><summary>Why is the calibration plot's axis so short for readmission?</summary><div class="details-body">

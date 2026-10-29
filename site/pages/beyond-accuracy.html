@@ -21,11 +21,17 @@
   <li><input type="checkbox" id="s1-r6"><div class="item-body"><label for="s1-r6">Every table and plot labelled <span class="partition">Test</span>.</label></div></li>
 </ul>
 
+<div class="callout agent-task">
+  <p class="callout-title">Ask your agent</p>
+  <p>Build Section 1, Beyond Accuracy, to this required minimum: &lt;paste the list above&gt;. Use the test probabilities at 0.50, with every number from <code>m11</code> (<code>preds</code>, <code>confusion</code>, <code>metrics</code>, <code>majority_accuracy</code>). Offer me two or three layouts first; build the one I choose.</p>
+</div>
+
 <h2>Done when</h2>
 <p class="checklist-status" data-for="s1-done"></p>
 <ul class="checklist" data-store="s1-done">
   <li><input type="checkbox" id="s1-d1"><div class="item-body"><label for="s1-d1">It works for every dataset and every model, on your public link.</label></div></li>
-  <li><input type="checkbox" id="s1-d2"><div class="item-body"><label for="s1-d2">Every number comes from <code>results/</code> through <code>m11</code>; you typed none of them.</label></div></li>
+  <li><input type="checkbox" id="s1-d2"><div class="item-body"><label for="s1-d2">Every number comes from <code>results/</code> through <code>m11</code>; none is typed in.</label></div></li>
+  <li><input type="checkbox" id="s1-d4"><div class="item-body"><label for="s1-d4">You ran the app with <code>bash run_app.sh</code> and did the reviewer tasks below yourself.</label></div></li>
   <li><input type="checkbox" id="s1-d3"><div class="item-body"><label for="s1-d3">Someone who hasn't seen your app can do the reviewer task below without help.</label></div></li>
 </ul>
 
@@ -52,15 +58,6 @@
   <li>Let the comparison follow Section 2's slider, so the lead can compare the models at the job's threshold too.</li>
 </ul>
 <p class="small muted">Accurate, readable tables meet every required minimum. Custom visuals are optional.</p>
-
-<h2>Where your numbers come from</h2>
-<p class="small">Building the Node app? The same functions are in <code>web/m11.js</code>, with camelCase names (<code>m11.majorityAccuracy</code>, <code>m11.aurocSummary</code>) and <code>null</code> where Python has <code>None</code>.</p>
-<ul>
-  <li><code>m11.preds(res, model)</code>: the test probabilities and labels.</li>
-  <li><code>m11.confusion(p, y, 0.5)</code>: TP, FN, FP and TN. A patient is flagged when <code>p &gt;= 0.5</code>.</li>
-  <li><code>m11.metrics(counts)</code>: every metric, plus <code>prevalence</code> and <code>flagged_per_100</code>. <code>None</code> means undefined.</li>
-  <li><code>m11.majority_accuracy(y)</code>: “the most common class for everyone”.</li>
-</ul>
 
 <h2>Common questions</h2>
 <details><summary>Which way round does the matrix go?</summary><div class="details-body">

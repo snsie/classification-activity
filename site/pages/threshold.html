@@ -18,11 +18,17 @@
   <li><input type="checkbox" id="s2-r4"><div class="item-body"><label for="s2-r4">Every table and plot labelled <span class="partition">Test</span>.</label></div></li>
 </ul>
 
+<div class="callout agent-task">
+  <p class="callout-title">Ask your agent</p>
+  <p>Build Section 2, A Threshold for the Job, to this required minimum: &lt;paste the list above&gt;. Recompute the confusion matrix and metrics with <code>m11.confusion</code> and <code>m11.metrics</code> at the slider's threshold, and compare them with 0.50. Offer me two or three layouts first; build the one I choose.</p>
+</div>
+
 <h2>Done when</h2>
 <p class="checklist-status" data-for="s2-done"></p>
 <ul class="checklist" data-store="s2-done">
   <li><input type="checkbox" id="s2-d1"><div class="item-body"><label for="s2-d1">It works for every dataset and every model, on your public link.</label></div></li>
   <li><input type="checkbox" id="s2-d2"><div class="item-body"><label for="s2-d2">Moving the slider changes no probability and no AUROC, and the app makes that clear.</label></div></li>
+  <li><input type="checkbox" id="s2-d4"><div class="item-body"><label for="s2-d4">You ran the app with <code>bash run_app.sh</code> and did the reviewer task below yourself.</label></div></li>
   <li><input type="checkbox" id="s2-d3"><div class="item-body"><label for="s2-d3">Someone who hasn't seen your app can do the reviewer task below without help.</label></div></li>
 </ul>
 
@@ -47,13 +53,6 @@
   <li>For readmission, there is no fixed target: show what each threshold gains and gives up, and let the lead choose.</li>
 </ul>
 <p class="small muted">Accurate, readable tables meet every required minimum. Custom visuals are optional.</p>
-
-<h2>Where your numbers come from</h2>
-<p class="small">Building the Node app? The same functions are in <code>web/m11.js</code>, with camelCase names (<code>m11.majorityAccuracy</code>, <code>m11.aurocSummary</code>) and <code>null</code> where Python has <code>None</code>.</p>
-<ul>
-  <li><code>m11.preds(res, model)</code>: the test probabilities and labels.</li>
-  <li><code>m11.confusion(p, y, t)</code> and <code>m11.metrics(...)</code> at the slider's value.</li>
-</ul>
 
 <h2>Common questions</h2>
 <details><summary>I set the threshold while looking at the test patients. Is that a problem?</summary><div class="details-body">

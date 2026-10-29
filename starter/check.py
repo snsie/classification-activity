@@ -2,7 +2,7 @@
 
     python check.py                   everything (run this before you submit)
     python check.py --stage setup     the data and the starter results (step 1)
-    python check.py --stage results   + your kNN pipeline and the results of `python -m analysis` (step 3)
+    python check.py --stage results   + analysis/models.py and the results of `python -m analysis` (step 3)
 
 Each stage includes the ones before it. Every failure says what to fix.
 """
@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import sys
 from functools import lru_cache
 from pathlib import Path
@@ -21,8 +22,9 @@ sys.path.insert(0, str(ROOT))
 
 import m11  # noqa: E402
 
-# The default logistic regression's test AUROC (instructor's reference run).
-REFERENCE_LOGREG = {"readmission": 0.6396, "diabetes": 0.8266}
+# Each classifier's test AUROC in the instructor's reference run (reproduce/reference.json).
+REFERENCE_TEST_AUROC = {"readmission": {"logreg": 0.6396, "knn": 0.5832, "rf": 0.651, "lgbm": 0.6322},
+                        "diabetes": {"logreg": 0.8266, "knn": 0.8124, "rf": 0.8232, "lgbm": 0.8069}}
 TOLERANCE = 0.005
 STAGES = ["setup", "results", "all"]
 AUROC_TOL = 1e-9
@@ -161,43 +163,52 @@ def check_results_file(r: Report, key: str, res: dict, require_all: bool) -> boo
 
 
 # ---------------------------------------------------------------- results
-SCALERS = ("StandardScaler", "MinMaxScaler", "RobustScaler", "MaxAbsScaler")
-EXPECTED = {  # final estimator class and settings that must not change
-    "baseline": ("DummyClassifier", {"strategy": "prior"}),
-    "logreg": ("LogisticRegression", {"max_iter": 5000, "C": 1.0}),
-    "knn": ("KNeighborsClassifier", {"n_neighbors": 25}),
-    "rf": ("RandomForestClassifier", {"n_estimators": 300, "min_samples_leaf": 3, "random_state": 0}),
-    "lgbm": ("LGBMClassifier", {"random_state": 0, "n_estimators": 100, "learning_rate": 0.1, "num_leaves": 31}),
+SPEC = "see Models in AGENT_BRIEF.md"
+# The fixed spec: the steps before the classifier, then the classifier's class and the settings that must not change.
+EXPECTED = {
+    "baseline": ([], "DummyClassifier", {"strategy": "prior"}),
+    "logreg": (["encode", "SimpleImputer", "StandardScaler"], "LogisticRegression", {"max_iter": 5000, "C": 1.0}),
+    "knn": (["encode", "SimpleImputer", "StandardScaler"], "KNeighborsClassifier", {"n_neighbors": 25}),
+    "rf": (["encode", "SimpleImputer"], "RandomForestClassifier", {"n_estimators": 300, "min_samples_leaf": 3, "random_state": 0}),
+    "lgbm": (["encode"], "LGBMClassifier", {"random_state": 0, "n_estimators": 100, "learning_rate": 0.1, "num_leaves": 31}),
 }
+
+
+def step_name(step) -> str:
+    """A step's class name; the supplied encode() step (a ColumnTransformer with its OneHotEncoder) is "encode"."""
+    if type(step).__name__ == "ColumnTransformer":
+        enc = [t for _, t, _ in step.transformers if type(t).__name__ == "OneHotEncoder"]
+        if enc and enc[0].get_params().get("min_frequency") == 10 and enc[0].get_params().get("handle_unknown") == "infrequent_if_exist":
+            return "encode"
+    if type(step).__name__ == "SimpleImputer" and step.get_params().get("strategy") != "median":
+        return "SimpleImputer(not median)"
+    return type(step).__name__
 
 
 def check_pipelines(r: Report) -> bool:
     from sklearn.pipeline import Pipeline
-
-    from analysis.models import MODELS
+    try:
+        from analysis.models import MODELS
+    except ModuleNotFoundError as e:
+        if e.name != "analysis.models":
+            raise
+        r.fail(f"analysis/models.py is missing; ask your agent to write it ({SPEC}).")
+        return False
+    if not r.check(list(MODELS) == m11.MODELS, f"MODELS lists the {len(m11.MODELS)} models in order",
+                   f"MODELS in analysis/models.py must have exactly the keys {', '.join(m11.MODELS)}, in that order ({SPEC})."):
+        return False
     ok = True
-    for name, (cls, params) in EXPECTED.items():
-        try:
-            model = MODELS[name]()
-        except NotImplementedError:
-            r.fail(f"{name}() still has its TODO; complete it in analysis/models.py, following the logreg() example.")
-            ok = False
-            continue
-        if name == "knn":
-            steps = [type(s).__name__ for _, s in model.steps] if isinstance(model, Pipeline) else []
-            scaled = any(s in SCALERS for s in steps[:-1])
-            if not r.check(isinstance(model, Pipeline) and scaled and "SimpleImputer" in steps[:-1],
-                           "knn is a Pipeline with imputation and scaling inside",
-                           "knn() must return one Pipeline with encode(), SimpleImputer and StandardScaler inside it, "
-                           "like logreg(), so scaling is learned from training rows only."):
-                ok = False
-                continue
-        final = model.steps[-1][1] if isinstance(model, Pipeline) else model
+    for name, (before, cls, params) in EXPECTED.items():
+        model = MODELS[name]()
+        steps = [s for _, s in model.steps] if isinstance(model, Pipeline) else [model]
+        names = [step_name(s) for s in steps[:-1]]
+        final = steps[-1]
         got = final.get_params()
-        same = type(final).__name__ == cls and all(got.get(k) == v for k, v in params.items())
-        ok &= r.check(same, f"{name} uses {cls} with the fixed settings",
-                      f"{name}() must end with {cls}({', '.join(f'{k}={v!r}' for k, v in params.items())}); "
-                      "restore the settings in analysis/models.py (no tuning).")
+        same = names == before and type(final).__name__ == cls and all(got.get(k) == v for k, v in params.items())
+        want = " → ".join(["encode()" if b == "encode" else (f'{b}(strategy="median")' if b == "SimpleImputer" else f"{b}()") for b in before]
+                          + [f"{cls}({', '.join(f'{k}={v!r}' for k, v in params.items())})"])
+        ok &= r.check(same, f"{name}: {' → '.join(before + [cls])} with the fixed settings",
+                      f"{name}() must build {want} as one Pipeline, with no other steps or tuning ({SPEC}).")
     return ok
 
 
@@ -211,12 +222,14 @@ def check_results(r: Report) -> bool:
             ok = False
             continue
         ok &= check_results_file(r, key, res, require_all=True)
-        if "logreg" in res["models"]:
-            got = res["models"]["logreg"]["test_auroc"]
-            ok &= r.check(abs(got - REFERENCE_LOGREG[key]) <= TOLERANCE,
-                          f"{key}: logreg test AUROC {got:.4f} matches the reference {REFERENCE_LOGREG[key]:.4f} (±{TOLERANCE})",
-                          f"{key}: logreg test AUROC {got:.4f} is not within ±{TOLERANCE} of the reference {REFERENCE_LOGREG[key]:.4f}; "
-                          "restore logreg() and the supplied data, then rerun `python -m analysis`.")
+        for name, want in REFERENCE_TEST_AUROC[key].items():
+            if name not in res["models"]:
+                continue
+            got = res["models"][name]["test_auroc"]
+            ok &= r.check(abs(got - want) <= TOLERANCE,
+                          f"{key}: {name} test AUROC {got:.4f} matches the reference {want:.4f} (±{TOLERANCE})",
+                          f"{key}: {name} test AUROC {got:.4f} is not within ±{TOLERANCE} of the reference {want:.4f}; "
+                          f"make {name}() match the spec and use the supplied data, then rerun `python -m analysis`.")
     return ok
 
 
@@ -244,6 +257,11 @@ def check_all(r: Report) -> bool:
                   "Commit your latest results/ and DECISIONS.md (git add, git commit, git push).")
     if export.unpushed():
         r.warn("Some commits are not on GitHub yet; run `git push`.")
+    launchers = [p.name for p in sorted(ROOT.glob("*.sh")) if re.search(r"streamlit run|server\.mjs|npm start", p.read_text(encoding="utf-8"))]
+    tracked = [n for n in launchers if export.git("ls-files", "--error-unmatch", n)]
+    ok &= r.check(bool(tracked), f"{(tracked or launchers or ['-'])[0]} launches your app and is committed",
+                  "Commit a Bash launcher in the top folder (for example run_app.sh) that starts your app; ask your agent to write it "
+                  "(see AGENT_BRIEF.md), then run it yourself.")
     first = (ROOT / "README.md").read_text(encoding="utf-8").splitlines()[0] if (ROOT / "README.md").exists() else ""
     if "http" not in first or "paste your" in first:
         r.warn("Put your public app link on the first line of README.md.")

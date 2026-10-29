@@ -1,6 +1,6 @@
 """Starter app for Streamlit Community Cloud: four plain sections that read results/ and show correct numbers.
 
-Run locally:  streamlit run streamlit_app.py
+Run locally:  bash run_app.sh  (your agent writes it; it runs streamlit run streamlit_app.py)
 Build each section up to its required minimum (see the activity website). Keep every number
 coming from m11.py, and label every table and plot "Training" or "Test".
 """

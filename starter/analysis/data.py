@@ -1,9 +1,10 @@
-"""Load the supplied datasets. You don't need to change this file.
+"""Load the supplied datasets, and the first step of every model pipeline. You don't need to change this file.
 
     from analysis import data
     df = data.load("diabetes")              # every row, with its split
     X, y = data.rows("diabetes", "train")   # the training rows: the models learn from these
     X_test, y_test = data.rows("diabetes", "test")  # the test rows: used only to evaluate
+    data.encode()                           # step 1 of every pipeline in analysis/models.py
 """
 
 from __future__ import annotations
@@ -13,6 +14,8 @@ from functools import lru_cache
 from pathlib import Path
 
 import pandas as pd
+from sklearn.compose import make_column_selector, make_column_transformer
+from sklearn.preprocessing import OneHotEncoder
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
@@ -58,3 +61,13 @@ def rows(key: str, split: str) -> tuple[pd.DataFrame, list[int]]:
 def ids(key: str, split: str) -> list[int]:
     df = _load(key)
     return df.loc[df.split == split, "row_id"].astype(int).tolist()
+
+
+def encode():
+    """Supplied first step of every model pipeline: turns each text category (such as admission type)
+    into 0/1 columns, learned from the training rows only."""
+    return make_column_transformer(
+        (OneHotEncoder(handle_unknown="infrequent_if_exist", min_frequency=10, sparse_output=False),
+         make_column_selector(dtype_include=object)),
+        remainder="passthrough",
+    )
