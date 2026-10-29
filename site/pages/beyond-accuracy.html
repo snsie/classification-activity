@@ -7,12 +7,13 @@
   <dt>Learning objective</dt><dd>After using it, the clinical lead can name the positive class {{help positive-class}}, see why accuracy {{help accuracy}} alone misleads, and read a confusion matrix {{help confusion-matrix}} as four groups of patients.</dd>
   <dt>Reader</dt><dd>A clinical lead {{help clinical-lead}} who knows the clinical problem but not the metrics.</dd>
   <dt>Data</dt><dd>Test-set probabilities {{help test-set}}, at threshold 0.50.</dd>
+  <dt>Canvas</dt><dd><a href="submit.html#q1">Question 1: the accuracy trap</a></dd>
 </dl>
 
 <h2>Required minimum <span class="tag required">Required</span></h2>
 <p class="checklist-status" data-for="s1-required"></p>
 <ul class="checklist" data-store="s1-required">
-  <li><input type="checkbox" id="s1-r1"><div class="item-body"><label for="s1-r1">A dataset selector (both datasets) and a model selector (all four models plus the baseline).</label></div></li>
+  <li><input type="checkbox" id="s1-r1"><div class="item-body"><label for="s1-r1">A dataset selector (both datasets) and a model selector (the four classifiers plus a baseline).</label></div></li>
   <li><input type="checkbox" id="s1-r2"><div class="item-body"><label for="s1-r2">Prevalence and baseline accuracy: the accuracy of “the most common class for everyone”.</label> {{help prevalence}} {{help majority-baseline}}</div></li>
   <li><input type="checkbox" id="s1-r3"><div class="item-body"><label for="s1-r3">A labelled confusion matrix at 0.50, with rows = actual and columns = predicted.</label> {{help tp}} {{help fn}} {{help fp}} {{help tn}}</div></li>
   <li><input type="checkbox" id="s1-r4"><div class="item-body"><label for="s1-r4">Sensitivity, specificity and precision, each with its “of the patients who…” denominator in words.</label> {{help sensitivity}} {{help specificity}} {{help precision}}</div></li>

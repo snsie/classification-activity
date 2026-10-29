@@ -108,6 +108,10 @@ main > .wide, main > .table-wrap, main > .card-grid { max-width: 60rem; }
 .card-grid .card h3 { margin-top: 0; }
 .card-link { font-weight: 600; text-decoration: none; }
 .card-link::after { content: " →"; }
+.pager { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; border-top: 1px solid var(--line); margin-top: 2.5rem; padding-top: 1rem; }
+.pager [rel="prev"]::after { content: none; }
+.pager [rel="prev"]::before { content: "← "; }
+.pager [rel="next"] { margin-left: auto; text-align: right; }
 .core-question { font-size: 1.3rem; font-weight: 600; line-height: 1.4; border-left: 4px solid var(--accent); padding: 0.25rem 0 0.25rem 1rem; margin: 1.25rem 0; }
 .callout { background: var(--accent-soft); border-radius: var(--radius); padding: 1rem 1.25rem; margin: 1.25rem 0; }
 .callout > :last-child { margin-bottom: 0; }

@@ -1,5 +1,6 @@
-// Serve the Node app and the exported results: npm start (or node web/server.mjs [port])
+// Preview the Node app on your computer: npm start (or node web/server.mjs [port])
 // No npm dependencies. Serves the files in web/ and the JSON files in results/; it never retrains a model.
+// GitHub Pages hosts the same files without this server.
 import { createServer } from "node:http";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { extname, join, normalize } from "node:path";
@@ -7,9 +8,7 @@ import { gzipSync } from "node:zlib";
 
 const WEB = new URL(".", import.meta.url).pathname;
 const RESULTS = new URL("../results/", import.meta.url).pathname;
-const PORT = Number(process.argv[2] || process.env.PORT || 8766);
-// A host such as Render sets PORT and needs the app on every interface; on your computer it stays private.
-const HOST = process.env.HOST || (process.env.PORT ? "0.0.0.0" : "127.0.0.1");
+const PORT = Number(process.argv[2] || 8766);
 const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".mjs": "text/javascript; charset=utf-8",
                 ".css": "text/css; charset=utf-8", ".json": "application/json; charset=utf-8", ".svg": "image/svg+xml",
                 ".png": "image/png", ".jpg": "image/jpeg", ".ico": "image/x-icon", ".woff2": "font/woff2" };
@@ -36,4 +35,4 @@ createServer((req, res) => {
     return send(req, res, file);
   }
   res.writeHead(404, { "Content-Type": "text/plain" }).end("Not found");
-}).listen(PORT, HOST, () => console.log(`Judge the Model: http://localhost:${PORT}/`));
+}).listen(PORT, "127.0.0.1", () => console.log(`Judge the Model: http://localhost:${PORT}/`));

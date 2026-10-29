@@ -11,7 +11,7 @@ Modelled on the M10 activity ([regression-activity](https://github.com/snsie/reg
 ## What's here
 | Folder | What it is |
 |---|---|
-| [`starter/`](starter) | **The student starter**, also downloadable as a zip from the website: the two datasets with a fixed train/test split and their dictionary (`data/`), the workflow (`analysis/`), the shared metric helpers (`m11.py`), the app twice (Streamlit `streamlit_app.py`; Node `web/` + `package.json`, no npm dependencies), baseline-only `results/`, `DECISIONS.md`, `AGENT_BRIEF.md`, `SETUP.md` and `check.py`. |
+| [`starter/`](starter) | **The student starter**, also downloadable as a zip from the website: the two datasets with a fixed train/test split and their dictionary (`data/`), the workflow (`analysis/`), the shared metric helpers (`m11.py`), the app twice (Streamlit `streamlit_app.py`; Node `web/` + `package.json`, no npm dependencies, hosted as static files on GitHub Pages), baseline-only `results/`, `DECISIONS.md`, `AGENT_BRIEF.md`, `SETUP.md` and `check.py`. |
 | [`reproduce/`](reproduce) | Instructor only (not linked from the site). Rebuilds `starter/data/` and `starter/results/` from the raw UCI and CDC files, with SHA-256 checks, and runs the logistic-regression reference run that `check.py` compares against. |
 | [`site/`](site) | Website source: page fragments (`pages/`), `layout.html`, the glossary (`terms.json`), and styles, behaviour and demos (`assets/`). |
 | [`scripts/`](scripts) | `build.mjs` builds the site into `dist/` and zips the starter; `serve.mjs` previews it under the GitHub Pages subpath. |

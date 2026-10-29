@@ -1,13 +1,13 @@
 <!--meta {"title":"Submit","description":"Submission checklist, a preview of the three Canvas questions, and the rubric."} -->
-<p class="eyebrow">Resources</p>
+<p class="eyebrow">Finish</p>
 <h1>Submit</h1>
 <p class="lead">Submit your public GitHub repository link on Canvas, with your app link on the first line of its README, plus three Canvas answers.</p>
 
-<h2>Submission checklist</h2>
+<h2 id="checklist">Submission checklist</h2>
 <p class="checklist-status" data-for="submit"></p>
 <ul class="checklist" data-store="submit">
   <li><input type="checkbox" id="sub-1"><div class="item-body"><label for="sub-1"><code>python check.py</code> passes</label></div></li>
-  <li><input type="checkbox" id="sub-2"><div class="item-body"><label for="sub-2">The app opens in a private window and all four sections work for both datasets and all four models plus the baseline</label> {{help public-link}}</div></li>
+  <li><input type="checkbox" id="sub-2"><div class="item-body"><label for="sub-2">The app opens in a private window and all four sections work for both datasets and the four classifiers plus a baseline</label> {{help public-link}}</div></li>
   <li><input type="checkbox" id="sub-3"><div class="item-body"><label for="sub-3">The README's first line is the app link</label></div></li>
   <li><input type="checkbox" id="sub-4"><div class="item-body"><label for="sub-4">All three sections of <code>DECISIONS.md</code> are complete, and the app shows your recommendations</label> {{help decisions-md}}</div></li>
   <li><input type="checkbox" id="sub-5"><div class="item-body"><label for="sub-5">All three Canvas answers are submitted, with the AI tools you used (or “none”)</label></div></li>
@@ -17,9 +17,9 @@
 <h2 id="canvas">Canvas questions (preview)</h2>
 <p>Answer these on Canvas: 100–150 words each, in your own words, citing numbers from your app. Say which partition each number comes from: training or test.</p>
 <ol>
-  <li><strong>Does the readmission model help? (Section 1)</strong> Report the test accuracy of “always no” and of one trained model at 0.50. Give that model's TP, FP, and FN. Would accuracy alone lead a hospital to the right decision? Name the metric that changes your answer, and explain what it shows in patients per 100 discharges.</li>
-  <li><strong>What does a threshold for the job cost? (Section 2)</strong> For one diabetes model, compare 0.50 with a threshold that reaches at least 0.90 sensitivity on the test set. Report both confusion matrices, plus the sensitivity, precision, and number flagged per 100 adults. Who carries the extra work? Why did AUROC stay the same? Why might new adults get slightly less than 0.90?</li>
-  <li><strong>Which model would you trust on new patients? (Sections 3 and 4)</strong> On one dataset, compare random forest with logistic regression: their training AUROC, test AUROC and the gap. Which one memorised its training patients, and how can you tell? Which would you recommend to the clinical lead, and what would you warn them about?</li>
+  <li id="q1"><strong>Does the readmission model help? (Section 1)</strong> Report the test accuracy of “always no” and of one trained model at 0.50. Give that model's TP, FP, and FN. Would accuracy alone lead a hospital to the right decision? Name the metric that changes your answer, and explain what it shows in patients per 100 discharges.</li>
+  <li id="q2"><strong>What does a threshold for the job cost? (Section 2)</strong> For one diabetes model, compare 0.50 with a threshold that reaches at least 0.90 sensitivity on the test set. Report both confusion matrices, plus the sensitivity, precision, and number flagged per 100 adults. Who carries the extra work? Why did AUROC stay the same? Why might new adults get slightly less than 0.90?</li>
+  <li id="q3"><strong>Which model would you trust on new patients? (Sections 3 and 4)</strong> On one dataset, compare random forest with logistic regression: their training AUROC, test AUROC and the gap. Which one memorised its training patients, and how can you tell? Which would you recommend to the clinical lead, and what would you warn them about?</li>
 </ol>
 
 <h2 id="rubric">Rubric <span class="tag optional">Suggested weights</span></h2>

@@ -32,7 +32,7 @@
 <div class="table-wrap"><table>
   <thead><tr><th scope="col">Command</th><th scope="col">Does</th></tr></thead>
   <tbody>
-    <tr><td><code>python -m analysis</code></td><td>Fits all five models on the training rows and writes, for each dataset, every row's training and test probability and each model's training and test AUROC to <code>results/&lt;key&gt;.json</code>. Copies your <code>DECISIONS.md</code> answers to <code>results/decisions.json</code>. Refuses to run until the kNN <code>TODO</code> is complete.</td></tr>
+    <tr><td><code>python -m analysis</code></td><td>Fits the four classifiers plus a baseline on the training rows and writes, for each dataset, every row's training and test probability and each model's training and test AUROC to <code>results/&lt;key&gt;.json</code>. Copies your <code>DECISIONS.md</code> answers to <code>results/decisions.json</code>. Refuses to run until the kNN <code>TODO</code> is complete.</td></tr>
     <tr><td><code>python check.py</code></td><td>Runs the integrity checks below. Add <code>--stage setup</code> or <code>--stage results</code> to check only up to that step.</td></tr>
   </tbody>
 </table></div>

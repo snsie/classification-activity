@@ -23,6 +23,9 @@ const VERSION = (process.env.GITHUB_SHA || (() => {
 
 const NAV = [
   { file: "index", label: "Overview" },
+  { group: "Get started" },
+  { file: "hosting", label: "Setup & publish" },
+  { file: "data", label: "Data & files" },
   { group: "The work" },
   { file: "models", label: "Models" },
   { file: "analysis", label: "Analysis" },
@@ -31,14 +34,14 @@ const NAV = [
   { file: "threshold", label: "2. A Threshold for the Job" },
   { file: "ranking", label: "3. Ranking vs. Being Right" },
   { file: "train-vs-test", label: "4. Training vs. Test" },
-  { group: "Resources" },
-  { file: "data", label: "Data & files" },
-  { file: "hosting", label: "Publish & back up" },
+  { group: "Finish" },
   { file: "submit", label: "Submit" },
+  { group: "Resources" },
   { file: "glossary", label: "Glossary" },
 ];
-const PAGES = ["index", "models", "analysis", "beyond-accuracy", "threshold", "ranking", "train-vs-test",
-  "data", "hosting", "submit", "glossary", "404"];
+// The completion path: every page on it except the glossary gets Previous/Next links, in nav order.
+const PATH = NAV.filter((n) => n.file && n.file !== "glossary");
+const PAGES = [...NAV.filter((n) => n.file).map((n) => n.file), "404"];
 
 const terms = JSON.parse(readFileSync(join(SITE, "terms.json"), "utf8"));
 const dictionary = JSON.parse(readFileSync(join(STARTER, "data", "datasets.json"), "utf8"));
@@ -145,18 +148,20 @@ const FILE_NOTES = {
   "check.py": "Integrity checks: must pass before you submit.",
   "m11.py": "Shared metric helpers: every number comes from these.",
   "streamlit_app.py": "Streamlit route: your app, the four plain starter sections.",
-  "package.json": "Node route: npm start runs the app. No npm dependencies.",
+  "package.json": "Node route: npm start previews the app. No npm dependencies.",
   "web/app.js": "Node route: your app, the same four plain starter sections.",
   "web/index.html": "Node route: the page the app draws into.",
   "web/style.css": "Node route: the app's styles.",
   "web/m11.js": "Node route: the shared metric helpers, ported from m11.py.",
-  "web/server.mjs": "Node route: serves web/ and results/.",
+  "web/server.mjs": "Node route: previews web/ and results/ on your computer.",
+  "index.html": "Node route: GitHub Pages opens this and sends visitors on to web/.",
+  ".nojekyll": "Node route: tells GitHub Pages to serve the files as they are.",
   "requirements.txt": "Pinned Python packages (CPU only).",
   ".gitignore": "Keeps caches and secrets out of git.",
   "analysis/__init__.py": "Marks analysis/ as a package.",
   "analysis/__main__.py": "The workflow: python -m analysis.",
   "analysis/data.py": "Loads the CSVs, the split and the predictors.",
-  "analysis/models.py": "The five models. You complete the kNN TODO here.",
+  "analysis/models.py": "The four classifiers plus a baseline. You complete the kNN TODO here.",
   "analysis/evaluate.py": "Fits on the training rows, scores both sets.",
   "analysis/export.py": "Reads DECISIONS.md and exports it.",
   "data/README.md": "Data dictionary, with “When is it known?” for every column.",
@@ -193,11 +198,20 @@ function expand(html, zipBytes) {
     .replace(/<pre>/g, '<pre tabindex="0">'); // code blocks can scroll sideways, so keyboard users must reach them
 }
 
+const href = (file) => (file === "index" ? "./" : `${file}.html`);
+
+function pager(current) {
+  const i = PATH.findIndex((n) => n.file === current);
+  if (i < 0) return "";
+  const link = (n, rel, text) => n ? `<a class="card-link" rel="${rel}" href="${href(n.file)}">${text}: ${esc(n.label)}</a>` : "<span></span>";
+  return `<nav class="pager" aria-label="Previous and next">${link(PATH[i - 1], "prev", "Previous")}${link(PATH[i + 1], "next", "Next")}</nav>`;
+}
+
 function nav(current) {
   return NAV.map((n) =>
     n.group
       ? `<li class="nav-group" aria-hidden="true">${n.group}</li>`
-      : `<li><a href="${n.file === "index" ? "./" : `${n.file}.html`}"${n.file === current ? ' aria-current="page"' : ""}>${esc(n.label)}</a></li>`,
+      : `<li><a href="${href(n.file)}"${n.file === current ? ' aria-current="page"' : ""}>${esc(n.label)}</a></li>`,
   ).join("");
 }
 
@@ -230,7 +244,7 @@ for (const page of PAGES) {
     .replace("{{base}}", meta.base ? `<base href="${meta.base}">` : "")
     .replace("{{nav}}", nav(page))
     .replace("{{version}}", VERSION === "local" ? "local build" : `<a href="${REPO}/commit/${VERSION}">version ${VERSION}</a>`)
-    .replace("{{content}}", body)
+    .replace("{{content}}", body + pager(page))
     .replace("{{scripts}}", (meta.scripts || []).map((s) => `<script type="module" src="assets/${s}?v={{v}}"></script>`).join(""))
     .replaceAll("{{v}}", VERSION);
   if (/\{\{[a-z]/.test(html)) throw new Error(`unexpanded token in ${page}: ${html.match(/\{\{[^}]*\}\}/)[0]}`);

@@ -17,7 +17,8 @@ const cache = {};
 
 async function load(name) {
   if (!(name in cache)) {
-    const r = await fetch(`results/${name}.json`);
+    // ../results/ is next to web/ on GitHub Pages; npm start serves it at the same address.
+    const r = await fetch(`../results/${name}.json`);
     cache[name] = r.ok ? await r.json() : null;
   }
   return cache[name];

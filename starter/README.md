@@ -30,11 +30,11 @@ Run the app on your computer: `streamlit run streamlit_app.py` (Streamlit) or `n
 |---|---|
 | `DECISIONS.md` | Your decisions: what matters for each job, your recommendations, and one design choice |
 | `AGENT_BRIEF.md` | Rules for your AI coding agent (have it read this first) |
-| `SETUP.md` | How to run and publish on Streamlit Community Cloud or Render |
+| `SETUP.md` | How to run and publish on Streamlit Community Cloud or GitHub Pages |
 | `analysis/` | The workflow; you complete one pipeline in `analysis/models.py` |
 | `m11.py` | The shared metric helpers: every number comes from these |
 | `streamlit_app.py`, `requirements.txt` | Your app if you choose Streamlit, hosted on Streamlit Community Cloud |
-| `web/`, `package.json` | Your app if you choose Node.js (`web/app.js`, with the metric helpers in `web/m11.js`), hosted on Render |
+| `web/`, `package.json` | Your app if you choose Node.js (`web/app.js`, with the metric helpers in `web/m11.js`), hosted on GitHub Pages (`index.html` and `.nojekyll` at the top level are for Pages) |
 | `results/` | What the analysis exports; the app reads only these files |
 | `data/` | The two datasets, the dictionary (`data/README.md`) and `manifest.json` |
 | `check.py` | Integrity checks: `python check.py` must pass before you submit |

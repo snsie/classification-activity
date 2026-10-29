@@ -1,7 +1,7 @@
 <!--meta {"title":"Overview","description":"A take-home activity: run a supplied Python workflow on two health datasets, train on a training set and evaluate on a test set, and build one app that helps a clinical lead judge whether any classifier is fit for each job."} -->
 <p class="eyebrow">M11 take-home activity</p>
 <h1>Judge the Model</h1>
-<p class="lead">Run a supplied Python workflow that trains four classifiers on two health datasets and evaluates them on a test set. Then build one app, in Streamlit or Node.js, that helps a clinical lead {{help clinical-lead}} decide whether any model is fit for each job.</p>
+<p class="lead">Run a supplied Python workflow that trains four classifiers plus a baseline on two health datasets and evaluates them on a test set. Then build one app, in Streamlit or Node.js, that helps a clinical lead {{help clinical-lead}} decide whether any model is fit for each job.</p>
 
 <p class="core-question">Which classifier would you trust for this job, at what threshold, and with what limits?</p>
 
@@ -10,11 +10,52 @@
   <dt>Who</dt><dd>Individual, take-home</dd>
   <dt>Analyze</dt><dd>Run a supplied Python workflow that fits each model on a training set {{help training-set}} and evaluates it on a test set {{help test-set}}. You write one model pipeline {{help pipeline}}. <a href="analysis.html">Analysis</a></dd>
   <dt>Build</dt><dd>One app with four sections, in Streamlit (Python) or Node.js (JavaScript), that helps a clinical lead judge whether any model is fit for each job. It reads the results your Python analysis exports {{help results-files}}.</dd>
-  <dt>Host</dt><dd>Streamlit Community Cloud or Render, with your code in a public GitHub repository. <a href="hosting.html">Publish &amp; back up</a></dd>
+  <dt>Host</dt><dd>Streamlit Community Cloud or GitHub Pages, with your code in a public GitHub repository. <a href="hosting.html">Setup &amp; publish</a></dd>
   <dt>Data</dt><dd>Readmission and diabetes, supplied as CSVs with a fixed train/test split. <a href="data.html">Data &amp; files</a></dd>
   <dt>Submit</dt><dd>Your public GitHub repository link (app link on the first line of the README), plus three Canvas answers. <a href="submit.html">Submit</a></dd>
   <dt>Audience</dt><dd>A clinical lead who knows the clinical problem but not the metrics, and who must decide whether to use a model</dd>
 </dl>
+
+<h2 id="start">Start here</h2>
+<ol class="steps">
+  <li><strong>Set up</strong>
+    <ul>
+      <li>Download the starter, create a public GitHub repository {{help github-backup}}, install the requirements, and run <code>python check.py --stage setup</code>.</li>
+      <li>Choose <a href="hosting.html#choose">Streamlit or Node.js</a> and publish the untouched starter. It shows baseline-only results.</li>
+    </ul>
+    <span class="done-when"><strong>Done when:</strong> the check passes and your app link loads in a private window.</span></li>
+  <li><strong>Decide what matters</strong>
+    <ul>
+      <li>Read both dataset scenarios: <a href="data.html#readmission">30-day readmission</a> and <a href="data.html#diabetes">diabetes screening</a>.</li>
+      <li>Then, before you look at any results, fill in <code>Before results</code> in <code>DECISIONS.md</code> {{help decisions-md}}: the positive class for each job, and which error matters more. Commit and push.</li>
+    </ul>
+    <span class="done-when"><strong>Done when:</strong> the commit is on GitHub.</span></li>
+  <li><strong>Write the kNN pipeline and run the analysis</strong>
+    <ul>
+      <li>Complete the kNN <code>TODO</code> in <code>analysis/models.py</code>, following the logistic regression example. <a href="models.html">Models</a></li>
+      <li>Run <code>python -m analysis</code>. <a href="analysis.html">Analysis</a></li>
+    </ul>
+    <span class="done-when"><strong>Done when:</strong> <code>python check.py --stage results</code> passes. Commit and push <code>results/</code>.</span></li>
+  <li><strong>Build your app</strong>
+    <ul>
+      <li>Build the four sections to their required minimums for a clinical lead.</li>
+      <li>Commit and push, then test in a private window.</li>
+    </ul>
+    <span class="done-when"><strong>Done when:</strong> every section works for both datasets and the four classifiers plus a baseline.</span></li>
+  <li><strong>Write your recommendations</strong>
+    <ul>
+      <li>Fill in <code>Recommendations</code> in <code>DECISIONS.md</code>: for each job, a model and threshold, or “none is adequate”, with a reason.</li>
+      <li>Fill in <code>Design choice and AI use</code>: one thing you chose to show or leave out for your clinical lead, and one AI suggestion you turned down.</li>
+      <li>Run <code>python -m analysis</code> again so your app shows them, then commit and push.</li>
+    </ul>
+    <span class="done-when"><strong>Done when:</strong> <code>python check.py</code> passes.</span></li>
+  <li><strong>Answer the Canvas questions</strong>
+    <ul>
+      <li>Three answers of 100–150 words each, citing numbers from your app. <a href="submit.html#canvas">The questions</a></li>
+      <li>Submit your repository link.</li>
+    </ul></li>
+</ol>
+<p>{{zip}}</p>
 
 <h2 id="judged">How your work is judged</h2>
 <p>Most of the credit is for reasoning: <strong>45 points</strong> for your three Canvas answers, each using your own numbers, tied to the job and stating the uncertainty. Your app earns <strong>25</strong> for meeting the four required minimums in a way a clinical lead can read cold, and <strong>5</strong> more for one design choice of your own, explained in <code>DECISIONS.md</code>. A valid analysis earns <strong>15</strong>, and your decisions <strong>10</strong>. You get no points for a higher AUROC, for choosing a particular model or for visual polish: a plain app with a well-reasoned design choice earns full credit. After the deadline, every app goes into a <a href="submit.html#gallery">class gallery</a>. <a href="submit.html#rubric">Full rubric</a></p>
@@ -43,49 +84,9 @@
   </article>
 </div>
 
-<h2 id="start">Start here</h2>
-<ol class="steps">
-  <li><strong>Set up</strong>
-    <ul>
-      <li>Download the starter, create a public GitHub repository {{help github-backup}}, install the requirements, and run <code>python check.py --stage setup</code>.</li>
-      <li>Choose <a href="hosting.html#choose">Streamlit or Node.js</a>, publish the untouched starter app (Streamlit Community Cloud or Render) and open it in a private window.</li>
-    </ul>
-    <span class="done-when"><strong>Done when:</strong> the check passes and your app link loads.</span></li>
-  <li><strong>Decide what matters</strong>
-    <ul>
-      <li>Before you look at any results, fill in <code>Before results</code> in <code>DECISIONS.md</code> {{help decisions-md}}: the positive class for each job, and which error matters more. Commit and push.</li>
-    </ul>
-    <span class="done-when"><strong>Done when:</strong> the commit is on GitHub.</span></li>
-  <li><strong>Write the kNN pipeline and run the analysis</strong>
-    <ul>
-      <li>Complete the kNN <code>TODO</code> in <code>analysis/models.py</code>, following the logistic regression example. <a href="models.html">Models</a></li>
-      <li>Run <code>python -m analysis</code>. It trains every model on the training rows and scores it on the test rows.</li>
-    </ul>
-    <span class="done-when"><strong>Done when:</strong> <code>python check.py --stage results</code> passes. Commit and push <code>results/</code>.</span></li>
-  <li><strong>Build your app</strong>
-    <ul>
-      <li>Build the four sections to their required minimums for a clinical lead.</li>
-      <li>Commit and push, then test in a private window.</li>
-    </ul>
-    <span class="done-when"><strong>Done when:</strong> every section works for both datasets and every model.</span></li>
-  <li><strong>Write your recommendations</strong>
-    <ul>
-      <li>Fill in <code>Recommendations</code> in <code>DECISIONS.md</code>: for each job, a model and threshold, or “none is adequate”, with a reason.</li>
-      <li>Fill in <code>Design choice and AI use</code>: one thing you chose to show or leave out for your clinical lead, and one AI suggestion you turned down.</li>
-      <li>Run <code>python -m analysis</code> again so your app shows them, then commit and push.</li>
-    </ul>
-    <span class="done-when"><strong>Done when:</strong> <code>python check.py</code> passes.</span></li>
-  <li><strong>Answer the Canvas questions</strong>
-    <ul>
-      <li>Three answers of 100–150 words each, citing numbers from your app. <a href="submit.html#canvas">The questions</a></li>
-      <li>Submit your repository link.</li>
-    </ul></li>
-</ol>
-<p>{{zip}}</p>
-
 <div class="callout">
   <p class="callout-title">New to these ideas?</p>
-  <p>Look for the <span class="help" aria-hidden="true" style="cursor:default">?</span> buttons. Each one opens a short, plain-language explanation of the term next to it, in the lecture's words. The <a href="glossary.html">glossary</a> lists them all.</p>
+  <p>Each <span class="help" aria-hidden="true" style="cursor:default">?</span> button explains the term next to it, in the lecture's words. The <a href="glossary.html">glossary</a> lists them all.</p>
 </div>
 
 <h2 id="fair-play">Fair play</h2>

@@ -1,4 +1,4 @@
-<!--meta {"title":"Models","description":"The four classifiers and the prevalence baseline: one core idea, a tiny illustration and one practical limitation each. kNN is new.","scripts":["demos.js"]} -->
+<!--meta {"title":"Models","description":"Four classifiers plus a baseline: one core idea, a tiny illustration and one practical limitation each. kNN is new.","scripts":["demos.js"]} -->
 <p class="eyebrow">The work</p>
 <h1>Models</h1>
 <p class="lead">Four classifiers plus a baseline, all fixed. Everyone compares the same models with the same settings: you don't tune anything. Logistic regression, random forest and gradient boosting are from the lecture. kNN is new, and you write its pipeline {{help pipeline}}.</p>
@@ -29,7 +29,7 @@
   <li><strong>Keep scaling inside the pipeline.</strong> Never scale the whole dataset first: the scaler would learn from the test rows. <code>python check.py --stage results</code> checks this.</li>
 </ul>
 
-<h2>The five models</h2>
+<h2>The four classifiers plus a baseline</h2>
 
 <article class="card model-card" id="baseline">
   <p class="eyebrow">Supplied</p>
