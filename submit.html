@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Submit · Judge the Model</title>
+  <meta name="description" content="Submission checklist, rubric and class gallery.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f6b6f'/%3E%3Cpath d='M7 25 C9 12 13 8 25 7' stroke='white' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cline x1='7' y1='25' x2='25' y2='7' stroke='white' stroke-width='1.5' stroke-dasharray='2 2.5'/%3E%3C/svg%3E">
+  <script>document.documentElement.classList.add("js")</script>
+  <link rel="stylesheet" href="assets/style.css?v=9617d8c">
+  <script type="module" src="assets/site.js?v=9617d8c"></script>
+  
+</head>
+<body data-page="submit">
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="./"><span class="brand-mark" aria-hidden="true"></span>Judge the Model</a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    </div>
+  </header>
+  <div class="shell">
+    <nav id="site-nav" class="site-nav" aria-label="Main">
+      <ul><li><a href="./">Overview</a></li><li class="nav-group" aria-hidden="true">Get started</li><li><a href="hosting.html">Setup &amp; publish</a></li><li><a href="data.html">Data &amp; files</a></li><li class="nav-group" aria-hidden="true">The work</li><li><a href="models.html">Models</a></li><li><a href="analysis.html">Analysis</a></li><li class="nav-group" aria-hidden="true">App sections</li><li><a href="beyond-accuracy.html">1. Beyond Accuracy</a></li><li><a href="threshold.html">2. A Threshold for the Job</a></li><li><a href="train-vs-test.html">3. Training vs. Test</a></li><li class="nav-group" aria-hidden="true">Finish</li><li><a href="submit.html" aria-current="page">Submit</a></li><li class="nav-group" aria-hidden="true">Resources</li><li><a href="glossary.html">Glossary</a></li></ul>
+    </nav>
+    <main id="main" tabindex="-1">
+      <p class="eyebrow">Finish</p>
+<h1>Submit</h1>
+<p class="lead">Submit your public GitHub repository link on Canvas, with your app link on the first line of its README, plus four Canvas answers.</p>
+
+<h2 id="checklist">Submission checklist</h2>
+<p class="checklist-status" data-for="submit"></p>
+<ul class="checklist" data-store="submit">
+  <li><input type="checkbox" id="sub-1"><div class="item-body"><label for="sub-1"><code>python check.py</code> passes</label></div></li>
+  <li><input type="checkbox" id="sub-6"><div class="item-body"><label for="sub-6">You ran <code>bash run_app.sh</code> yourself, did every section's reviewer task, and <code>run_app.sh</code> is committed</label></div></li>
+  <li><input type="checkbox" id="sub-2"><div class="item-body"><label for="sub-2">The app opens in a private window and all three sections work for both datasets and the four classifiers plus a baseline</label> <a class="help" href="glossary.html#public-link" data-help="public-link" aria-label="What is Public app link?" title="What is Public app link?"><span aria-hidden="true">?</span></a></div></li>
+  <li><input type="checkbox" id="sub-3"><div class="item-body"><label for="sub-3">The README's first line is the app link</label></div></li>
+  <li><input type="checkbox" id="sub-4"><div class="item-body"><label for="sub-4">All three sections of <code>DECISIONS.md</code> are complete, in your own words, and the app shows your recommendations</label> <a class="help" href="glossary.html#decisions-md" data-help="decisions-md" aria-label="What is DECISIONS.md?" title="What is DECISIONS.md?"><span aria-hidden="true">?</span></a></div></li>
+  <li><input type="checkbox" id="sub-5"><div class="item-body"><label for="sub-5">All four Canvas answers are submitted, written by you, with the AI tools you used</label></div></li>
+</ul>
+<p class="small muted">Ticks are saved in this browser only.</p>
+
+<h2 id="rubric">Rubric <span class="tag optional">Suggested weights</span></h2>
+<div class="table-wrap"><table>
+  <thead><tr><th scope="col">Component</th><th scope="col" class="num">Points</th><th scope="col">Full credit</th></tr></thead>
+  <tbody>
+    <tr><td>Valid analysis</td><td class="num">15</td><td><code>analysis/models.py</code> matches the spec, with preprocessing inside every pipeline; a working <code>run_app.sh</code>; <code>check.py</code> passes</td></tr>
+    <tr><td>Decisions</td><td class="num">15</td><td>Specific, justified Before results entries; recommendations tied to each job and to your results</td></tr>
+    <tr><td>App</td><td class="num">25</td><td>All three required minimums met, readable cold by a clinical lead, labelled partitions, no false claims, recommendations shown</td></tr>
+    <tr><td>Design choice and AI use</td><td class="num">5</td><td>One design choice of your own, visible in the app, with a reason tied to your clinical lead and the job; one AI suggestion you turned down, with a reason (or “no AI tools used”)</td></tr>
+    <tr><td>Canvas reasoning</td><td class="num">40</td><td>Own numbers, correct interpretation, tied to the job, uncertainty stated (10 each)</td></tr>
+  </tbody>
+</table></div>
+<p>No points for higher AUROC, for choosing a particular model or for visual polish. The design-choice points reward a deliberate, explained decision, not a good-looking app: “I put flagged adults per 100 first because the clinical lead staffs the clinic” earns full credit in a plain app.</p>
+
+<h2 id="gallery">Class gallery <span class="tag optional">Ungraded</span></h2>
+<p>After the deadline, every app goes into a class gallery. Open a few of your classmates' apps and vote in three categories:</p>
+<ul>
+  <li><strong>The app a clinical lead would actually open</strong>: the reader could make the decision from it, cold.</li>
+  <li><strong>Most honest about uncertainty</strong>: it shows what the model can't do, not only what it can.</li>
+  <li><strong>Clearest threshold trade-off</strong>: it makes plain what moving the threshold gains, and who carries the cost.</li>
+</ul>
+<p>Votes don't change your grade. The winners are shown to the class, with their design choices.</p>
+
+<h2>False claims to avoid</h2>
+<p>None of these may appear anywhere in your app:</p>
+<ul>
+  <li>AUROC described as “accuracy” <a class="help" href="glossary.html#auroc" data-help="auroc" aria-label="What is AUROC?" title="What is AUROC?"><span aria-hidden="true">?</span></a></li>
+  <li>a training result labelled as a test result <a class="help" href="glossary.html#training-auroc" data-help="training-auroc" aria-label="What is Training AUROC?" title="What is Training AUROC?"><span aria-hidden="true">?</span></a></li>
+  <li>a causal claim about a feature</li>
+</ul>
+<nav class="pager" aria-label="Previous and next"><a class="card-link" rel="prev" href="train-vs-test.html">Previous: 3. Training vs. Test</a><span></span></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>M11 take-home activity: judging classifiers for a job.
+      Data: UCI Diabetes 130-US Hospitals (CC BY 4.0); CDC/NCHS NHANES 2017–2018 (public domain).</p>
+    <p><a href="https://github.com/snsie/classification-activity">Source and files on GitHub</a> · <a href="glossary.html">Glossary</a> · <a href="https://github.com/snsie/classification-activity/commit/9617d8c">version 9617d8c</a></p>
+  </footer>
+</body>
+</html>

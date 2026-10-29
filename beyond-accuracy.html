@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>1. Beyond Accuracy · Judge the Model</title>
+  <meta name="description" content="App section brief: name the positive class, see why accuracy alone misleads, and read a confusion matrix as four groups of patients.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f6b6f'/%3E%3Cpath d='M7 25 C9 12 13 8 25 7' stroke='white' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cline x1='7' y1='25' x2='25' y2='7' stroke='white' stroke-width='1.5' stroke-dasharray='2 2.5'/%3E%3C/svg%3E">
+  <script>document.documentElement.classList.add("js")</script>
+  <link rel="stylesheet" href="assets/style.css?v=9617d8c">
+  <script type="module" src="assets/site.js?v=9617d8c"></script>
+  
+</head>
+<body data-page="beyond-accuracy">
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="./"><span class="brand-mark" aria-hidden="true"></span>Judge the Model</a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    </div>
+  </header>
+  <div class="shell">
+    <nav id="site-nav" class="site-nav" aria-label="Main">
+      <ul><li><a href="./">Overview</a></li><li class="nav-group" aria-hidden="true">Get started</li><li><a href="hosting.html">Setup &amp; publish</a></li><li><a href="data.html">Data &amp; files</a></li><li class="nav-group" aria-hidden="true">The work</li><li><a href="models.html">Models</a></li><li><a href="analysis.html">Analysis</a></li><li class="nav-group" aria-hidden="true">App sections</li><li><a href="beyond-accuracy.html" aria-current="page">1. Beyond Accuracy</a></li><li><a href="threshold.html">2. A Threshold for the Job</a></li><li><a href="train-vs-test.html">3. Training vs. Test</a></li><li class="nav-group" aria-hidden="true">Finish</li><li><a href="submit.html">Submit</a></li><li class="nav-group" aria-hidden="true">Resources</li><li><a href="glossary.html">Glossary</a></li></ul>
+    </nav>
+    <main id="main" tabindex="-1">
+      <p class="eyebrow">App section 1</p>
+<h1>Beyond Accuracy</h1>
+<p class="core-question">Does a high accuracy mean the model helps?</p>
+
+<dl class="facts">
+  <dt>Learning objective</dt><dd>After using it, the clinical lead can name the positive class <a class="help" href="glossary.html#positive-class" data-help="positive-class" aria-label="What is Positive class?" title="What is Positive class?"><span aria-hidden="true">?</span></a>, see why accuracy <a class="help" href="glossary.html#accuracy" data-help="accuracy" aria-label="What is Accuracy?" title="What is Accuracy?"><span aria-hidden="true">?</span></a> alone misleads, and read a confusion matrix <a class="help" href="glossary.html#confusion-matrix" data-help="confusion-matrix" aria-label="What is Confusion matrix?" title="What is Confusion matrix?"><span aria-hidden="true">?</span></a> as four groups of patients, and compare the models on more than accuracy.</dd>
+  <dt>Reader</dt><dd>A clinical lead <a class="help" href="glossary.html#clinical-lead" data-help="clinical-lead" aria-label="What is Clinical lead?" title="What is Clinical lead?"><span aria-hidden="true">?</span></a> who knows the clinical problem but not the metrics.</dd>
+  <dt>Data</dt><dd>Test-set probabilities <a class="help" href="glossary.html#test-set" data-help="test-set" aria-label="What is Test set?" title="What is Test set?"><span aria-hidden="true">?</span></a>, at threshold 0.50.</dd>
+</dl>
+
+<h2>Required minimum <span class="tag required">Required</span></h2>
+<p class="checklist-status" data-for="s1-required"></p>
+<ul class="checklist" data-store="s1-required">
+  <li><input type="checkbox" id="s1-r1"><div class="item-body"><label for="s1-r1">A dataset selector (both datasets) and a model selector (the four classifiers plus a baseline).</label></div></li>
+  <li><input type="checkbox" id="s1-r2"><div class="item-body"><label for="s1-r2">Prevalence and baseline accuracy: the accuracy of “the most common class for everyone”.</label> <a class="help" href="glossary.html#prevalence" data-help="prevalence" aria-label="What is Prevalence?" title="What is Prevalence?"><span aria-hidden="true">?</span></a> <a class="help" href="glossary.html#majority-baseline" data-help="majority-baseline" aria-label="What is “Most common class for everyone” baseline?" title="What is “Most common class for everyone” baseline?"><span aria-hidden="true">?</span></a></div></li>
+  <li><input type="checkbox" id="s1-r3"><div class="item-body"><label for="s1-r3">A labelled confusion matrix at 0.50, with rows = actual and columns = predicted.</label> <a class="help" href="glossary.html#tp" data-help="tp" aria-label="What is True positive (TP)?" title="What is True positive (TP)?"><span aria-hidden="true">?</span></a> <a class="help" href="glossary.html#fn" data-help="fn" aria-label="What is False negative (FN)?" title="What is False negative (FN)?"><span aria-hidden="true">?</span></a> <a class="help" href="glossary.html#fp" data-help="fp" aria-label="What is False positive (FP)?" title="What is False positive (FP)?"><span aria-hidden="true">?</span></a> <a class="help" href="glossary.html#tn" data-help="tn" aria-label="What is True negative (TN)?" title="What is True negative (TN)?"><span aria-hidden="true">?</span></a></div></li>
+  <li><input type="checkbox" id="s1-r4"><div class="item-body"><label for="s1-r4">Sensitivity, specificity and precision, each with its “of the patients who…” denominator in words.</label> <a class="help" href="glossary.html#sensitivity" data-help="sensitivity" aria-label="What is Sensitivity (recall, TPR)?" title="What is Sensitivity (recall, TPR)?"><span aria-hidden="true">?</span></a> <a class="help" href="glossary.html#specificity" data-help="specificity" aria-label="What is Specificity?" title="What is Specificity?"><span aria-hidden="true">?</span></a> <a class="help" href="glossary.html#precision" data-help="precision" aria-label="What is Precision?" title="What is Precision?"><span aria-hidden="true">?</span></a></div></li>
+  <li><input type="checkbox" id="s1-r7"><div class="item-body"><label for="s1-r7">A comparison of all five at 0.50: a small labelled confusion matrix for each, and one table row each with accuracy, sensitivity (recall, TPR), specificity, FPR (1 − specificity), precision and F1.</label> <a class="help" href="glossary.html#accuracy" data-help="accuracy" aria-label="What is Accuracy?" title="What is Accuracy?"><span aria-hidden="true">?</span></a> <a class="help" href="glossary.html#fpr" data-help="fpr" aria-label="What is False positive rate (FPR)?" title="What is False positive rate (FPR)?"><span aria-hidden="true">?</span></a> <a class="help" href="glossary.html#f1" data-help="f1" aria-label="What is F1?" title="What is F1?"><span aria-hidden="true">?</span></a></div></li>
+  <li><input type="checkbox" id="s1-r5"><div class="item-body"><label for="s1-r5">Undefined values shown as “undefined”, never as 0.</label> <a class="help" href="glossary.html#undefined" data-help="undefined" aria-label="What is Undefined metric?" title="What is Undefined metric?"><span aria-hidden="true">?</span></a></div></li>
+  <li><input type="checkbox" id="s1-r6"><div class="item-body"><label for="s1-r6">Every table and plot labelled <span class="partition">Test</span>.</label></div></li>
+</ul>
+
+<div class="callout agent-task">
+  <p class="callout-title">Ask your agent</p>
+  <p>Build Section 1, Beyond Accuracy, to this required minimum: &lt;paste the list above&gt;. Use the test probabilities at 0.50, with every number from <code>m11</code> (<code>preds</code>, <code>confusion</code>, <code>metrics</code>, <code>majority_accuracy</code>). Offer me two or three layouts first; build the one I choose.</p>
+</div>
+
+<h2>Done when</h2>
+<p class="checklist-status" data-for="s1-done"></p>
+<ul class="checklist" data-store="s1-done">
+  <li><input type="checkbox" id="s1-d1"><div class="item-body"><label for="s1-d1">It works for every dataset and every model, on your public link.</label></div></li>
+  <li><input type="checkbox" id="s1-d2"><div class="item-body"><label for="s1-d2">Every number comes from <code>results/</code> through <code>m11</code>; none is typed in.</label></div></li>
+  <li><input type="checkbox" id="s1-d4"><div class="item-body"><label for="s1-d4">You ran the app with <code>bash run_app.sh</code> and did the reviewer tasks below yourself.</label></div></li>
+  <li><input type="checkbox" id="s1-d3"><div class="item-body"><label for="s1-d3">Someone who hasn't seen your app can do the reviewer task below without help.</label></div></li>
+</ul>
+
+<div class="callout">
+  <p class="callout-title">Reviewers will try</p>
+  <p><strong>Readmission, best model at 0.50:</strong> how many readmissions does it catch, and how does its accuracy compare with “always no”?</p>
+  <p><strong>Diabetes, every model at 0.50:</strong> which model has the highest F1, and how far apart are the models' accuracies?</p>
+</div>
+
+<div class="callout">
+  <p class="callout-title">Never in your app</p>
+  <ul>
+    <li>AUROC described as “accuracy”.</li>
+    <li>A training result labelled as a test result.</li>
+    <li>A causal claim about a feature.</li>
+  </ul>
+</div>
+
+<h2>Ideas, not templates <span class="tag optional">Optional</span></h2>
+<ul>
+  <li>Draw 100 patients as dots, sorted into the four cells, so “of the patients who…” is something you can count.</li>
+  <li>Put “always no” and the model side by side: same accuracy, very different catches.</li>
+  <li>Say each metric as the clinical lead's question: “Of the patients we flag, how many come back?”</li>
+  <li>Let the comparison follow Section 2's slider, so the lead can compare the models at the job's threshold too.</li>
+</ul>
+<p class="small muted">Accurate, readable tables meet every required minimum. Custom visuals are optional.</p>
+
+<h2>Common questions</h2>
+<details><summary>Which way round does the matrix go?</summary><div class="details-body">
+  <p>The course layout: rows are what actually happened, columns are what the model said, positives first. scikit-learn's <code>confusion_matrix</code> uses another order, so label both axes.</p></div></details>
+<details><summary>The baseline flags no one. Is precision 0?</summary><div class="details-body">
+  <p>No: with no one flagged, precision is 0 ÷ 0, which is undefined. Show “undefined”.</p></div></details>
+<details><summary>Can I say a feature raises the risk of readmission?</summary><div class="details-body">
+  <p>No. The models learned associations in historical data. Say “patients with more past admissions tended to get higher probabilities”, never “admissions cause readmission”.</p></div></details>
+<nav class="pager" aria-label="Previous and next"><a class="card-link" rel="prev" href="analysis.html">Previous: Analysis</a><a class="card-link" rel="next" href="threshold.html">Next: 2. A Threshold for the Job</a></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>M11 take-home activity: judging classifiers for a job.
+      Data: UCI Diabetes 130-US Hospitals (CC BY 4.0); CDC/NCHS NHANES 2017–2018 (public domain).</p>
+    <p><a href="https://github.com/snsie/classification-activity">Source and files on GitHub</a> · <a href="glossary.html">Glossary</a> · <a href="https://github.com/snsie/classification-activity/commit/9617d8c">version 9617d8c</a></p>
+  </footer>
+</body>
+</html>

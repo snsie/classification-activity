@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2. A Threshold for the Job · Judge the Model</title>
+  <meta name="description" content="App section brief: the threshold is a decision separate from the model; show what moving it gains and gives up compared with 0.50.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f6b6f'/%3E%3Cpath d='M7 25 C9 12 13 8 25 7' stroke='white' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cline x1='7' y1='25' x2='25' y2='7' stroke='white' stroke-width='1.5' stroke-dasharray='2 2.5'/%3E%3C/svg%3E">
+  <script>document.documentElement.classList.add("js")</script>
+  <link rel="stylesheet" href="assets/style.css?v=9617d8c">
+  <script type="module" src="assets/site.js?v=9617d8c"></script>
+  
+</head>
+<body data-page="threshold">
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="./"><span class="brand-mark" aria-hidden="true"></span>Judge the Model</a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    </div>
+  </header>
+  <div class="shell">
+    <nav id="site-nav" class="site-nav" aria-label="Main">
+      <ul><li><a href="./">Overview</a></li><li class="nav-group" aria-hidden="true">Get started</li><li><a href="hosting.html">Setup &amp; publish</a></li><li><a href="data.html">Data &amp; files</a></li><li class="nav-group" aria-hidden="true">The work</li><li><a href="models.html">Models</a></li><li><a href="analysis.html">Analysis</a></li><li class="nav-group" aria-hidden="true">App sections</li><li><a href="beyond-accuracy.html">1. Beyond Accuracy</a></li><li><a href="threshold.html" aria-current="page">2. A Threshold for the Job</a></li><li><a href="train-vs-test.html">3. Training vs. Test</a></li><li class="nav-group" aria-hidden="true">Finish</li><li><a href="submit.html">Submit</a></li><li class="nav-group" aria-hidden="true">Resources</li><li><a href="glossary.html">Glossary</a></li></ul>
+    </nav>
+    <main id="main" tabindex="-1">
+      <p class="eyebrow">App section 2</p>
+<h1>A Threshold for the Job</h1>
+<p class="core-question">What does reaching the job's sensitivity target cost?</p>
+
+<dl class="facts">
+  <dt>Learning objective</dt><dd>After using it, the clinical lead can see that the threshold <a class="help" href="glossary.html#threshold" data-help="threshold" aria-label="What is Threshold?" title="What is Threshold?"><span aria-hidden="true">?</span></a> is a decision separate from the model, and what moving it gains and gives up compared with 0.50.</dd>
+  <dt>The diabetes job</dt><dd>Finding positives matters most: the screening team wants a sensitivity of at least 0.90. <a class="help" href="glossary.html#threshold-for-the-job" data-help="threshold-for-the-job" aria-label="What is Threshold for the job?" title="What is Threshold for the job?"><span aria-hidden="true">?</span></a></dd>
+  <dt>Data</dt><dd>Test-set probabilities <a class="help" href="glossary.html#test-set" data-help="test-set" aria-label="What is Test set?" title="What is Test set?"><span aria-hidden="true">?</span></a>.</dd>
+</dl>
+
+<h2>Required minimum <span class="tag required">Required</span></h2>
+<p class="checklist-status" data-for="s2-required"></p>
+<ul class="checklist" data-store="s2-required">
+  <li><input type="checkbox" id="s2-r1"><div class="item-body"><label for="s2-r1">A dataset selector (both datasets) and a model selector (the four classifiers plus a baseline).</label></div></li>
+  <li><input type="checkbox" id="s2-r2"><div class="item-body"><label for="s2-r2">A threshold slider, with the confusion matrix and metrics updating live.</label></div></li>
+  <li><input type="checkbox" id="s2-r3"><div class="item-body"><label for="s2-r3">A side-by-side comparison of 0.50 and the slider's threshold, including the number flagged per 100.</label> <a class="help" href="glossary.html#flagged-per-100" data-help="flagged-per-100" aria-label="What is Flagged per 100?" title="What is Flagged per 100?"><span aria-hidden="true">?</span></a></div></li>
+  <li><input type="checkbox" id="s2-r4"><div class="item-body"><label for="s2-r4">Every table and plot labelled <span class="partition">Test</span>.</label></div></li>
+</ul>
+
+<div class="callout agent-task">
+  <p class="callout-title">Ask your agent</p>
+  <p>Build Section 2, A Threshold for the Job, to this required minimum: &lt;paste the list above&gt;. Recompute the confusion matrix and metrics with <code>m11.confusion</code> and <code>m11.metrics</code> at the slider's threshold, and compare them with 0.50. Offer me two or three layouts first; build the one I choose.</p>
+</div>
+
+<h2>Done when</h2>
+<p class="checklist-status" data-for="s2-done"></p>
+<ul class="checklist" data-store="s2-done">
+  <li><input type="checkbox" id="s2-d1"><div class="item-body"><label for="s2-d1">It works for every dataset and every model, on your public link.</label></div></li>
+  <li><input type="checkbox" id="s2-d2"><div class="item-body"><label for="s2-d2">Moving the slider changes no probability and no AUROC, and the app makes that clear.</label></div></li>
+  <li><input type="checkbox" id="s2-d4"><div class="item-body"><label for="s2-d4">You ran the app with <code>bash run_app.sh</code> and did the reviewer task below yourself.</label></div></li>
+  <li><input type="checkbox" id="s2-d3"><div class="item-body"><label for="s2-d3">Someone who hasn't seen your app can do the reviewer task below without help.</label></div></li>
+</ul>
+
+<div class="callout">
+  <p class="callout-title">Reviewers will try</p>
+  <p><strong>Diabetes:</strong> what does reaching 0.90 sensitivity cost in false alarms per 100 adults?</p>
+</div>
+
+<div class="callout">
+  <p class="callout-title">Never in your app</p>
+  <ul>
+    <li>AUROC described as “accuracy”.</li>
+    <li>A training result labelled as a test result.</li>
+    <li>A causal claim about a feature.</li>
+  </ul>
+</div>
+
+<h2>Ideas, not templates <span class="tag optional">Optional</span></h2>
+<ul>
+  <li>Two strips of dots, one for adults with diabetes and one without, with the threshold as a line you drag.</li>
+  <li>Say the trade in the lead's units: “per 100 adults screened, <em>N</em> more follow-up tests to find <em>M</em> more cases”, with <em>N</em> and <em>M</em> computed by <code>m11</code>.</li>
+  <li>For readmission, there is no fixed target: show what each threshold gains and gives up, and let the lead choose.</li>
+</ul>
+<p class="small muted">Accurate, readable tables meet every required minimum. Custom visuals are optional.</p>
+
+<h2>Common questions</h2>
+<details><summary>I set the threshold while looking at the test patients. Is that a problem?</summary><div class="details-body">
+  <p>A little. A threshold chosen to reach 0.90 sensitivity on these test patients will usually do slightly worse on new ones (the lecture calls this peeking <a class="help" href="glossary.html#peeking" data-help="peeking" aria-label="What is Peeking?" title="What is Peeking?"><span aria-hidden="true">?</span></a>). In a real project you would set it on separate data. Here, treat your test sensitivity as likely optimistic.</p></div></details>
+<details><summary>Why doesn't AUROC change when I move the slider?</summary><div class="details-body">
+  <p>AUROC describes how the model ranks patients across every threshold at once. Moving the threshold changes who is flagged, not the ranking.</p></div></details>
+<details><summary>Should the slider go in steps of 0.01?</summary><div class="details-body">
+  <p>That's fine. Steps of 0.01 are fine enough to reach 0.90 sensitivity for every model.</p></div></details>
+<nav class="pager" aria-label="Previous and next"><a class="card-link" rel="prev" href="beyond-accuracy.html">Previous: 1. Beyond Accuracy</a><a class="card-link" rel="next" href="train-vs-test.html">Next: 3. Training vs. Test</a></nav>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <p>M11 take-home activity: judging classifiers for a job.
+      Data: UCI Diabetes 130-US Hospitals (CC BY 4.0); CDC/NCHS NHANES 2017–2018 (public domain).</p>
+    <p><a href="https://github.com/snsie/classification-activity">Source and files on GitHub</a> · <a href="glossary.html">Glossary</a> · <a href="https://github.com/snsie/classification-activity/commit/9617d8c">version 9617d8c</a></p>
+  </footer>
+</body>
+</html>
