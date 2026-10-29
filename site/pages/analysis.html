@@ -1,103 +1,70 @@
-<!--meta {"title":"Analysis","description":"The staged Python workflow: the protocol, the commands, the DECISIONS.md template, what each stage refuses and why, and the files it exports."} -->
+<!--meta {"title":"Analysis","description":"The Python workflow: the train/test protocol, the one command, the DECISIONS.md template, and the files it exports."} -->
 <p class="eyebrow">The work</p>
 <h1>Analysis</h1>
-<p class="lead">You run a supplied, staged Python workflow from the command line. There is no notebook. Each stage refuses to run until its prerequisite is met, and says why in one sentence. That makes the fair-comparison rules {{help five-rules}} part of the workflow, not a promise.</p>
+<p class="lead">You run a supplied Python workflow from the command line. There is no notebook. One command fits every model on the training rows, scores it on the test rows, and writes the results your app reads.</p>
 
 <h2 id="protocol">The protocol</h2>
-<p>Each dataset is split once, before anything else: 80% development {{help development-set}} and 20% test {{help test-set}}, stratified. The development rows are split again into 5 fixed folds {{help fold}}. Every model uses the same folds.</p>
-<svg class="diagram" viewBox="0 0 760 300" role="img" aria-labelledby="protocol-title" aria-describedby="protocol-text">
-  <title id="protocol-title">The protocol: a development lane where every choice is made, and a locked test lane opened once at the end</title>
+<p>Each dataset is split once, before anything else: 80% training {{help training-set}} and 20% test {{help test-set}}, stratified. The split is the <code>split</code> column in each CSV, and every model uses it.</p>
+<svg class="diagram" viewBox="0 0 760 270" role="img" aria-labelledby="protocol-title" aria-describedby="protocol-text">
+  <title id="protocol-title">The protocol: every model learns from the training rows only, then is scored on the test rows it never saw</title>
   <defs><marker id="arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"/></marker></defs>
-  <rect class="lane" x="4" y="20" width="752" height="140" rx="10"/>
-  <text x="18" y="42" font-weight="700">Development (80%): 5 folds, every choice made here</text>
-  <rect class="box gate" x="18" y="62" width="128" height="74" rx="8"/><text x="28" y="86">Commit</text><text x="28" y="104">Before results</text><text class="small" x="28" y="124">DECISIONS.md</text>
-  <rect class="box" x="176" y="62" width="150" height="74" rx="8"/><text x="186" y="86">train</text><text class="small" x="186" y="104">5 folds → out-of-fold</text><text class="small" x="186" y="120">probabilities, AUROCs</text>
-  <rect class="box" x="356" y="62" width="150" height="74" rx="8"/><text x="366" y="86">explore</text><text class="small" x="366" y="104">diabetes: each model's</text><text class="small" x="366" y="120">rule threshold</text>
-  <rect class="box gate" x="536" y="62" width="128" height="74" rx="8"/><text x="546" y="86">Commit</text><text x="546" y="104">Before test</text><text class="small" x="546" y="124">model + reason</text>
-  <path class="arrow" d="M146,99 H174"/><path class="arrow" d="M326,99 H354"/><path class="arrow" d="M506,99 H534"/>
-  <rect class="lane" x="4" y="180" width="752" height="110" rx="10"/>
-  <text x="18" y="202" font-weight="700">Test (20%): locked until the end, opened once</text>
-  <rect class="box locked" x="18" y="218" width="300" height="56" rx="8"/><text x="28" y="242">Locked: no model, threshold or choice</text><text class="small" x="28" y="260">ever sees these rows</text>
-  <rect class="box" x="400" y="218" width="160" height="56" rx="8"/><text x="410" y="242">test (once)</text><text class="small" x="410" y="260">refit on all dev rows</text>
-  <rect class="box gate" x="590" y="216" width="156" height="66" rx="8"/><text x="600" y="236">export</text><text class="small" x="600" y="254">after Verification</text><text class="small" x="600" y="270">and Recommendations</text>
-  <path class="arrow" d="M600,136 C600,170 480,180 480,216"/><path class="arrow" d="M318,246 H398"/><path class="arrow" d="M560,246 H588"/>
+  <rect class="lane" x="4" y="20" width="752" height="120" rx="10"/>
+  <text x="18" y="42" font-weight="700">Training (80%): the models learn from these rows</text>
+  <rect class="box gate" x="18" y="58" width="150" height="66" rx="8"/><text x="28" y="82">Commit</text><text x="28" y="100">Before results</text><text class="small" x="28" y="116">DECISIONS.md</text>
+  <rect class="box" x="210" y="58" width="190" height="66" rx="8"/><text x="220" y="82">fit each model</text><text class="small" x="220" y="100">its whole pipeline, on the</text><text class="small" x="220" y="116">training rows only</text>
+  <path class="arrow" d="M168,91 H208"/>
+  <rect class="lane" x="4" y="156" width="752" height="108" rx="10"/>
+  <text x="18" y="178" font-weight="700">Test (20%): never used for fitting</text>
+  <rect class="box locked" x="18" y="192" width="190" height="56" rx="8"/><text x="28" y="216">No model learns from</text><text class="small" x="28" y="234">these rows</text>
+  <rect class="box" x="300" y="192" width="200" height="56" rx="8"/><text x="310" y="216">score</text><text class="small" x="310" y="234">training and test probabilities</text>
+  <rect class="box gate" x="560" y="192" width="186" height="56" rx="8"/><text x="570" y="216">export</text><text class="small" x="570" y="234">results/ for your app</text>
+  <path class="arrow" d="M400,124 C430,150 400,170 400,190"/><path class="arrow" d="M208,220 H298"/><path class="arrow" d="M500,220 H558"/>
 </svg>
 <ol id="protocol-text" class="small">
-  <li><strong>Commit <code>Before results</code></strong> in <code>DECISIONS.md</code> {{help decisions-md}}.</li>
-  <li><strong><code>train</code></strong> fits every model on the supplied folds and writes development out-of-fold (OOF) {{help oof}} probabilities, plus training and CV AUROC per fold.</li>
-  <li><strong><code>explore</code></strong> shows, for diabetes, each model's threshold under the job's rule {{help diabetes-rule}}, using development data only.</li>
-  <li><strong>Commit <code>Before test</code></strong>: your diabetes model and the reason.</li>
-  <li><strong><code>test</code></strong> refits on all development rows and predicts the locked test rows once.</li>
-  <li><strong>Fill in <code>Verification</code> and <code>Recommendations</code></strong>, then <strong><code>export</code></strong> them for your app.</li>
+  <li><strong>Commit <code>Before results</code></strong> in <code>DECISIONS.md</code> {{help decisions-md}}, before you see any result.</li>
+  <li><strong><code>python -m analysis</code></strong> fits each model on the training rows only.</li>
+  <li>It then gives every training and test row a probability, and writes both, with the training and test AUROC, to <code>results/</code>.</li>
+  <li>It also copies <code>DECISIONS.md</code> to <code>results/decisions.json</code>, so rerun it after you write your recommendations.</li>
 </ol>
 
 <h2 id="commands">The commands</h2>
 <p>Run them from the starter folder, with your environment active.</p>
 <div class="table-wrap"><table>
-  <thead><tr><th scope="col">Command</th><th scope="col">Requires</th><th scope="col">Does</th></tr></thead>
+  <thead><tr><th scope="col">Command</th><th scope="col">Does</th></tr></thead>
   <tbody>
-    <tr><td><code>python -m analysis train</code></td><td>The <code>Before results</code> section of <code>DECISIONS.md</code> is filled in and committed; the kNN and SVM <code>TODO</code>s are complete</td><td>Fits all models on the supplied folds and writes development out-of-fold (OOF) probabilities, plus training and CV AUROC per fold, to <code>results/&lt;key&gt;_dev.json</code>. Records the commit hash.</td></tr>
-    <tr><td><code>python -m analysis explore</code></td><td><code>train</code> done</td><td>For diabetes, prints each model's rule threshold, specificity, precision, and number flagged per 100 adults (development only)</td></tr>
-    <tr><td><code>python -m analysis test</code></td><td>The <code>Before test</code> section is filled in and committed</td><td>Refits on all development rows, predicts test rows once, writes <code>results/&lt;key&gt;_test.json</code> and <code>results/test_record.json</code> (saved choices plus the commit hash). Refuses a second run unless forced; a forced run is logged.</td></tr>
-    <tr><td><code>python -m analysis export</code></td><td>Any time</td><td>Copies the parsed <code>DECISIONS.md</code> sections (including Recommendations) to <code>results/decisions.json</code></td></tr>
-    <tr><td><code>python check.py</code></td><td>Any time</td><td>Runs the integrity checks below. Add <code>--stage setup</code>, <code>train</code> or <code>test</code> to check only up to that step.</td></tr>
-  </tbody>
-</table></div>
-
-<h2 id="refuses">What each stage refuses, and why</h2>
-<div class="table-wrap"><table>
-  <thead><tr><th scope="col">Stage</th><th scope="col">Refuses when…</th><th scope="col">Why</th></tr></thead>
-  <tbody>
-    <tr><td><code>train</code></td><td><code>Before results</code> is empty, or differs from your last commit</td><td>Your positive classes, error costs and prediction must be on record before any result exists.</td></tr>
-    <tr><td><code>train</code></td><td><code>knn()</code> or <code>svm()</code> still has its <code>TODO</code></td><td>Every model must be trained on the same folds in one run.</td></tr>
-    <tr><td><code>explore</code></td><td>Some model has no development results yet</td><td>The rule thresholds come from development out-of-fold probabilities.</td></tr>
-    <tr><td><code>test</code></td><td><code>Before test</code> is empty, names no valid model, or differs from your last commit</td><td>Your diabetes choice must be on record before the test set opens (lecture §13 and §15).</td></tr>
-    <tr><td><code>test</code></td><td>It has already run once (unless you add <code>--force</code>, which is logged)</td><td>A test set used twice is one more validation set: its score is optimistic {{help peeking}}.</td></tr>
+    <tr><td><code>python -m analysis</code></td><td>Fits all four models on the training rows and writes, for each dataset, every row's training and test probability and each model's training and test AUROC to <code>results/&lt;key&gt;.json</code>. Copies your <code>DECISIONS.md</code> answers to <code>results/decisions.json</code>. Refuses to run until the kNN <code>TODO</code> is complete.</td></tr>
+    <tr><td><code>python check.py</code></td><td>Runs the integrity checks below. Add <code>--stage setup</code> or <code>--stage results</code> to check only up to that step.</td></tr>
   </tbody>
 </table></div>
 
 <h2 id="decisions">The <code>DECISIONS.md</code> template</h2>
-<p>Fixed headings, read by the workflow. Write each answer after its label, and keep the headings and labels exactly as they are. <strong>Limit:</strong> 250 words, not counting the recommendation lines.</p>
+<p>Fixed headings, read by the workflow. Write each answer after its label, and keep the headings and labels exactly as they are. <strong>Limit:</strong> 150 words for <code>Before results</code>.</p>
 <pre><code>## Before results
 For each dataset: positive class; which error matters more for the job (missed positive or false alarm) and why.
 - readmission:
 - diabetes:
-- heart:
-
-Prediction: on heart, which model will have the highest CV AUROC, and will its lead over logreg be within one SD?
-
-Leak: pick diabetes HbA1c or heart `ca`. Using "When is it known?", explain why it is excluded.
-
-## Before test
-Diabetes model: &lt;logreg|knn|rf|lgbm|svm&gt;
-Reason (1–2 sentences):
-
-## Verification
-Hand calculation: one metric recomputed from a confusion matrix, with arithmetic.
-
-Check: one check you made of the code or outputs, and what you found.
-
-AI and other help: tools used, or "none".
 
 ## Recommendations
 - readmission: &lt;model and threshold, or "none is adequate for this job"&gt; because ...
 - diabetes: ...
-- heart: ...</code></pre>
+
+## Design choice and AI use
+A few sentences each. The design choice must be your own idea, not an AI tool's.
+- design choice: &lt;one thing you chose to show, or leave out, for your clinical lead&gt; because ...
+- AI suggestion I turned down: &lt;what an AI tool suggested, and why you didn't use it, or "no AI tools used"&gt;</code></pre>
 <ul>
-  <li><strong>Commit each section at its step.</strong> <code>check.py</code> reads your git history: <code>Before results</code> must be committed before your first results commit, and <code>Before test</code> before your test results.</li>
-  <li><strong>Don't change a section afterwards.</strong> If a result surprises you, explain it in Canvas instead.</li>
-  <li><strong>For the leak</strong>, use the “When is it known?” column on <a href="data.html">Data &amp; files</a> {{help when-known}}.</li>
+  <li><strong>Fill in <code>Before results</code> first</strong>, then commit and push, before you run the analysis.</li>
+  <li><strong>Fill in <code>Recommendations</code> last</strong>, once your app shows the results. Rerun <code>python -m analysis</code> so the app shows them at the top.</li>
+  <li><strong>Fill in <code>Design choice and AI use</code> last too</strong>, once your app is built: one thing you chose to show or leave out for your clinical lead, and one AI suggestion you turned down.</li>
 </ul>
 
 <h2 id="exports">The files the workflow exports</h2>
 <p>Your app reads only these files {{help results-files}}. Commit and push <code>results/</code> so your hosted app can load them. Every probability is rounded to 4 decimals before any metric is computed, so <code>m11</code> recomputes the exported numbers exactly.</p>
 <div class="table-wrap"><table>
-  <thead><tr><th scope="col">File</th><th scope="col">Written by</th><th scope="col">Holds</th></tr></thead>
+  <thead><tr><th scope="col">File</th><th scope="col">Holds</th></tr></thead>
   <tbody>
-    <tr><td><code>results/&lt;key&gt;_dev.json</code></td><td><code>train</code></td><td><code>row_id</code>, <code>fold</code> and <code>y</code> (the label) of every development row; <code>commit</code> (your <code>Before results</code> commit); and for each model, <code>oof</code> (one out-of-fold probability per row) and <code>folds</code> (per fold: <code>train_auroc</code>, <code>cv_auroc</code>, row counts). The starter's files hold the baseline only.</td></tr>
-    <tr><td><code>results/&lt;key&gt;_test.json</code></td><td><code>test</code></td><td><code>row_id</code> and <code>y</code> of every test row, and for each model, <code>p</code> (one test probability per row) and <code>auroc</code>.</td></tr>
-    <tr><td><code>results/test_record.json</code></td><td><code>test</code></td><td>Your <code>Before test</code> choice and reason, your <code>Before test</code> commit, the saved diabetes threshold with its rule and its development and test counts, and a log of every test run.</td></tr>
-    <tr><td><code>results/decisions.json</code></td><td><code>export</code></td><td>Your parsed <code>DECISIONS.md</code> answers, which sections are complete, your word count, and <code>recommendations</code> (the three lines your app shows at the top).</td></tr>
+    <tr><td><code>results/&lt;key&gt;.json</code></td><td><code>train</code> and <code>test</code>: the <code>row_id</code> and <code>y</code> (the label) of every row, and the counts. For each model in <code>models</code>: <code>train_p</code> and <code>test_p</code> (one probability per row) and <code>train_auroc</code> and <code>test_auroc</code>. The starter's files hold the baseline only.</td></tr>
+    <tr><td><code>results/decisions.json</code></td><td>Your parsed <code>DECISIONS.md</code> answers, which sections are complete, your word count, and <code>recommendations</code> (the lines your app shows at the top).</td></tr>
   </tbody>
 </table></div>
 <details>
@@ -105,37 +72,22 @@ AI and other help: tools used, or "none".
   <div class="details-body">
 <pre><code>import m11
 
-dev = m11.load("diabetes_dev")
-p, y = m11.oof(dev, "logreg")                 # development out-of-fold
+res = m11.load("diabetes")
+p, y = m11.preds(res, "logreg")               # test probabilities and labels
 c = m11.confusion(p, y, 0.5)                  # {"tp", "fn", "fp", "tn"}
 print(m11.metrics(c)["sensitivity"])          # None means undefined
-print(m11.threshold_for_rule(p, y)["threshold"])
-print(m11.fold_summary(dev)["favoured"])</code></pre>
-  </div>
-</details>
-<details>
-  <summary>Example: read your results in the browser (Route A)</summary>
-  <div class="details-body">
-<pre><code>import * as m11 from "./m11.js";
-
-const dev = await m11.load("diabetes_dev");
-const [p, y] = m11.oof(dev, "logreg");
-const c = m11.confusion(p, y, 0.5);
-console.log(m11.metrics(c).sensitivity);      // null means undefined
-console.log(m11.foldSummary(dev).favoured);</code></pre>
+print(m11.auroc_summary(res)["rf"])           # {"train", "test", "gap"}</code></pre>
   </div>
 </details>
 
 <h2 id="check">What <code>check.py</code> verifies</h2>
 <ul>
   <li>The data files match their fingerprints in <code>data/manifest.json</code>.</li>
-  <li>Development and test rows are disjoint, and every development row has exactly one out-of-fold prediction from the supplied folds.</li>
-  <li><code>knn</code> and <code>svm</code> are <code>Pipeline</code> objects, with scaling inside.</li>
+  <li>Your results cover exactly the supplied training and test rows, so no model was fitted on test rows.</li>
+  <li><code>knn</code> is a <code>Pipeline</code> object, with scaling inside, and no model's settings have changed.</li>
   <li>No outcome or ID column is used as a predictor.</li>
-  <li>The default <code>logreg</code> CV AUROC matches the reference within ±0.005.</li>
-  <li>Recomputed metrics match the exports, and confusion counts add up.</li>
-  <li>The saved diabetes threshold matches the rule for your chosen model.</li>
-  <li>Test predictions cover test rows only, and <code>test_record.json</code> matches <code>Before test</code>.</li>
-  <li>In git history, <code>Before results</code> was committed before the first results commit, and <code>Before test</code> before the test results.</li>
+  <li>The default <code>logreg</code> test AUROC matches the reference within ±0.005.</li>
+  <li>Every exported AUROC matches the one recomputed with <code>m11</code>.</li>
+  <li>All three sections of <code>DECISIONS.md</code> are complete, exported and committed.</li>
 </ul>
 <p>Every failure says what to fix in one sentence. Fix the first one, then run it again.</p>

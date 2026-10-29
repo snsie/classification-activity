@@ -2,7 +2,7 @@
 
 **Website: <https://snsie.github.io/classification-activity/>**
 
-Students run a supplied Python workflow that trains five classifiers (plus a prevalence baseline) on three health datasets, save each decision in `DECISIONS.md` before seeing the results it depends on, and build one app with four sections that helps a clinical lead judge whether any model is fit for each job. They submit a public GitHub repository (app link on the README's first line) and four Canvas answers.
+Students run a supplied Python workflow that trains three classifiers (plus a prevalence baseline) on the training rows of two health datasets and scores them on the test rows, write their decisions in `DECISIONS.md`, and build one Streamlit app with four sections that helps a clinical lead judge whether any model is fit for each job. They submit a public GitHub repository (app link on the README's first line) and three Canvas answers.
 
 **Central question:** Which classifier would you trust for this job, at what threshold, and with what limits?
 
@@ -11,12 +11,12 @@ Modelled on the M10 activity ([regression-activity](https://github.com/snsie/reg
 ## What's here
 | Folder | What it is |
 |---|---|
-| [`starter/`](starter) | **The student starter**, also downloadable as a zip from the website: the three datasets with fixed folds and their dictionary (`data/`), the staged workflow (`analysis/`), the shared metric helpers (`m11.py`, `app/m11.js`), both app routes (GitHub Pages: `index.html` + `app/`; Streamlit: `streamlit_app.py`), baseline-only `results/`, `DECISIONS.md`, `AGENT_BRIEF.md`, `SETUP.md` and `check.py`. |
+| [`starter/`](starter) | **The student starter**, also downloadable as a zip from the website: the two datasets with a fixed train/test split and their dictionary (`data/`), the workflow (`analysis/`), the shared metric helpers (`m11.py`), the Streamlit app (`streamlit_app.py`), baseline-only `results/`, `DECISIONS.md`, `AGENT_BRIEF.md`, `SETUP.md` and `check.py`. |
 | [`reproduce/`](reproduce) | Instructor only (not linked from the site). Rebuilds `starter/data/` and `starter/results/` from the raw UCI and CDC files, with SHA-256 checks, and runs the logistic-regression reference run that `check.py` compares against. |
 | [`site/`](site) | Website source: page fragments (`pages/`), `layout.html`, the glossary (`terms.json`), and styles, behaviour and demos (`assets/`). |
 | [`scripts/`](scripts) | `build.mjs` builds the site into `dist/` and zips the starter; `serve.mjs` previews it under the GitHub Pages subpath. |
-| [`tests/`](tests) | `m11.py`/`m11.js` parity, `check.py` known-good and known-bad fixtures, both app routes, the demos, and an end-to-end site check with an accessibility scan. |
-| `instructor/` | **Git-ignored, never pushed.** The private full solution (`make_solution.py` builds it), `EXPECTED.md` with expected values, and the solution apps. |
+| [`tests/`](tests) | `m11.py` fixtures, `check.py` known-good and known-bad fixtures, the Streamlit app, the demos, and an end-to-end site check with an accessibility scan. |
+| `instructor/` | **Git-ignored, never pushed.** The private full solution (`make_solution.py` builds it), `EXPECTED.md` with expected values, and the solution app. |
 
 ## Build and preview the site
 Requires Node 20 or later; there are no npm dependencies.
@@ -33,7 +33,7 @@ uv venv --python 3.11 .venv && uv pip install --python .venv/bin/python -r repro
 .venv/bin/python -m playwright install chromium
 .venv/bin/python reproduce/reproduce.py --check       # data and baseline results reproduce; check.py's reference matches
 .venv/bin/python instructor/make_solution.py           # private full solution (instructor machines only)
-.venv/bin/python -m pytest tests/                      # parity, check.py fixtures, both app routes, demos
+.venv/bin/python -m pytest tests/                      # m11, check.py fixtures, the Streamlit app, demos
 npm run build && node scripts/serve.mjs 4174 &
 .venv/bin/python tests/e2e.py http://localhost:4174/classification-activity/   # links, downloads, keyboard, dark mode, axe
 ```
@@ -44,6 +44,5 @@ npm run build && node scripts/serve.mjs 4174 &
 |---|---|---|---|
 | 30-day readmission | UCI Diabetes 130-US Hospitals 1999–2008 (Strack et al. 2014) | CC BY 4.0 | 20,000 (1,796) |
 | Diabetes screening | NHANES 2017–2018, CDC/NCHS | Public domain | 5,257 (997) |
-| Heart disease | UCI Heart Disease, Cleveland (Detrano et al. 1989) | CC BY 4.0 | 303 (139) |
 
-Each CSV has a stratified 80/20 development/test split (`random_state=0`) and five stratified folds on the development rows (`StratifiedKFold(5, shuffle=True, random_state=0)`). `starter/data/manifest.json` records sources, fingerprints, versions and counts; `starter/data/README.md` is the dictionary, with a **When is it known?** entry for every column.
+Each CSV has a stratified 80/20 train/test split (`random_state=0`). `starter/data/manifest.json` records sources, fingerprints, versions and counts; `starter/data/README.md` is the dictionary, with a **When is it known?** entry for every column.

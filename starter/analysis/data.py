@@ -1,9 +1,9 @@
 """Load the supplied datasets. You don't need to change this file.
 
     from analysis import data
-    df = data.load("heart")              # every row, with split and fold
-    X, y, folds = data.development("heart")
-    X_test, y_test = data.test("heart")  # only `python -m analysis test` should call this
+    df = data.load("diabetes")              # every row, with its split
+    X, y = data.rows("diabetes", "train")   # the training rows: the models learn from these
+    X_test, y_test = data.rows("diabetes", "test")  # the test rows: used only to evaluate
 """
 
 from __future__ import annotations
@@ -16,8 +16,8 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
-DATASETS = ["readmission", "diabetes", "heart"]
-ID_COLUMNS = ["row_id", "split", "fold"]
+DATASETS = ["readmission", "diabetes"]
+ID_COLUMNS = ["row_id", "split"]
 TARGET = "target"
 
 
@@ -38,7 +38,7 @@ def categorical(key: str) -> list[str]:
 
 @lru_cache(maxsize=None)
 def _load(key: str) -> pd.DataFrame:
-    df = pd.read_csv(DATA / f"{key}.csv", dtype={"split": str, "fold": "Int64"})
+    df = pd.read_csv(DATA / f"{key}.csv", dtype={"split": str})
     for c in categorical(key):
         df[c] = df[c].astype(object)  # text categories; blank = missing
     return df
@@ -48,25 +48,13 @@ def load(key: str) -> pd.DataFrame:
     return _load(key).copy()
 
 
-def development(key: str) -> tuple[pd.DataFrame, list[int], list[int]]:
-    """Development rows: predictors, labels and the supplied fold (1–5) of each row."""
+def rows(key: str, split: str) -> tuple[pd.DataFrame, list[int]]:
+    """The predictors and labels of the supplied "train" or "test" rows."""
     df = _load(key)
-    dev = df[df.split == "dev"]
-    return dev[predictors(key)].reset_index(drop=True), dev[TARGET].astype(int).tolist(), dev.fold.astype(int).tolist()
+    part = df[df.split == split]
+    return part[predictors(key)].reset_index(drop=True), part[TARGET].astype(int).tolist()
 
 
-def development_ids(key: str) -> list[int]:
+def ids(key: str, split: str) -> list[int]:
     df = _load(key)
-    return df.loc[df.split == "dev", "row_id"].astype(int).tolist()
-
-
-def test(key: str) -> tuple[pd.DataFrame, list[int]]:
-    """Test rows. Locked: only `python -m analysis test` reads them, once."""
-    df = _load(key)
-    t = df[df.split == "test"]
-    return t[predictors(key)].reset_index(drop=True), t[TARGET].astype(int).tolist()
-
-
-def test_ids(key: str) -> list[int]:
-    df = _load(key)
-    return df.loc[df.split == "test", "row_id"].astype(int).tolist()
+    return df.loc[df.split == split, "row_id"].astype(int).tolist()

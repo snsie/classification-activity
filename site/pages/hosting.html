@@ -1,26 +1,16 @@
-<!--meta {"title":"Publish & back up","description":"Publish your app on GitHub Pages (recommended) or Streamlit Community Cloud, and back up everything to a public GitHub repository."} -->
+<!--meta {"title":"Publish & back up","description":"Publish your app on Streamlit Community Cloud, and back up everything to a public GitHub repository."} -->
 <p class="eyebrow">Resources</p>
 <h1>Publish &amp; back up</h1>
-<p class="lead">You need <strong>both</strong>: a public app link {{help public-link}} that anyone can open, and a public GitHub repository {{help github-backup}}. Publish the untouched starter first, in step 1. It takes about 20 minutes.</p>
+<p class="lead">You need <strong>both</strong>: a public app link {{help public-link}} that anyone can open, and a public GitHub repository {{help github-backup}}. Publish the untouched starter first, in step 1.</p>
 
 <div class="callout">
   <p class="callout-title">Both are required</p>
-  <p>A repository alone isn't a hosted app, and a hosted app alone isn't a backup. Your repository is also what you submit, and its git history shows that you saved each decision before each stage.</p>
+  <p>A repository alone isn't a hosted app, and a hosted app alone isn't a backup. Your repository is also what you submit.</p>
 </div>
 
-<h2>1. Choose a route</h2>
-<div class="table-wrap"><table>
-  <thead><tr><th scope="col"></th><th scope="col">Route A: GitHub Pages <span class="tag">Recommended</span></th><th scope="col">Route B: Streamlit Community Cloud</th></tr></thead>
-  <tbody>
-    <tr><th scope="row">You write</th><td>HTML + JavaScript (<code>app/index.html</code>, <code>app/app.js</code>); plain, or built with Node</td><td>Python (<code>streamlit_app.py</code>)</td></tr>
-    <tr><th scope="row">Good if you…</th><td>like web pages, or want full design freedom</td><td>used Streamlit before</td></tr>
-    <tr><th scope="row">Runs Python online?</th><td>No: static files only {{help static-site}}. The app reads <code>results/</code></td><td>Yes</td></tr>
-    <tr><th scope="row">Cost</th><td>Free with a public repository</td><td>Free</td></tr>
-  </tbody>
-</table></div>
-<p class="small muted">Either way, your Python analysis runs on your computer, and the app only reads the files it exported.</p>
+<p>Your app is a Streamlit app (<code>streamlit_app.py</code>), hosted free on Streamlit Community Cloud. Your Python analysis runs on your computer, and the hosted app only reads the files it exported to <code>results/</code>.</p>
 
-<h2>2. Put the starter on GitHub</h2>
+<h2>1. Put the starter on GitHub</h2>
 <ol class="steps">
   <li>Download and unzip the starter from <a href="data.html">Data &amp; files</a>.</li>
   <li>Install Python 3.11 or newer and git. In the starter folder, run:
@@ -34,58 +24,40 @@ python check.py --stage setup</code></pre></li>
 git add .
 git commit -m "Starter"
 git remote add origin https://github.com/&lt;username&gt;/&lt;repo&gt;.git
-git push -u origin main</code></pre>
-    <p class="small">You need git on your computer, not only the GitHub website: the workflow checks your commits before it trains or tests.</p></li>
+git push -u origin main</code></pre></li>
 </ol>
 
-<h2>3. Publish the untouched starter</h2>
-<details open><summary>Route A: GitHub Pages (recommended)</summary><div class="details-body">
-  <ol>
-    <li>On your repository, open <strong>Settings → Pages</strong>.</li>
-    <li>Under <strong>Source</strong>, choose <strong>Deploy from a branch</strong>, then branch <code>main</code> and folder <code>/ (root)</code>. Click <strong>Save</strong>.</li>
-    <li>After 1–2 minutes your link is <code>https://&lt;username&gt;.github.io/&lt;repo&gt;/</code>. It opens <code>app/</code>.</li>
-  </ol>
-  <p>To try it on your computer first, run <code>npm run serve</code> (or <code>python -m http.server 8000</code>) and open <code>http://localhost:8000/app/</code>. Opening the HTML file directly won't load the results.</p>
-  <p class="small"><strong>Built with Node (for example Vite)?</strong> That's fine. Deploy the built output to GitHub Pages (for example with a GitHub Actions workflow), and make sure the built site still contains <code>results/</code> at the path your code loads it from.</p>
-</div></details>
-<details><summary>Route B: Streamlit Community Cloud</summary><div class="details-body">
-  <ol>
-    <li>Go to <a href="https://share.streamlit.io">share.streamlit.io</a> and sign in with GitHub.</li>
-    <li>Click <strong>Create app</strong>, then pick your repository, branch <code>main</code> and file <code>streamlit_app.py</code>.</li>
-    <li>Click <strong>Deploy</strong>. It installs the pinned packages in <code>requirements.txt</code>; list any package you add there too.</li>
-  </ol>
-  <p>To try it on your computer first: <code>streamlit run streamlit_app.py</code></p>
-</div></details>
+<h2>2. Publish the untouched starter</h2>
+<ol>
+  <li>Go to <a href="https://share.streamlit.io">share.streamlit.io</a> and sign in with GitHub.</li>
+  <li>Click <strong>Create app</strong>, then pick your repository, branch <code>main</code> and file <code>streamlit_app.py</code>.</li>
+  <li>Click <strong>Deploy</strong>. It installs the pinned packages in <code>requirements.txt</code>; list any package you add there too.</li>
+</ol>
+<p>To try it on your computer first: <code>streamlit run streamlit_app.py</code></p>
 
-<h2>4. Test it in a private window</h2>
+<h2>3. Test it in a private window</h2>
 <ul>
   <li>Open your link in a <strong>private or incognito window</strong>. It must load without signing in.</li>
   <li>Switch datasets and models in every section.</li>
   <li>Put your link on the <strong>first line</strong> of <code>README.md</code>, then commit and push.</li>
 </ul>
 
-<h2>5. Push updates</h2>
-<p>Commit and push whenever a section starts working, after each workflow stage, and after your final checks. Commit <code>results/</code> too: your hosted app reads it from GitHub.</p>
+<h2>4. Push updates</h2>
+<p>Commit and push whenever a section starts working, after each run of the analysis, and after your final checks. Commit <code>results/</code> too: your hosted app reads it from GitHub.</p>
 <pre><code>git add .
 git commit -m "Section 2 works"
 git push</code></pre>
-<p>Both hosts update a minute or two after you push. A commit on your laptop is not a backup until it's pushed. Never commit passwords, tokens or API keys.</p>
+<p>Streamlit updates a minute or two after you push. A commit on your laptop is not a backup until it's pushed. Never commit passwords, tokens or API keys.</p>
 
 <h2>Troubleshooting</h2>
-<details><summary>The page is blank, or says there are no results</summary><div class="details-body">
+<details><summary>The app says there are no results</summary><div class="details-body">
   <ul>
-    <li>Check that <code>results/</code> is committed and pushed: open <code>https://&lt;username&gt;.github.io/&lt;repo&gt;/results/heart_dev.json</code>. It should show data.</li>
-    <li>Load results through <code>m11.load(...)</code>, which finds <code>results/</code> from <code>app/m11.js</code>. Don't use a leading slash in your own paths.</li>
-    <li>Open the browser's developer console (F12) and read the first error. Before you run the test, “404” lines for <code>*_test.json</code> and <code>test_record.json</code> are expected: those files don't exist yet.</li>
-    <li>Hard-refresh (Ctrl+Shift+R, or Cmd+Shift+R on a Mac); browsers can cache old files.</li>
+    <li>Check that <code>results/</code> is committed and pushed: open your repository on GitHub and look for <code>results/diabetes.json</code>.</li>
+    <li>Load results through <code>m11.load(...)</code>, which finds <code>results/</code> next to <code>m11.py</code>.</li>
   </ul></div></details>
-<details><summary>My GitHub Pages link shows "404"</summary><div class="details-body">
-  <p>Wait two minutes. Check that Pages is set to branch <code>main</code>, folder <code>/ (root)</code>, and that <code>index.html</code> and <code>app/</code> are at the top of the repository, not inside another folder.</p></div></details>
 <details><summary>The Streamlit app is asleep</summary><div class="details-body">
-  <p>Apps on Streamlit Community Cloud sleep after a few days without visitors. Open the link and click the button to wake it; it takes about a minute. Open it again just before you submit.</p></div></details>
+  <p>Apps on Streamlit Community Cloud sleep after a few days without visitors. Open the link and click the button to wake it. Open it again just before you submit.</p></div></details>
 <details><summary>Streamlit says "ModuleNotFoundError"</summary><div class="details-body">
   <p>Add the missing package to <code>requirements.txt</code> with a pinned version, commit and push. Streamlit redeploys automatically.</p></div></details>
-<details><summary><code>import lightgbm</code> fails on a Mac</summary><div class="details-body">
-  <p>If the message mentions <code>libomp</code>, run <code>brew install libomp</code>, then try again.</p></div></details>
 <details><summary>Nothing works</summary><div class="details-body">
-  <p>Switch to the other route. Both read the same <code>results/</code> files with the same helpers, so your analysis carries over. Tell your instructor if your link breaks after you submit.</p></div></details>
+  <p>Run the app on your computer with <code>streamlit run streamlit_app.py</code> and read the first error. Tell your instructor if your link breaks after you submit.</p></div></details>

@@ -1,15 +1,15 @@
-<!--meta {"title":"Data & files","description":"The three datasets, their jobs and framing, the data dictionary with When is it known?, individual CSV downloads, and the starter zip."} -->
+<!--meta {"title":"Data & files","description":"The two datasets, their jobs and framing, the data dictionary with When is it known?, individual CSV downloads, and the starter zip."} -->
 <p class="eyebrow">Resources</p>
 <h1>Data &amp; files</h1>
-<p class="lead">Everything is in one starter folder: the data, the workflow, both app routes, and baseline-only results so your app runs from the first minute.</p>
+<p class="lead">Everything is in one starter folder: the data, the workflow, the starter app, and baseline-only results so your app runs from the start.</p>
 
 <p>{{zip}}</p>
 <p class="small">Prefer to browse? Every file is listed <a href="#files">below</a> and in the {{repo starter|starter folder on GitHub}}.</p>
 
-<h2 id="datasets">The three datasets</h2>
-<p>Each CSV has the same layout: <code>row_id</code>; <code>split</code> (<code>dev</code> or <code>test</code>; 80/20, stratified); <code>fold</code> (1–5 for development rows, stratified, seed 0); the predictors; and <code>target</code> (1 = the positive class). Blank cells are missing values.</p>
+<h2 id="datasets">The two datasets</h2>
+<p>Each CSV has the same layout: <code>row_id</code>; <code>split</code> (<code>train</code> or <code>test</code>; 80/20, stratified, seed 0); the predictors; and <code>target</code> (1 = the positive class). Blank cells are missing values.</p>
 <ul>
-  <li><strong>Use the fold column.</strong> Every model uses these folds {{help fold}}; never reshuffle.</li>
+  <li><strong>Use the split column.</strong> Every model learns from the same training rows and is scored on the same test rows; never reshuffle.</li>
   <li><strong>Check “When is it known?”</strong> for every column {{help when-known}}. A predictor must exist at the prediction point.</li>
   <li><strong>One row per person</strong> in every dataset, so each person's records are already kept together {{help records-together}}.</li>
 </ul>
@@ -18,7 +18,6 @@
   <tbody>
     <tr><td><a href="#readmission">30-day readmission</a></td><td class="num">{{num readmission.n_rows}}</td><td class="num">{{num readmission.n_pos}} ({{pct readmission.prevalence}})</td><td>The accuracy trap {{help accuracy-trap}}</td></tr>
     <tr><td><a href="#diabetes">Diabetes screening</a></td><td class="num">{{num diabetes.n_rows}}</td><td class="num">{{num diabetes.n_pos}} ({{pct diabetes.prevalence}})</td><td>Choosing a threshold for a sensitivity target</td></tr>
-    <tr><td><a href="#heart">Heart disease</a></td><td class="num">{{num heart.n_rows}}</td><td class="num">{{num heart.n_pos}} ({{pct heart.prevalence}})</td><td>Small samples: wide fold SD and a noisy test set</td></tr>
   </tbody>
 </table></div>
 
@@ -30,22 +29,10 @@
 <p>{{dl data/diabetes.csv}}</p>
 {{dataset diabetes}}
 
-<h3 id="heart">Heart disease</h3>
-<p>{{dl data/heart.csv}}</p>
-{{dataset heart}}
-
 <p>The full dictionary, with every category and missing-value count, is {{dl data/README.md}}. Sources, licences, versions, row counts and SHA-256 fingerprints are in {{dl data/manifest.json}}.</p>
 
 <h2 id="starter">Using the starter</h2>
-<div class="table-wrap"><table>
-  <thead><tr><th scope="col"></th><th scope="col">Route A: GitHub Pages (recommended)</th><th scope="col">Route B: Streamlit</th></tr></thead>
-  <tbody>
-    <tr><th scope="row">Files you edit</th><td><code>app/index.html</code>, <code>app/app.js</code></td><td><code>streamlit_app.py</code></td></tr>
-    <tr><th scope="row">Metric helper</th><td><code>app/m11.js</code></td><td><code>m11.py</code></td></tr>
-    <tr><th scope="row">Run on your computer</th><td><code>npm run serve</code> (or <code>python -m http.server 8000</code>), then open <code>localhost:8000/app/</code></td><td><code>streamlit run streamlit_app.py</code></td></tr>
-  </tbody>
-</table></div>
-<p>Both routes read the same <code>results/</code> files, and both helpers give identical numbers. Have your AI agent read {{dl AGENT_BRIEF.md}} first.</p>
+<p>You edit <code>streamlit_app.py</code>, which reads <code>results/</code> through the metric helpers in <code>m11.py</code>. Run it on your computer with <code>streamlit run streamlit_app.py</code>. Have your AI agent read {{dl AGENT_BRIEF.md}} first.</p>
 
 <h2 id="files">All files</h2>
 {{files}}
@@ -54,6 +41,5 @@
 <ul class="small">
   <li>Strack B, DeShazo JP, Gennings C, et al. Impact of HbA1c measurement on hospital readmission rates: analysis of 70,000 clinical database patient records. BioMed Research International 2014. Data: <a href="https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008">UCI Machine Learning Repository</a>, CC BY 4.0.</li>
   <li>Centers for Disease Control and Prevention, National Center for Health Statistics. National Health and Nutrition Examination Survey 2017–2018, public-use data files. <a href="https://wwwn.cdc.gov/nchs/nhanes/">wwwn.cdc.gov/nchs/nhanes</a></li>
-  <li>Detrano R, Janosi A, Steinbrunn W, et al. International application of a new probability algorithm for the diagnosis of coronary artery disease. Am J Cardiol 1989;64:304–10. Data: <a href="https://archive.ics.uci.edu/dataset/45/heart+disease">UCI Machine Learning Repository</a>, CC BY 4.0.</li>
   <li>Readmission and diabetes cohorts follow the M11 lecture app (<a href="https://github.com/snsie/classification-app">classification-app</a>, <code>pipeline/datasets.py</code>).</li>
 </ul>

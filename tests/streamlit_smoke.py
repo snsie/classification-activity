@@ -16,7 +16,7 @@ from streamlit.testing.v1 import AppTest
 folder = Path(sys.argv[1]).resolve()
 os.chdir(folder)
 sys.path.insert(0, str(folder))
-SECTIONS = ["1. Beyond Accuracy", "2. A Threshold for the Job", "3. Ranking vs. Being Right", "4. A Fair Comparison"]
+SECTIONS = ["1. Beyond Accuracy", "2. A Threshold for the Job", "3. Ranking vs. Being Right", "4. Training vs. Test"]
 out = {"runs": 0, "exceptions": [], "unlabelled": [], "slider": None}
 
 
@@ -29,8 +29,8 @@ def texts(at) -> str:
 
 
 for section in SECTIONS:
-    for dataset in ["readmission", "diabetes", "heart"]:
-        for model in ["baseline", "logreg", "knn", "svm", "rf", "lgbm"]:
+    for dataset in ["readmission", "diabetes"]:
+        for model in ["baseline", "logreg", "knn", "rf"]:
             at = AppTest.from_file(str(folder / "streamlit_app.py"), default_timeout=120).run()
             at.sidebar.radio[0].set_value(section).run()
             at.sidebar.selectbox[0].set_value(dataset).run()
@@ -41,7 +41,7 @@ for section in SECTIONS:
                 continue
             body = texts(at)
             trained = "has no results yet" not in body
-            if trained and "Development (OOF)" not in body:
+            if trained and "Test ·" not in body and "Training and Test ·" not in body:
                 out["unlabelled"].append([section, dataset, model])
             if section.startswith("2.") and dataset == "diabetes" and model == "logreg" and at.slider:
                 at.slider[0].set_value(0.2).run()

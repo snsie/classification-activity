@@ -26,19 +26,11 @@
       },
       {
         "name": "split",
-        "meaning": "`dev` (development: train and choose) or `test` (locked test set, used once)",
+        "meaning": "`train` (the models learn from these rows) or `test` (used only to evaluate them)",
         "units": "",
         "kind": "id",
         "known": "Assigned by the course",
         "missing": "never blank"
-      },
-      {
-        "name": "fold",
-        "meaning": "Cross-validation fold 1–5 for development rows; blank for test rows",
-        "units": "",
-        "kind": "id",
-        "known": "Assigned by the course",
-        "missing": "blank on test rows"
       },
       {
         "name": "age",
@@ -314,19 +306,11 @@
       },
       {
         "name": "split",
-        "meaning": "`dev` (development: train and choose) or `test` (locked test set, used once)",
+        "meaning": "`train` (the models learn from these rows) or `test` (used only to evaluate them)",
         "units": "",
         "kind": "id",
         "known": "Assigned by the course",
         "missing": "never blank"
-      },
-      {
-        "name": "fold",
-        "meaning": "Cross-validation fold 1–5 for development rows; blank for test rows",
-        "units": "",
-        "kind": "id",
-        "known": "Assigned by the course",
-        "missing": "blank on test rows"
       },
       {
         "name": "age",
@@ -433,177 +417,6 @@
         "name": "pills",
         "meaning": "Now taking diabetes pills (DIQ070)",
         "known": "At the interview; only people already treated for diabetes answer yes"
-      }
-    ]
-  },
-  "heart": {
-    "name": "Heart disease",
-    "unit": "patient",
-    "units": "patients",
-    "cohort": "UCI Heart Disease, Cleveland Clinic Foundation: patients referred for coronary angiography (processed file, 14 attributes).",
-    "job": "Classify disease within a diagnostic-workup cohort.",
-    "teaches": "Small samples: wide fold SD and a noisy test set",
-    "framing": "This is a selected cohort already in diagnostic workup, not the general population.",
-    "positive": "Angiographic heart disease (any major vessel with > 50% narrowing; label > 0)",
-    "negative": "No angiographic disease (label 0)",
-    "prediction_point": "After the clinical and noninvasive tests, before angiography",
-    "source": "UCI Machine Learning Repository: Heart Disease (Cleveland), processed.cleveland.data",
-    "url": "https://archive.ics.uci.edu/dataset/45/heart+disease",
-    "citation": "Detrano R, Janosi A, Steinbrunn W, et al. International application of a new probability algorithm for the diagnosis of coronary artery disease. Am J Cardiol 1989;64(5):304–10.",
-    "licence": "CC BY 4.0",
-    "one_per_patient": true,
-    "columns": [
-      {
-        "name": "row_id",
-        "meaning": "Row number in this file",
-        "units": "",
-        "kind": "id",
-        "known": "Assigned by the course",
-        "missing": "never blank"
-      },
-      {
-        "name": "split",
-        "meaning": "`dev` (development: train and choose) or `test` (locked test set, used once)",
-        "units": "",
-        "kind": "id",
-        "known": "Assigned by the course",
-        "missing": "never blank"
-      },
-      {
-        "name": "fold",
-        "meaning": "Cross-validation fold 1–5 for development rows; blank for test rows",
-        "units": "",
-        "kind": "id",
-        "known": "Assigned by the course",
-        "missing": "blank on test rows"
-      },
-      {
-        "name": "age",
-        "meaning": "Age",
-        "units": "years",
-        "kind": "number",
-        "known": "At the visit",
-        "missing": "never blank"
-      },
-      {
-        "name": "male",
-        "meaning": "1 = male, 0 = female",
-        "units": "0/1",
-        "kind": "0/1",
-        "known": "At the visit",
-        "missing": "never blank"
-      },
-      {
-        "name": "chest_pain",
-        "meaning": "Chest pain type",
-        "units": "",
-        "kind": "category",
-        "known": "At the visit (history)",
-        "missing": "never blank",
-        "categories": [
-          "atypical angina",
-          "no symptoms",
-          "non-anginal pain",
-          "typical angina"
-        ]
-      },
-      {
-        "name": "rest_bp",
-        "meaning": "Resting systolic blood pressure on admission",
-        "units": "mmHg",
-        "kind": "number",
-        "known": "At the visit",
-        "missing": "never blank"
-      },
-      {
-        "name": "chol",
-        "meaning": "Serum cholesterol",
-        "units": "mg/dL",
-        "kind": "number",
-        "known": "From a blood test before angiography",
-        "missing": "never blank"
-      },
-      {
-        "name": "high_fasting_glucose",
-        "meaning": "1 = fasting blood sugar > 120 mg/dL",
-        "units": "0/1",
-        "kind": "0/1",
-        "known": "From a blood test before angiography",
-        "missing": "never blank"
-      },
-      {
-        "name": "rest_ecg",
-        "meaning": "Resting ECG result",
-        "units": "",
-        "kind": "category",
-        "known": "At the visit",
-        "missing": "never blank",
-        "categories": [
-          "ST-T wave abnormality",
-          "left ventricular hypertrophy",
-          "normal"
-        ]
-      },
-      {
-        "name": "max_hr",
-        "meaning": "Maximum heart rate on the exercise test",
-        "units": "beats/min",
-        "kind": "number",
-        "known": "Exercise test, before angiography",
-        "missing": "never blank"
-      },
-      {
-        "name": "exercise_angina",
-        "meaning": "1 = chest pain brought on by the exercise test",
-        "units": "0/1",
-        "kind": "0/1",
-        "known": "Exercise test, before angiography",
-        "missing": "never blank"
-      },
-      {
-        "name": "st_depression",
-        "meaning": "ST depression on exercise, relative to rest",
-        "units": "mm",
-        "kind": "number",
-        "known": "Exercise test, before angiography",
-        "missing": "never blank"
-      },
-      {
-        "name": "st_slope",
-        "meaning": "Slope of the peak-exercise ST segment",
-        "units": "",
-        "kind": "category",
-        "known": "Exercise test, before angiography",
-        "missing": "never blank",
-        "categories": [
-          "downsloping",
-          "flat",
-          "upsloping"
-        ]
-      },
-      {
-        "name": "thal",
-        "meaning": "Thallium stress scan result (blank = not recorded)",
-        "units": "",
-        "kind": "category",
-        "known": "Thallium stress test, before angiography",
-        "missing": "blank = not recorded (2 rows)",
-        "categories": [
-          "fixed defect",
-          "normal",
-          "reversible defect"
-        ]
-      }
-    ],
-    "target": {
-      "meaning": "1 = angiographic disease (UCI `num` 1–4), 0 = none (`num` 0)",
-      "known": "At coronary angiography (the outcome)"
-    },
-    "excluded": [
-      {
-        "name": "ca",
-        "meaning": "Number of major vessels (0–3) coloured by fluoroscopy",
-        "known": "During the procedure that defines the outcome"
       }
     ]
   }

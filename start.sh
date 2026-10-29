@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 # Start the activity app (or the website) for a local look.
 #
-#   ./start.sh                      starter app, Route A (GitHub Pages version)
-#   ./start.sh starter --streamlit  starter app, Route B (Streamlit)
-#   ./start.sh solution             private full-solution app, Route A
-#   ./start.sh solution --streamlit private full-solution app, Route B
+#   ./start.sh                      starter Streamlit app
+#   ./start.sh solution             private full-solution Streamlit app
 #   ./start.sh site                 the student website (builds it first)
 #   ./start.sh ... --port 9000      choose the port (default: the first free one from 8765)
 #
@@ -14,15 +12,13 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PY="$ROOT/.venv/bin/python"
 TARGET="starter"
-STREAMLIT=0
 PORT=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     starter|solution|site) TARGET="$1" ;;
-    --streamlit) STREAMLIT=1 ;;
     --port) PORT="${2:?--port needs a number}"; shift ;;
-    -h|--help) sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "Unknown option: $1 (try ./start.sh --help)" >&2; exit 1 ;;
   esac
   shift
@@ -52,7 +48,6 @@ case "$TARGET" in
     [[ -d "$DIR" ]] || { echo "No solution yet. Build it: $PY instructor/make_solution.py" >&2; exit 1; }
     ;;
   site)
-    [[ $STREAMLIT -eq 0 ]] || { echo "--streamlit applies to the app, not the site." >&2; exit 1; }
     cd "$ROOT"
     node scripts/build.mjs
     echo "Website: http://localhost:$PORT/classification-activity/"
@@ -61,10 +56,5 @@ case "$TARGET" in
 esac
 
 cd "$DIR"
-if [[ $STREAMLIT -eq 1 ]]; then
-  echo "Streamlit app ($TARGET): http://localhost:$PORT/"
-  exec "$PY" -m streamlit run streamlit_app.py --server.port "$PORT" --server.headless true
-else
-  echo "GitHub Pages app ($TARGET): http://localhost:$PORT/app/"
-  exec "$PY" -m http.server "$PORT" --bind 127.0.0.1
-fi
+echo "Streamlit app ($TARGET): http://localhost:$PORT/"
+exec "$PY" -m streamlit run streamlit_app.py --server.port "$PORT" --server.headless true

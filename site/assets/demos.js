@@ -1,6 +1,6 @@
 // Small illustrative demos for the Models page. All numbers are made up (see demo-math.js),
-// never the activity's data. Both probes move with a pointer (drag or tap) or the arrow keys.
-import { KNN_DEMO, SVM_DEMO, knnPoints, knnPredict, svmDistance, svmLineX, svmLineZ, svmScore, svmSide } from "./demo-math.js";
+// never the activity's data. The probe moves with a pointer (drag or tap) or the arrow keys.
+import { KNN_DEMO, knnPoints, knnPredict } from "./demo-math.js";
 
 const W = 420, H = 320, PAD = 40;
 
@@ -13,9 +13,6 @@ const KEYS = {
   neg: `<circle class="neg-ring" cx="11" cy="11" r="5"/>`,
   probe: `<path class="probe" d="${diamond(11, 11, 8)}"/>`,
   ring: `<line class="nbr" x1="-6" y1="11" x2="2" y2="11"/><circle class="ring" cx="11" cy="11" r="8"/>`,
-  sv: `<circle class="sv" cx="11" cy="11" r="8"/>`,
-  boundary: `<line class="boundary" x1="0" x2="22" y1="11" y2="11"/>`,
-  margin: `<line class="margin" x1="0" x2="22" y1="11" y2="11"/>`,
 };
 const legend = (items) => `<ul class="legend">${items
   .map(([key, label]) => `<li><svg class="key" viewBox="0 0 22 22" aria-hidden="true">${KEYS[key]}</svg>${label}</li>`).join("")}</ul>`;
@@ -112,65 +109,7 @@ function knnDemo(root) {
   render();
 }
 
-// ---- SVM: the widest margin, and a raw score that isn't a probability -----------------------
-function svmDemo(root) {
-  const m = SVM_DEMO;
-  const [lo, hi] = m.range;
-  const probe = { x: 3.0, z: 3.0 };
-  const sx = (x) => PAD + ((x - lo) / (hi - lo)) * (W - 2 * PAD);
-  const sy = (z) => H - PAD - ((z - lo) / (hi - lo)) * (H - 2 * PAD);
-  const line = (level, cls) => `<line class="${cls}" x1="${sx(lo)}" y1="${sy(svmLineZ(m, lo, level))}" x2="${sx(hi)}" y2="${sy(svmLineZ(m, hi, level))}"/>`;
-  const region = (sign, cls) => `<polygon class="${cls}" points="${svmSide(m, sign).map(([x, z]) => `${sx(x)},${sy(z)}`).join(" ")}"/>`;
-  // The line labels sit in a band above the plot, over the top end of each line, so they never cover a patient.
-  const TOP = 24;
-  const xAt = (level, y) => sx(svmLineX(m, lo + ((H - PAD - y) / (H - 2 * PAD)) * (hi - lo), level));
-  const topLabel = (level, y, text, cls = "", anchor = "middle") => `<text class="${cls}" x="${xAt(level, y + 4) - (anchor === "start" ? 4 : 0)}" y="${y}" text-anchor="${anchor}">${text}</text>`;
-  root.innerHTML = `
-    <p class="demo-intro"><span class="tag illustrative">Illustrative example: made-up numbers</span></p>
-    <p>Sixteen made-up training patients, two features, chosen so a straight line separates them cleanly (real data rarely does). Drag the new patient (the white diamond), or focus it and use the arrow keys.</p>
-    ${legend([["pos", "had the outcome"], ["neg", "didn't"], ["probe", "new patient"], ["sv", "support vector (outlined)"], ["boundary", "decision boundary: score = 0"], ["margin", "margins: score = +1 and −1"]])}
-    <svg class="chart" viewBox="0 ${-TOP} ${W} ${H + TOP}" id="svm-svg" role="group" aria-label="Scatter plot of 16 made-up patients with the SVM decision boundary, its margins, the positive-score and negative-score sides, and a movable new patient" aria-describedby="svm-read"></svg>
-    <div class="demo-readout" aria-live="polite" id="svm-read"></div>`;
-  const svg = root.querySelector("#svm-svg");
-  const sv = new Set(m.supportVectors);
-  const frame = `<defs><clipPath id="svm-clip"><rect x="${PAD}" y="${PAD - 10}" width="${W - 2 * PAD}" height="${H - 2 * PAD + 10}"/></clipPath>
-        <clipPath id="svm-clip-top"><rect x="${PAD}" y="-6" width="${W - 2 * PAD}" height="${H - PAD + 6}"/></clipPath></defs>
-      <g clip-path="url(#svm-clip)">${region(1, "region-pos")}${region(-1, "region-neg")}</g>
-      <line class="axis" x1="${PAD}" x2="${W - PAD}" y1="${H - PAD}" y2="${H - PAD}"/><line class="axis" x1="${PAD}" x2="${PAD}" y1="${PAD - 10}" y2="${H - PAD}"/>
-      ${[0, 2, 4, 6].map((t) => `<text x="${sx(t)}" y="${H - PAD + 16}" text-anchor="middle">${t}</text><text x="${PAD - 6}" y="${sy(t) + 4}" text-anchor="end">${t}</text>`).join("")}
-      <text x="${W / 2}" y="${H - 4}" text-anchor="middle">Feature 1 (made up)</text>
-      <text transform="translate(15 ${H / 2}) rotate(-90)" text-anchor="middle">Feature 2 (made up)</text>
-      <text class="strong" x="${W - PAD - 6}" y="${PAD + 6}" text-anchor="end">Positive score</text>
-      <text class="strong" x="${PAD + 6}" y="${H - PAD - 8}">Negative score</text>
-      <g clip-path="url(#svm-clip)">${line(1, "margin")}${line(-1, "margin")}</g>
-      <g clip-path="url(#svm-clip-top)">${line(0, "boundary")}</g>
-      ${topLabel(0, -TOP + 14, "Decision boundary: score = 0", "strong", "start")}
-      ${topLabel(-1, PAD - 14, "Margin")}${topLabel(1, PAD - 14, "Margin")}`;
-  const render = () => {
-    svg.innerHTML = `${frame}
-      ${m.points.map((p, i) => `<circle class="${p.y > 0 ? "pos" : "neg-ring"}" cx="${sx(p.x)}" cy="${sy(p.z)}" r="5"/>${sv.has(i) ? `<circle class="sv" cx="${sx(p.x)}" cy="${sy(p.z)}" r="9"/>` : ""}`).join("")}
-      <path class="probe" id="svm-probe" tabindex="0" role="slider" aria-label="New patient: feature 1 ${probe.x.toFixed(1)}, feature 2 ${probe.z.toFixed(1)}" aria-valuetext="${probe.x.toFixed(1)}, ${probe.z.toFixed(1)}" d="${diamond(sx(probe.x), sy(probe.z))}"/>`;
-    const s = svmScore(m, probe.x, probe.z);
-    root.querySelector("#svm-read").innerHTML = `
-      <p><strong>Raw score: ${s >= 0 ? "+" : "−"}${Math.abs(s).toFixed(2)}</strong>: a ${s >= 0 ? "positive score, on the outcome side" : "negative score, on the no-outcome side"} of the boundary.
-        Geometric distance from the boundary: ${svmDistance(m, probe.x, probe.z).toFixed(2)} feature units (the score ÷ the length of the weights).</p>
-      <p>Higher means more likely to have the outcome, but the score is <strong>not a probability</strong>: it can be above 1 or below 0, and a score of +2 isn't twice as likely as +1. In the activity, the supplied <code>with_probabilities()</code> helper learns how to turn scores into probabilities from the training rows. Its probability of 0.5 need not fall exactly at score 0.</p>`;
-    arrowKeys(svg.querySelector("#svm-probe"), move);
-  };
-  const move = (p, d) => {
-    if (p) Object.assign(probe, p);
-    else { probe.x += d[0] * 0.1; probe.z += d[1] * 0.1; }
-    probe.x = Math.min(hi, Math.max(lo, probe.x));
-    probe.z = Math.min(hi, Math.max(lo, probe.z));
-    const hadFocus = document.activeElement?.id === "svm-probe";
-    render();
-    if (hadFocus) svg.querySelector("#svm-probe").focus();
-  };
-  draggable(svg, (x, y) => ({ x: lo + ((x - PAD) / (W - 2 * PAD)) * (hi - lo), z: lo + ((H - PAD - y) / (H - 2 * PAD)) * (hi - lo) }), move);
-  render();
-}
-
-const DEMOS = { "demo-knn": knnDemo, "demo-svm": svmDemo };
+const DEMOS = { "demo-knn": knnDemo };
 for (const [id, fn] of Object.entries(DEMOS)) {
   const el = document.getElementById(id);
   if (el) fn(el);

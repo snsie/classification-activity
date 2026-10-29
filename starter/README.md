@@ -2,11 +2,11 @@
 
 # Judge the Model
 
-An app that helps a clinical lead judge whether any classifier is fit for each job: 30-day readmission, diabetes screening and heart disease. It reads the results my Python analysis exported to `results/`.
+An app that helps a clinical lead judge whether any classifier is fit for each job: 30-day readmission and diabetes screening. It reads the results my Python analysis exported to `results/`.
 
 **Central question:** Which classifier would you trust for this job, at what threshold, and with what limits?
 
-Submit the link to **this repository** on Canvas, plus your four Canvas answers.
+Submit the link to **this repository** on Canvas, plus your three Canvas answers.
 
 ## Quick start
 ```bash
@@ -19,27 +19,22 @@ python check.py --stage setup
 | Step | Command | Before you run it |
 |---|---|---|
 | 2 | — | Fill in `Before results` in `DECISIONS.md`; commit and push |
-| 3 | `python -m analysis train` | Complete the kNN and SVM TODOs in `analysis/models.py` |
-| 4 | `python -m analysis explore` | — then fill in `Before test`; commit and push |
-| 5 | `python -m analysis test` (once) | — then fill in `Verification` and `Recommendations` |
-| 5 | `python -m analysis export` | — |
+| 3 | `python -m analysis` | Complete the kNN TODO in `analysis/models.py` |
+| 5 | `python -m analysis` (again) | Fill in `Recommendations` and `Design choice and AI use` in `DECISIONS.md` |
 | any | `python check.py` | — |
 
-Run the app on your computer:
-- **Route A (GitHub Pages):** `npm run serve` (or `python -m http.server 8000`), then open <http://localhost:8000/app/>.
-- **Route B (Streamlit):** `streamlit run streamlit_app.py`
+Run the app on your computer: `streamlit run streamlit_app.py`
 
 ## What's here
 | File | What it is |
 |---|---|
-| `DECISIONS.md` | Your decisions, saved before the results they depend on |
+| `DECISIONS.md` | Your decisions: what matters for each job, your recommendations, and one design choice |
 | `AGENT_BRIEF.md` | Rules for your AI coding agent (have it read this first) |
-| `SETUP.md` | How to run and publish (GitHub Pages or Streamlit) |
-| `analysis/` | The staged workflow; you complete two pipelines in `analysis/models.py` |
-| `m11.py`, `app/m11.js` | The shared metric helpers: every number comes from these |
-| `index.html`, `app/` | Route A: GitHub Pages (`index.html` opens `app/`) |
-| `streamlit_app.py`, `requirements.txt` | Route B: Streamlit Community Cloud |
+| `SETUP.md` | How to run and publish on Streamlit Community Cloud |
+| `analysis/` | The workflow; you complete one pipeline in `analysis/models.py` |
+| `m11.py` | The shared metric helpers: every number comes from these |
+| `streamlit_app.py`, `requirements.txt` | Your app, hosted on Streamlit Community Cloud |
 | `results/` | What the analysis exports; the app reads only these files |
-| `data/` | The three datasets, the dictionary (`data/README.md`) and `manifest.json` |
+| `data/` | The two datasets, the dictionary (`data/README.md`) and `manifest.json` |
 | `check.py` | Integrity checks: `python check.py` must pass before you submit |
 | `prompts/` | Optional: your AI prompts, one file per session |

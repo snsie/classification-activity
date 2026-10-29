@@ -1,8 +1,0 @@
-{
-  "name": "judge-the-model",
-  "private": true,
-  "description": "Preview the GitHub Pages app (Route A) at http://localhost:8000/app/",
-  "scripts": {
-    "serve": "node -e \"const h=require('http'),f=require('fs'),p=require('path');const T={'.html':'text/html','.js':'text/javascript','.json':'application/json','.css':'text/css','.csv':'text/csv','.md':'text/markdown'};h.createServer((q,s)=>{let u=decodeURIComponent(q.url.split('?')[0]);let x=p.join(process.cwd(),u);if(!x.startsWith(process.cwd()))return s.writeHead(403).end();if(f.existsSync(x)&&f.statSync(x).isDirectory())x=p.join(x,'index.html');if(!f.existsSync(x))return s.writeHead(404).end('Not found');s.writeHead(200,{'Content-Type':T[p.extname(x)]||'application/octet-stream'}).end(f.readFileSync(x))}).listen(process.env.PORT||8000,function(){console.log('http://localhost:'+this.address().port+'/app/')})\""
-  }
-}

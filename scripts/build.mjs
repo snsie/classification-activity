@@ -1,7 +1,7 @@
 // Builds the static site into dist/. No dependencies: node scripts/build.mjs
 //
 // Pages are HTML fragments in site/pages/ wrapped in site/layout.html. Tokens like
-// {{help auroc}}, {{dl data/heart.csv}} or {{num heart.n_rows}} are expanded here, and the build
+// {{help auroc}}, {{dl data/diabetes.csv}} or {{num diabetes.n_rows}} are expanded here, and the build
 // fails on any unknown glossary term, missing download or missing number, so broken links and
 // invented numbers can't ship. Every count and share comes from starter/data/manifest.json.
 // All links are relative, so the site works under the GitHub Pages project subpath.
@@ -30,14 +30,14 @@ const NAV = [
   { file: "beyond-accuracy", label: "1. Beyond Accuracy" },
   { file: "threshold", label: "2. A Threshold for the Job" },
   { file: "ranking", label: "3. Ranking vs. Being Right" },
-  { file: "fair-comparison", label: "4. A Fair Comparison" },
+  { file: "train-vs-test", label: "4. Training vs. Test" },
   { group: "Resources" },
   { file: "data", label: "Data & files" },
   { file: "hosting", label: "Publish & back up" },
   { file: "submit", label: "Submit" },
   { file: "glossary", label: "Glossary" },
 ];
-const PAGES = ["index", "models", "analysis", "beyond-accuracy", "threshold", "ranking", "fair-comparison",
+const PAGES = ["index", "models", "analysis", "beyond-accuracy", "threshold", "ranking", "train-vs-test",
   "data", "hosting", "submit", "glossary", "404"];
 
 const terms = JSON.parse(readFileSync(join(SITE, "terms.json"), "utf8"));
@@ -83,7 +83,7 @@ function repoLink(path, text) {
   return `<a href="${REPO}/${kind}/main/${path}">${esc(text || path)}</a>`;
 }
 
-/** A number from manifest.json: {{num heart.n_rows}}, {{pct diabetes.prevalence}}. */
+/** A number from manifest.json: {{num diabetes.n_rows}}, {{pct diabetes.prevalence}}. */
 function fact(path, kind) {
   const [key, ...rest] = path.split(".");
   let v = manifest.datasets[key];
@@ -115,7 +115,7 @@ function datasetCard(key) {
       <dt>Framing</dt><dd>${esc(d.framing)}</dd>
     </dl>
     <p class="data-facts"><span class="tag">From the supplied data</span> ${int(m.n_rows)} ${d.units}, ${int(m.n_pos)} positive (${(m.prevalence * 100).toFixed(1)}%).
-      Development: ${int(m.n_dev)} (${int(m.n_dev_pos)} positive) in 5 folds. Test: ${int(m.n_test)} (${int(m.n_test_pos)} positive).</p>
+      Training: ${int(m.n_train)} (${int(m.n_train_pos)} positive). Test: ${int(m.n_test)} (${int(m.n_test_pos)} positive).</p>
     <div class="table-wrap"><table class="dictionary">
     <caption>Predictors in <code>${key}.csv</code>, with “When is it known?” ${help("when-known")}</caption>
     <thead><tr><th scope="col">Column</th><th scope="col">Meaning</th><th scope="col">Units</th><th scope="col">Categories / missing</th><th scope="col">When is it known?</th></tr></thead>
@@ -136,29 +136,23 @@ function glossary() {
     .join("");
 }
 
-const DATASET_NAMES = { readmission: "30-day readmission", diabetes: "Diabetes screening", heart: "Heart disease" };
+const DATASET_NAMES = { readmission: "30-day readmission", diabetes: "Diabetes screening" };
 const FILE_NOTES = {
   "README.md": "Your README: your app link goes on the first line.",
-  "DECISIONS.md": "Your decisions, saved before the results they depend on.",
+  "DECISIONS.md": "Your decisions: what matters for each job, your recommendations, and one design choice.",
   "AGENT_BRIEF.md": "Rules for your AI coding agent. Have it read this first.",
-  "SETUP.md": "Run, publish and back up (both routes).",
+  "SETUP.md": "Run, publish and back up.",
   "check.py": "Integrity checks: must pass before you submit.",
-  "m11.py": "Shared metric helpers (Python).",
-  "app/m11.js": "Shared metric helpers (browser).",
-  "app/app.js": "Route A: the four plain starter sections.",
-  "app/index.html": "Route A: the app page.",
-  "index.html": "Route A: opens app/ from your site's root link.",
-  "package.json": "Route A: npm run serve previews the app.",
-  "streamlit_app.py": "Route B: the four plain starter sections.",
+  "m11.py": "Shared metric helpers: every number comes from these.",
+  "streamlit_app.py": "Your app: the four plain starter sections.",
   "requirements.txt": "Pinned Python packages (CPU only).",
   ".gitignore": "Keeps caches and secrets out of git.",
   "analysis/__init__.py": "Marks analysis/ as a package.",
-  "analysis/__main__.py": "The staged workflow: train, explore, test, export.",
-  "analysis/data.py": "Loads the CSVs, folds and predictors.",
-  "analysis/models.py": "The six models. You complete the kNN and SVM TODOs here.",
-  "analysis/evaluate.py": "Cross-validation and the one-time test fit.",
-  "analysis/export.py": "Reads DECISIONS.md and checks git history.",
-  "analysis/with_probabilities.py": "Supplied helper that turns an SVM's raw score into a probability.",
+  "analysis/__main__.py": "The workflow: python -m analysis.",
+  "analysis/data.py": "Loads the CSVs, the split and the predictors.",
+  "analysis/models.py": "The four models. You complete the kNN TODO here.",
+  "analysis/evaluate.py": "Fits on the training rows, scores both sets.",
+  "analysis/export.py": "Reads DECISIONS.md and exports it.",
   "data/README.md": "Data dictionary, with “When is it known?” for every column.",
   "data/datasets.json": "The same dictionary, as data.",
   "data/manifest.json": "Sources, licences, versions, counts and SHA-256 fingerprints.",
@@ -171,7 +165,7 @@ function fileList() {
     const rel = relative(STARTER, f);
     let note = FILE_NOTES[rel];
     if (!note && /^data\/\w+\.csv$/.test(rel)) note = `${DATASET_NAMES[rel.slice(5, -4)]} dataset.`;
-    if (!note && /^results\/\w+_dev\.json$/.test(rel)) note = `Development results, ${DATASET_NAMES[rel.slice(8, -9)]} (starter: baseline only).`;
+    if (!note && /^results\/\w+\.json$/.test(rel)) note = `Results, ${DATASET_NAMES[rel.slice(8, -5)]} (starter: baseline only).`;
     if (!note) throw new Error(`no description for starter/${rel}: add it to FILE_NOTES`);
     return `<tr><td>${download(rel, rel)}</td><td>${esc(note)}</td></tr>`;
   });
@@ -208,6 +202,12 @@ cpSync(join(SITE, "assets"), join(OUT, "assets"), { recursive: true });
 cpSync(STARTER, join(OUT, "starter"), { recursive: true, filter: (p) => !p.includes("__pycache__") && !p.includes(".venv") });
 writeFileSync(join(OUT, ".nojekyll"), "");
 writeFileSync(join(OUT, "assets", "terms.js"), `// Generated from site/terms.json\nexport const TERMS = ${JSON.stringify(terms)};\n`);
+// Every asset URL carries the commit, so after a deploy browsers can't mix a cached old file with
+// new ones (GitHub Pages lets them cache each file for 10 minutes). Imports between modules too.
+for (const f of readdirSync(join(OUT, "assets")).filter((f) => f.endsWith(".js"))) {
+  const p = join(OUT, "assets", f);
+  writeFileSync(p, readFileSync(p, "utf8").replace(/(from\s+"\.\/[\w-]+\.js)"/g, `$1?v=${VERSION}"`));
+}
 
 const zip = makeZip(starterFiles().map((f) => ({ name: `${ZIP_DIR}/${relative(STARTER, f)}`, data: readFileSync(f) })));
 writeFileSync(join(OUT, "downloads", ZIP_NAME), zip);
@@ -225,7 +225,8 @@ for (const page of PAGES) {
     .replace("{{nav}}", nav(page))
     .replace("{{version}}", VERSION === "local" ? "local build" : `<a href="${REPO}/commit/${VERSION}">version ${VERSION}</a>`)
     .replace("{{content}}", body)
-    .replace("{{scripts}}", (meta.scripts || []).map((s) => `<script type="module" src="assets/${s}"></script>`).join(""));
+    .replace("{{scripts}}", (meta.scripts || []).map((s) => `<script type="module" src="assets/${s}?v={{v}}"></script>`).join(""))
+    .replaceAll("{{v}}", VERSION);
   if (/\{\{[a-z]/.test(html)) throw new Error(`unexpanded token in ${page}: ${html.match(/\{\{[^}]*\}\}/)[0]}`);
   writeFileSync(join(OUT, `${page}.html`), html);
 }

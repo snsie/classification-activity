@@ -14,7 +14,6 @@ import zipfile
 from pathlib import Path
 
 NHANES = "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/{}.xpt"
-UCI_HEART = "https://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/{}"
 UCI_READMIT = "https://archive.ics.uci.edu/static/public/296/diabetes+130-us+hospitals+for+years+1999-2008.zip"
 
 LICENCE = {
@@ -32,10 +31,6 @@ RAW = {
     "DIQ_J.xpt": (NHANES.format("DIQ_J"), "1ecbf5360dfc331d1efbf32198553dc30e9a1f4cff0a907ed30ca72bac797f89", "nhanes"),
     "HDL_J.xpt": (NHANES.format("HDL_J"), "9f4eb41b89f0c9f3d6262f873e671eeb2f2eb40581a8426b2a3c8fd4fc19439e", "nhanes"),
     "TCHOL_J.xpt": (NHANES.format("TCHOL_J"), "0291a6a4f6d82dac8392c8c992b519946824dfeda01647935520cf506ed9f4ab", "nhanes"),
-    "processed.cleveland.data": (UCI_HEART.format("processed.cleveland.data"),
-                                 "a74b7efa387bc9d108d7d0115d831fe9b414b29ae7124f331b622b4efa0427c8", "uci"),
-    "heart-disease.names": (UCI_HEART.format("heart-disease.names"),
-                            "ec7ed5aa4ed8321097808f47b836301c2a0c36f3bb09c40b8b43b622363e6b61", "uci"),
     "diabetic_data.csv": (UCI_READMIT, None, "uci"),
     "IDS_mapping.csv": (UCI_READMIT, None, "uci"),
 }

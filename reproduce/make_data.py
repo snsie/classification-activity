@@ -1,16 +1,13 @@
-"""Build the three activity datasets, their fixed splits, the dictionary and the manifest.
+"""Build the two activity datasets, their fixed train/test split, the dictionary and the manifest.
 
-Cohorts and features follow the M11 lecture app (snsie/classification-app, pipeline/datasets.py):
-readmission and diabetes are copied from it; heart disease is a new builder from the UCI
-documentation. Differences from the lecture, all presentational:
+Cohorts and features follow the M11 lecture app (snsie/classification-app, pipeline/datasets.py).
+Differences from the lecture, all presentational:
   * categories are kept as readable text (one column each). The starter one-hot encodes them
     inside every model's pipeline, so the encoding is learned from training rows only;
   * readmission's admission and discharge codes are replaced by their UCI descriptions;
-  * diabetes `race` is one text column instead of five 0/1 columns; `sbp` is rounded to 0.01;
-  * heart `cp`, `restecg`, `slope` and `thal` are categories, and `ca` is excluded (leaked).
+  * diabetes `race` is one text column instead of five 0/1 columns; `sbp` is rounded to 0.01.
 
-Splits: an 80/20 development/test split, stratified (train_test_split, random_state=0), then
-five stratified folds of the development rows (StratifiedKFold(5, shuffle=True, random_state=0)).
+Split: an 80/20 train/test split, stratified (train_test_split, random_state=0).
 """
 
 from __future__ import annotations
@@ -22,12 +19,11 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import StratifiedKFold, train_test_split
+from sklearn.model_selection import train_test_split
 
 SEED = 0
-N_FOLDS = 5
 TEST_SHARE = 0.2
-KEYS = ["readmission", "diabetes", "heart"]
+KEYS = ["readmission", "diabetes"]
 
 # ---------------------------------------------------------------- dataset definitions
 # Each column: name, meaning, units, kind ("number", "0/1" or "category"), categories (for
@@ -35,18 +31,14 @@ KEYS = ["readmission", "diabetes", "heart"]
 COMMON = [
     {"name": "row_id", "meaning": "Row number in this file", "units": "", "kind": "id", "known": "Assigned by the course",
      "missing": "never blank"},
-    {"name": "split", "meaning": "`dev` (development: train and choose) or `test` (locked test set, used once)", "units": "",
+    {"name": "split", "meaning": "`train` (the models learn from these rows) or `test` (used only to evaluate them)", "units": "",
      "kind": "id", "known": "Assigned by the course", "missing": "never blank"},
-    {"name": "fold", "meaning": "Cross-validation fold 1–5 for development rows; blank for test rows", "units": "",
-     "kind": "id", "known": "Assigned by the course", "missing": "blank on test rows"},
 ]
 
 READMIT_CITE = ("Strack B, DeShazo JP, Gennings C, et al. Impact of HbA1c measurement on hospital readmission rates: "
                 "analysis of 70,000 clinical database patient records. BioMed Research International 2014;2014:781670.")
 NHANES_CITE = ("Centers for Disease Control and Prevention, National Center for Health Statistics. "
                "National Health and Nutrition Examination Survey 2017–2018.")
-HEART_CITE = ("Detrano R, Janosi A, Steinbrunn W, et al. International application of a new probability algorithm "
-              "for the diagnosis of coronary artery disease. Am J Cardiol 1989;64(5):304–10.")
 
 DATASETS = {
     "readmission": {
@@ -125,49 +117,9 @@ DATASETS = {
             {"name": "pills", "meaning": "Now taking diabetes pills (DIQ070)", "known": "At the interview; only people already treated for diabetes answer yes"},
         ],
     },
-    "heart": {
-        "name": "Heart disease",
-        "unit": "patient", "units": "patients",
-        "cohort": "UCI Heart Disease, Cleveland Clinic Foundation: patients referred for coronary angiography (processed file, 14 attributes).",
-        "job": "Classify disease within a diagnostic-workup cohort.",
-        "teaches": "Small samples: wide fold SD and a noisy test set",
-        "framing": "This is a selected cohort already in diagnostic workup, not the general population.",
-        "positive": "Angiographic heart disease (any major vessel with > 50% narrowing; label > 0)",
-        "negative": "No angiographic disease (label 0)",
-        "prediction_point": "After the clinical and noninvasive tests, before angiography",
-        "source": "UCI Machine Learning Repository: Heart Disease (Cleveland), processed.cleveland.data",
-        "url": "https://archive.ics.uci.edu/dataset/45/heart+disease",
-        "citation": HEART_CITE, "licence": "CC BY 4.0",
-        "one_per_patient": True,
-        "columns": [
-            {"name": "age", "meaning": "Age", "units": "years", "kind": "number", "known": "At the visit"},
-            {"name": "male", "meaning": "1 = male, 0 = female", "units": "0/1", "kind": "0/1", "known": "At the visit"},
-            {"name": "chest_pain", "meaning": "Chest pain type", "units": "", "kind": "category", "known": "At the visit (history)"},
-            {"name": "rest_bp", "meaning": "Resting systolic blood pressure on admission", "units": "mmHg", "kind": "number", "known": "At the visit"},
-            {"name": "chol", "meaning": "Serum cholesterol", "units": "mg/dL", "kind": "number", "known": "From a blood test before angiography"},
-            {"name": "high_fasting_glucose", "meaning": "1 = fasting blood sugar > 120 mg/dL", "units": "0/1", "kind": "0/1", "known": "From a blood test before angiography"},
-            {"name": "rest_ecg", "meaning": "Resting ECG result", "units": "", "kind": "category", "known": "At the visit"},
-            {"name": "max_hr", "meaning": "Maximum heart rate on the exercise test", "units": "beats/min", "kind": "number", "known": "Exercise test, before angiography"},
-            {"name": "exercise_angina", "meaning": "1 = chest pain brought on by the exercise test", "units": "0/1", "kind": "0/1", "known": "Exercise test, before angiography"},
-            {"name": "st_depression", "meaning": "ST depression on exercise, relative to rest", "units": "mm", "kind": "number", "known": "Exercise test, before angiography"},
-            {"name": "st_slope", "meaning": "Slope of the peak-exercise ST segment", "units": "", "kind": "category", "known": "Exercise test, before angiography"},
-            {"name": "thal", "meaning": "Thallium stress scan result (blank = not recorded)", "units": "", "kind": "category", "known": "Thallium stress test, before angiography"},
-        ],
-        "target": {"meaning": "1 = angiographic disease (UCI `num` 1–4), 0 = none (`num` 0)",
-                   "known": "At coronary angiography (the outcome)"},
-        "excluded": [
-            {"name": "ca", "meaning": "Number of major vessels (0–3) coloured by fluoroscopy", "known": "During the procedure that defines the outcome"},
-        ],
-    },
 }
 
 # Category value labels. Codes not listed keep their description from the source.
-HEART_CODES = {
-    "chest_pain": {1: "typical angina", 2: "atypical angina", 3: "non-anginal pain", 4: "no symptoms"},
-    "rest_ecg": {0: "normal", 1: "ST-T wave abnormality", 2: "left ventricular hypertrophy"},
-    "st_slope": {1: "upsloping", 2: "flat", 3: "downsloping"},
-    "thal": {3: "normal", 6: "fixed defect", 7: "reversible defect"},
-}
 NHANES_RACE = {1: "Mexican American", 2: "Other Hispanic", 3: "Non-Hispanic White", 4: "Non-Hispanic Black",
                6: "Non-Hispanic Asian", 7: "Other / multiracial"}
 # Discharged to hospice or died: these patients cannot be readmitted (Strack et al. 2014; lecture app)
@@ -283,40 +235,16 @@ def diabetes(raw: Path) -> tuple[pd.DataFrame, list[dict]]:
     return X.reset_index(drop=True), funnel
 
 
-def heart(raw: Path) -> tuple[pd.DataFrame, list[dict]]:
-    cols = ["age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach", "exang", "oldpeak", "slope", "ca", "thal", "num"]
-    d = pd.read_csv(raw / "processed.cleveland.data", header=None, names=cols, na_values="?")
-    X = pd.DataFrame(index=d.index)
-    X["age"] = d.age.astype(int)
-    X["male"] = d.sex.astype(int)
-    X["chest_pain"] = d.cp.map(HEART_CODES["chest_pain"])
-    X["rest_bp"] = d.trestbps.astype(int)
-    X["chol"] = d.chol.astype(int)
-    X["high_fasting_glucose"] = d.fbs.astype(int)
-    X["rest_ecg"] = d.restecg.map(HEART_CODES["rest_ecg"])
-    X["max_hr"] = d.thalach.astype(int)
-    X["exercise_angina"] = d.exang.astype(int)
-    X["st_depression"] = d.oldpeak
-    X["st_slope"] = d.slope.map(HEART_CODES["st_slope"])
-    X["thal"] = d.thal.map(HEART_CODES["thal"])  # 2 blanks: not recorded
-    # `ca` is deliberately not copied: see DATASETS["heart"]["excluded"].
-    X["target"] = (d.num > 0).astype(int)
-    return X, [{"step": "Cleveland patients in the processed UCI file", "n": int(len(d))}]
-
-
-BUILDERS = {"readmission": readmission, "diabetes": diabetes, "heart": heart}
+BUILDERS = {"readmission": readmission, "diabetes": diabetes}
 
 
 # ---------------------------------------------------------------- splits and files
 def add_splits(X: pd.DataFrame) -> pd.DataFrame:
     y = X.target.to_numpy()
-    dev, test = train_test_split(np.arange(len(y)), test_size=TEST_SHARE, stratify=y, random_state=SEED)
-    split = np.array(["dev"] * len(y), dtype=object)
+    _, test = train_test_split(np.arange(len(y)), test_size=TEST_SHARE, stratify=y, random_state=SEED)
+    split = np.array(["train"] * len(y), dtype=object)
     split[test] = "test"
-    fold = pd.array([pd.NA] * len(y), dtype="Int64")
-    for k, (_, va) in enumerate(StratifiedKFold(N_FOLDS, shuffle=True, random_state=SEED).split(np.zeros(len(dev)), y[dev]), 1):
-        fold[dev[va]] = k
-    out = pd.DataFrame({"row_id": np.arange(1, len(y) + 1), "split": split, "fold": fold})
+    out = pd.DataFrame({"row_id": np.arange(1, len(y) + 1), "split": split})
     return pd.concat([out, X.reset_index(drop=True)], axis=1)
 
 
@@ -342,12 +270,11 @@ def make_data(raw: Path, out: Path, raw_files: dict) -> dict:
     out.mkdir(parents=True, exist_ok=True)
     manifest = {
         "built_by": "reproduce/make_data.py in the M11 activity repository (instructor-only)",
-        "dataset_definitions": "Readmission and diabetes cohorts from snsie/classification-app pipeline/datasets.py; heart from the UCI documentation",
+        "dataset_definitions": "Readmission and diabetes cohorts from snsie/classification-app pipeline/datasets.py",
         "raw_files": raw_files,
         "versions": {"python": "3.11", "numpy": version("numpy"), "pandas": version("pandas"), "scikit-learn": version("scikit-learn")},
-        "split": {"seed": SEED, "test_share": TEST_SHARE, "n_folds": N_FOLDS,
-                  "method": "train_test_split(test_size=0.2, stratify=target, random_state=0) → dev/test; "
-                            "StratifiedKFold(5, shuffle=True, random_state=0) on the dev rows → fold 1–5"},
+        "split": {"seed": SEED, "test_share": TEST_SHARE,
+                  "method": "train_test_split(test_size=0.2, stratify=target, random_state=0) → train/test"},
         "datasets": {},
     }
     dictionary = {}
@@ -356,21 +283,20 @@ def make_data(raw: Path, out: Path, raw_files: dict) -> dict:
         df = add_splits(X)
         path = out / f"{key}.csv"
         df.to_csv(path, index=False, lineterminator="\n")
-        dev, test = df[df.split == "dev"], df[df.split == "test"]
+        train, test = df[df.split == "train"], df[df.split == "test"]
         manifest["datasets"][key] = {
             "file": f"{key}.csv",
             "sha256": sha256(path),
             "n_rows": int(len(df)), "n_pos": int(df.target.sum()), "prevalence": round(float(df.target.mean()), 4),
-            "n_dev": int(len(dev)), "n_dev_pos": int(dev.target.sum()),
+            "n_train": int(len(train)), "n_train_pos": int(train.target.sum()),
             "n_test": int(len(test)), "n_test_pos": int(test.target.sum()),
-            "folds": {str(k): {"n": int((dev.fold == k).sum()), "n_pos": int(dev[dev.fold == k].target.sum())} for k in range(1, N_FOLDS + 1)},
             "predictors": [c["name"] for c in DATASETS[key]["columns"]],
             "cohort": funnel,
             "source": DATASETS[key]["source"], "url": DATASETS[key]["url"], "licence": DATASETS[key]["licence"],
         }
         dictionary[key] = dictionary_entry(key, df)
         m = manifest["datasets"][key]
-        print(f"  {key}: {m['n_rows']} rows, {m['n_pos']} positive ({m['prevalence']:.1%}); dev {m['n_dev']}, test {m['n_test']}")
+        print(f"  {key}: {m['n_rows']} rows, {m['n_pos']} positive ({m['prevalence']:.1%}); train {m['n_train']}, test {m['n_test']}")
     (out / "datasets.json").write_text(json.dumps(dictionary, indent=2, ensure_ascii=False) + "\n")
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n")
     (out / "README.md").write_text(readme(dictionary, manifest))
@@ -386,11 +312,10 @@ def readme(dictionary: dict, manifest: dict) -> str:
     lines = [
         "# The data",
         "",
-        "Three public health datasets. One row is one patient or adult. Every file has the same layout:",
+        "Two public health datasets. One row is one patient or adult. Every file has the same layout:",
         "",
         "- `row_id`: a row number.",
-        "- `split`: `dev` (development, 80%: train models and make choices) or `test` (20%: locked, used once by `python -m analysis test`).",
-        "- `fold`: 1–5 for development rows. Every model uses these folds. Never reshuffle them.",
+        "- `split`: `train` (80%: the models learn from these rows) or `test` (20%: used only to evaluate the models). Never reshuffle it.",
         "- the predictors, then `target` (1 = the positive class).",
         "",
         "Blank cells are missing values. **When is it known?** says when each value exists, relative to the prediction point. "
@@ -409,7 +334,7 @@ def readme(dictionary: dict, manifest: dict) -> str:
             f"- **Prediction point:** {d['prediction_point']}",
             f"- **Positive class (`target` = 1):** {d['positive']}",
             f"- **Framing:** {d['framing']}",
-            f"- **Split:** {m['n_dev']:,} development rows ({m['n_dev_pos']:,} positive) in 5 folds; {m['n_test']:,} test rows ({m['n_test_pos']:,} positive).",
+            f"- **Split:** {m['n_train']:,} training rows ({m['n_train_pos']:,} positive); {m['n_test']:,} test rows ({m['n_test_pos']:,} positive).",
             f"- **Source:** {d['source']} ({d['licence']}). {d['citation']}",
             "",
             "| Column | Meaning | Units | Categories / missing | When is it known? |",

@@ -1,10 +1,10 @@
-"""check.py and the workflow's guards, on a known-good results set and known-bad ones.
+"""check.py and the workflow's guard, on a known-good results set and known-bad ones.
 
     .venv/bin/python instructor/make_solution.py      # builds the known-good repository first
     .venv/bin/python -m pytest tests/test_check.py
 
-Each known-bad case is a clone of the full solution (so its git history is real), changed the way
-a student might change it. check.py must fail with a message that says what to fix.
+Each known-bad case is a clone of the full solution, changed the way a student might change it.
+check.py must fail with a message that says what to fix.
 """
 
 from __future__ import annotations
@@ -56,14 +56,10 @@ def fails(r: subprocess.CompletedProcess) -> list[str]:
     return [ln.strip()[len("FAIL"):].strip() for ln in r.stdout.splitlines() if ln.strip().startswith("FAIL")]
 
 
-def commit_of(repo: Path, subject: str) -> str:
-    return run(repo, "git", "log", "--format=%H", f"--grep=^{subject}$", ok=True).stdout.split()[0]
-
-
 # ---------------------------------------------------------------- known good
 def test_known_good_passes(tmp_path):
     repo = clone(tmp_path)
-    for stage in ("setup", "train", "test"):
+    for stage in ("setup", "results"):
         r = check(repo, "--stage", stage)
         assert r.returncode == 0, r.stdout
     r = check(repo)
@@ -75,8 +71,17 @@ def test_untouched_starter_passes_setup(tmp_path):
     shutil.copytree(STARTER, dest, ignore=shutil.ignore_patterns("__pycache__"))
     r = check(dest, "--stage", "setup")
     assert r.returncode == 0, r.stdout
-    r = check(dest, "--stage", "train")
+    r = check(dest, "--stage", "results")
     assert r.returncode != 0 and any("TODO" in f for f in fails(r)), r.stdout
+
+
+def test_rerun_passes(tmp_path):
+    """Rerunning the analysis later (same code) must not be flagged."""
+    repo = clone(tmp_path)
+    run(repo, PY, "-m", "analysis", ok=True)
+    commit(repo, "Rerun")
+    r = check(repo)
+    assert r.returncode == 0, r.stdout
 
 
 # ---------------------------------------------------------------- known bad
@@ -92,158 +97,94 @@ def test_preprocessing_outside_pipeline(tmp_path):
     assert any(f.startswith("knn() must return one Pipeline") for f in fails(r)), r.stdout
 
 
-def test_reshuffled_folds(tmp_path):
+def test_trained_on_test_rows(tmp_path):
     repo = clone(tmp_path)
     p = repo / "analysis" / "data.py"
-    s = p.read_text().replace(
-        "    return dev[predictors(key)].reset_index(drop=True), dev[TARGET].astype(int).tolist(), dev.fold.astype(int).tolist()",
-        "    import numpy as np\n"
-        "    from sklearn.model_selection import StratifiedKFold\n"
-        "    y = dev[TARGET].astype(int).to_numpy()\n"
-        "    folds = np.zeros(len(y), int)\n"
-        "    for k, (_, va) in enumerate(StratifiedKFold(5, shuffle=True, random_state=1).split(y, y), 1):\n"
-        "        folds[va] = k\n"
-        "    return dev[predictors(key)].reset_index(drop=True), y.tolist(), folds.tolist()")
+    s = p.read_text().replace('    part = df[df.split == split]\n',
+                              '    part = df if split == "train" else df[df.split == split]  # every row, test rows included\n')
+    s = s.replace('    return df.loc[df.split == split, "row_id"]', '    return (df if split == "train" else df.loc[df.split == split])["row_id"]')
     p.write_text(s)
-    run(repo, PY, "-m", "analysis", "train", ok=True)
-    commit(repo, "Retrain on my own folds")
+    run(repo, PY, "-m", "analysis", ok=True)
+    commit(repo, "Train on everything")
     r = check(repo)
     assert r.returncode == 1
-    assert any("differ from data/" in f and "never reshuffle" in f for f in fails(r)), r.stdout
+    assert any("does not match the train rows" in f and "never train on test rows" in f for f in fails(r)), r.stdout
 
 
-def test_test_run_before_before_test_committed(tmp_path):
+def test_changed_model_setting(tmp_path):
     repo = clone(tmp_path)
-    run(repo, "git", "reset", "-q", "--hard", commit_of(repo, "Train results"), ok=True)
-    d = repo / "DECISIONS.md"
-    d.write_text(d.read_text().replace("Diabetes model: <logreg|knn|rf|lgbm|svm>", "Diabetes model: logreg")
-                 .replace("Reason (1–2 sentences):", "Reason (1–2 sentences): simplest model within one SD."))
-    # The workflow refuses...
-    r = run(repo, PY, "-m", "analysis", "test", ok=False)
-    assert 'Commit your "Before test" answers first' in r.stdout
-    # ...so simulate a student who bypassed the guard, then committed decisions and results together.
-    code = ("import sys; from analysis import export, __main__ as w; "
-            "export.committed = lambda s: (True, ''); sys.argv = ['x', 'test']; w.main()")
-    run(repo, PY, "-c", code, ok=True)
-    commit(repo, "Before test and test results")
-    r = check(repo, "--stage", "test")
-    assert r.returncode == 1
-    assert any('has no complete "Before test"' in f for f in fails(r)), r.stdout
+    p = repo / "analysis" / "models.py"
+    p.write_text(p.read_text().replace("KNeighborsClassifier(n_neighbors=25)", "KNeighborsClassifier(n_neighbors=5)"))
+    commit(repo, "Tune k")
+    r = check(repo)
+    assert r.returncode == 1 and any(f.startswith("knn() must end with KNeighborsClassifier(n_neighbors=25)") for f in fails(r)), r.stdout
 
 
-def test_hand_edited_metric(tmp_path):
+def test_hand_edited_auroc(tmp_path):
     repo = clone(tmp_path)
-    p = repo / "results" / "heart_dev.json"
+    p = repo / "results" / "diabetes.json"
     d = json.loads(p.read_text())
-    d["models"]["knn"]["folds"][2]["cv_auroc"] += 0.02
+    d["models"]["knn"]["test_auroc"] += 0.02
     p.write_text(json.dumps(d))
     commit(repo, "Nudge a number")
     r = check(repo)
     assert r.returncode == 1
-    assert any(f.startswith("heart: knn fold 3 CV AUROC") and "never edit results by hand" in f for f in fails(r)), r.stdout
-
-
-def test_hand_edited_test_counts(tmp_path):
-    repo = clone(tmp_path)
-    p = repo / "results" / "test_record.json"
-    d = json.loads(p.read_text())
-    d["diabetes_threshold"]["test"]["counts"]["tp"] += 1
-    p.write_text(json.dumps(d))
-    commit(repo, "Nudge test counts")
-    r = check(repo)
-    assert r.returncode == 1 and any("diabetes test counts" in f for f in fails(r)), r.stdout
-
-
-def test_decision_changed_after_test(tmp_path):
-    repo = clone(tmp_path)
-    d = repo / "DECISIONS.md"
-    d.write_text(d.read_text().replace("Diabetes model: logreg", "Diabetes model: rf"))
-    run(repo, PY, "-m", "analysis", "export", ok=True)
-    commit(repo, "Change my mind")
-    r = check(repo)
-    assert r.returncode == 1
-    assert any("does not match \"Before test\"" in f for f in fails(r)), r.stdout
-
-
-def test_before_results_changed_after_training(tmp_path):
-    repo = clone(tmp_path)
-    d = repo / "DECISIONS.md"
-    d.write_text(d.read_text().replace("Random forest will have the highest CV AUROC", "kNN will have the highest CV AUROC"))
-    run(repo, PY, "-m", "analysis", "export", ok=True)
-    commit(repo, "Rewrite my prediction")
-    r = check(repo)
-    assert r.returncode == 1 and any('"Before results" in DECISIONS.md changed after `train` ran' in f for f in fails(r)), r.stdout
+    assert any(f.startswith("diabetes: knn test AUROC") and "never edit results by hand" in f for f in fails(r)), r.stdout
 
 
 def test_stale_export(tmp_path):
     repo = clone(tmp_path)
     d = repo / "DECISIONS.md"
-    d.write_text(d.read_text().replace("- heart: logistic regression", "- heart: none is adequate; logistic regression"))
-    commit(repo, "Edit a recommendation without exporting")
+    d.write_text(d.read_text().replace("- readmission: none is adequate", "- readmission: still none is adequate"))
+    commit(repo, "Edit a recommendation without rerunning")
     r = check(repo)
-    assert r.returncode == 1 and any("run `python -m analysis export`" in f for f in fails(r)), r.stdout
+    assert r.returncode == 1 and any("run `python -m analysis` again" in f for f in fails(r)), r.stdout
 
 
-# ---------------------------------------------------------------- the workflow's guards
-def test_guards_before_results(tmp_path):
+def test_incomplete_decisions(tmp_path):
+    repo = clone(tmp_path)
+    d = repo / "DECISIONS.md"
+    d.write_text(re.sub(r"- diabetes: logistic regression.*", "- diabetes: ...", d.read_text()))
+    run(repo, PY, "-m", "analysis", ok=True)
+    commit(repo, "Drop a recommendation")
+    r = check(repo)
+    assert r.returncode == 1 and any('Fill in "Recommendations"' in f and "diabetes" in f for f in fails(r)), r.stdout
+
+
+def test_incomplete_design_choice(tmp_path):
+    repo = clone(tmp_path)
+    d = repo / "DECISIONS.md"
+    d.write_text(re.sub(r"- AI suggestion I turned down:.*", "- AI suggestion I turned down:", d.read_text()))
+    run(repo, PY, "-m", "analysis", ok=True)
+    commit(repo, "Drop the AI reflection")
+    r = check(repo)
+    assert r.returncode == 1 and any('Fill in "Design choice and AI use"' in f and "AI suggestion" in f for f in fails(r)), r.stdout
+
+
+def test_uncommitted_results(tmp_path):
+    repo = clone(tmp_path)
+    (repo / "results" / "decisions.json").write_text((repo / "results" / "decisions.json").read_text() + "\n")
+    r = check(repo)
+    assert r.returncode == 1 and any(f.startswith("Commit your latest results/") for f in fails(r)), r.stdout
+
+
+# ---------------------------------------------------------------- the workflow's guard
+def test_guard_knn_todo(tmp_path):
     dest = tmp_path / "s"
     shutil.copytree(STARTER, dest, ignore=shutil.ignore_patterns("__pycache__"))
-    r = run(dest, PY, "-m", "analysis", "train", ok=False)
-    assert "Fill in \"Before results\"" in r.stdout
-    r = run(dest, PY, "-m", "analysis", "explore", ok=False)
-    assert "Run `python -m analysis train` first" in r.stdout
-    r = run(dest, PY, "-m", "analysis", "test", ok=False)
-    assert "Run `python -m analysis train` first" in r.stdout
-    # Filled in but not a repository, then filled in but not committed.
-    sol = (SOLUTION / "DECISIONS.md").read_text()
-    before = sol[sol.index("## Before results"):sol.index("## Before test")]
-    tmpl = (dest / "DECISIONS.md").read_text()
-    (dest / "DECISIONS.md").write_text(tmpl[:tmpl.index("## Before results")] + before + tmpl[tmpl.index("## Before test"):])
-    r = run(dest, PY, "-m", "analysis", "train", ok=False)
-    assert "not a git repository" in r.stdout
-    run(dest, "git", "init", "-q", "-b", "main", ok=True)
-    run(dest, "git", "config", "user.name", "Test")
-    run(dest, "git", "config", "user.email", "test@example.invalid")
-    (dest / "DECISIONS.md").write_text(tmpl)
-    commit(dest, "Starter")
-    (dest / "DECISIONS.md").write_text(tmpl[:tmpl.index("## Before results")] + before + tmpl[tmpl.index("## Before test"):])
-    r = run(dest, PY, "-m", "analysis", "train", ok=False)
-    assert 'Commit your "Before results" answers first' in r.stdout
-    commit(dest, "Before results")
-    r = run(dest, PY, "-m", "analysis", "train", ok=False)
+    r = run(dest, PY, "-m", "analysis", ok=False)
     assert "Complete the knn() TODO" in r.stdout
-    # Every refusal is one sentence.
-    assert r.stdout.strip().count(". ") == 0 or r.stdout.strip().endswith(".")
-
-
-def test_guards_second_test_run(tmp_path):
-    repo = clone(tmp_path)
-    r = run(repo, PY, "-m", "analysis", "test", ok=False)
-    assert "already been opened once" in r.stdout and "--force" in r.stdout
-    run(repo, PY, "-m", "analysis", "test", "--force", ok=True)
-    rec = json.loads((repo / "results" / "test_record.json").read_text())
-    assert [x["forced"] for x in rec["runs"]] == [False, True]
-    commit(repo, "Forced rerun")
-    r = check(repo)
-    assert "opened 2 times" in r.stdout
 
 
 def test_every_failure_is_one_sentence(tmp_path):
     repo = clone(tmp_path)
-    for p in (repo / "results").glob("*_test.json"):
-        p.unlink()
     (repo / "results" / "decisions.json").unlink()
+    p = repo / "results" / "readmission.json"
+    d = json.loads(p.read_text())
+    del d["models"]["rf"]
+    p.write_text(json.dumps(d))
     r = check(repo)
     msgs = fails(r)
     assert msgs
     for m in msgs:
         assert m.endswith((".", ")")) and len(re.findall(r"[.;:] [A-Z]", m)) == 0, m
-
-
-def test_legitimate_retrain_passes(tmp_path):
-    """Rerunning train later (same decisions, same code) must not be flagged."""
-    repo = clone(tmp_path)
-    run(repo, PY, "-m", "analysis", "train", ok=True)
-    commit(repo, "Retrain")
-    r = check(repo)
-    assert r.returncode == 0, r.stdout

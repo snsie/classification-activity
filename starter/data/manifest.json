@@ -1,6 +1,6 @@
 {
   "built_by": "reproduce/make_data.py in the M11 activity repository (instructor-only)",
-  "dataset_definitions": "Readmission and diabetes cohorts from snsie/classification-app pipeline/datasets.py; heart from the UCI documentation",
+  "dataset_definitions": "Readmission and diabetes cohorts from snsie/classification-app pipeline/datasets.py",
   "raw_files": {
     "DEMO_J.xpt": {
       "url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/DEMO_J.xpt",
@@ -37,16 +37,6 @@
       "sha256": "0291a6a4f6d82dac8392c8c992b519946824dfeda01647935520cf506ed9f4ab",
       "licence": "Public domain (US government work), CDC/NCHS"
     },
-    "processed.cleveland.data": {
-      "url": "https://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/processed.cleveland.data",
-      "sha256": "a74b7efa387bc9d108d7d0115d831fe9b414b29ae7124f331b622b4efa0427c8",
-      "licence": "CC BY 4.0, UCI Machine Learning Repository"
-    },
-    "heart-disease.names": {
-      "url": "https://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/heart-disease.names",
-      "sha256": "ec7ed5aa4ed8321097808f47b836301c2a0c36f3bb09c40b8b43b622363e6b61",
-      "licence": "CC BY 4.0, UCI Machine Learning Repository"
-    },
     "diabetic_data.csv": {
       "url": "https://archive.ics.uci.edu/static/public/296/diabetes+130-us+hospitals+for+years+1999-2008.zip",
       "sha256": "0689e7ec031237dc63031b938805c48377748761a3b26acab621567afa24df97",
@@ -67,42 +57,19 @@
   "split": {
     "seed": 0,
     "test_share": 0.2,
-    "n_folds": 5,
-    "method": "train_test_split(test_size=0.2, stratify=target, random_state=0) → dev/test; StratifiedKFold(5, shuffle=True, random_state=0) on the dev rows → fold 1–5"
+    "method": "train_test_split(test_size=0.2, stratify=target, random_state=0) → train/test"
   },
   "datasets": {
     "readmission": {
       "file": "readmission.csv",
-      "sha256": "175250cdf39370daeae53ca469154ded0d777bc75277ceb6f7349de5b2bab4b0",
+      "sha256": "83968df5574efd8af99f6bd6146a9d9a4d1acbecfc7e76af758e7baf5ff10fd0",
       "n_rows": 20000,
       "n_pos": 1796,
       "prevalence": 0.0898,
-      "n_dev": 16000,
-      "n_dev_pos": 1437,
+      "n_train": 16000,
+      "n_train_pos": 1437,
       "n_test": 4000,
       "n_test_pos": 359,
-      "folds": {
-        "1": {
-          "n": 3200,
-          "n_pos": 287
-        },
-        "2": {
-          "n": 3200,
-          "n_pos": 287
-        },
-        "3": {
-          "n": 3200,
-          "n_pos": 287
-        },
-        "4": {
-          "n": 3200,
-          "n_pos": 288
-        },
-        "5": {
-          "n": 3200,
-          "n_pos": 288
-        }
-      },
       "predictors": [
         "age",
         "female",
@@ -149,36 +116,14 @@
     },
     "diabetes": {
       "file": "diabetes.csv",
-      "sha256": "328c9f53ac0ceb3e16b36993eddb11bfaa8f02b9649cdfcf1a250d590929fd2a",
+      "sha256": "c2a290f9d214fe0026f580c094b106c8cf1adafcb4495f8c953605a3e8444484",
       "n_rows": 5257,
       "n_pos": 997,
       "prevalence": 0.1897,
-      "n_dev": 4205,
-      "n_dev_pos": 797,
+      "n_train": 4205,
+      "n_train_pos": 797,
       "n_test": 1052,
       "n_test_pos": 200,
-      "folds": {
-        "1": {
-          "n": 841,
-          "n_pos": 159
-        },
-        "2": {
-          "n": 841,
-          "n_pos": 159
-        },
-        "3": {
-          "n": 841,
-          "n_pos": 159
-        },
-        "4": {
-          "n": 841,
-          "n_pos": 160
-        },
-        "5": {
-          "n": 841,
-          "n_pos": 160
-        }
-      },
       "predictors": [
         "age",
         "female",
@@ -211,62 +156,6 @@
       "source": "CDC/NCHS National Health and Nutrition Examination Survey (NHANES) 2017–2018, public-use files",
       "url": "https://wwwn.cdc.gov/nchs/nhanes/continuousnhanes/default.aspx?BeginYear=2017",
       "licence": "Public domain"
-    },
-    "heart": {
-      "file": "heart.csv",
-      "sha256": "6016157e884b4cdd78ed1b34f4bd591eb542e2cda3c3b57bff7217f1c2936c6c",
-      "n_rows": 303,
-      "n_pos": 139,
-      "prevalence": 0.4587,
-      "n_dev": 242,
-      "n_dev_pos": 111,
-      "n_test": 61,
-      "n_test_pos": 28,
-      "folds": {
-        "1": {
-          "n": 49,
-          "n_pos": 23
-        },
-        "2": {
-          "n": 49,
-          "n_pos": 22
-        },
-        "3": {
-          "n": 48,
-          "n_pos": 22
-        },
-        "4": {
-          "n": 48,
-          "n_pos": 22
-        },
-        "5": {
-          "n": 48,
-          "n_pos": 22
-        }
-      },
-      "predictors": [
-        "age",
-        "male",
-        "chest_pain",
-        "rest_bp",
-        "chol",
-        "high_fasting_glucose",
-        "rest_ecg",
-        "max_hr",
-        "exercise_angina",
-        "st_depression",
-        "st_slope",
-        "thal"
-      ],
-      "cohort": [
-        {
-          "step": "Cleveland patients in the processed UCI file",
-          "n": 303
-        }
-      ],
-      "source": "UCI Machine Learning Repository: Heart Disease (Cleveland), processed.cleveland.data",
-      "url": "https://archive.ics.uci.edu/dataset/45/heart+disease",
-      "licence": "CC BY 4.0"
     }
   }
 }

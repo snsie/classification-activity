@@ -1,46 +1,53 @@
-<!--meta {"title":"Submit","description":"Submission checklist, a preview of the four Canvas questions, and the rubric."} -->
+<!--meta {"title":"Submit","description":"Submission checklist, a preview of the three Canvas questions, and the rubric."} -->
 <p class="eyebrow">Resources</p>
 <h1>Submit</h1>
-<p class="lead">Submit your public GitHub repository link on Canvas, with your app link on the first line of its README, plus four Canvas answers.</p>
+<p class="lead">Submit your public GitHub repository link on Canvas, with your app link on the first line of its README, plus three Canvas answers.</p>
 
 <h2>Submission checklist</h2>
 <p class="checklist-status" data-for="submit"></p>
 <ul class="checklist" data-store="submit">
   <li><input type="checkbox" id="sub-1"><div class="item-body"><label for="sub-1"><code>python check.py</code> passes</label></div></li>
-  <li><input type="checkbox" id="sub-2"><div class="item-body"><label for="sub-2">The app opens in a private window and all four sections work for all three datasets and all five models plus the baseline</label> {{help public-link}}</div></li>
+  <li><input type="checkbox" id="sub-2"><div class="item-body"><label for="sub-2">The app opens in a private window and all four sections work for both datasets and all three models plus the baseline</label> {{help public-link}}</div></li>
   <li><input type="checkbox" id="sub-3"><div class="item-body"><label for="sub-3">The README's first line is the app link</label></div></li>
-  <li><input type="checkbox" id="sub-4"><div class="item-body"><label for="sub-4">All four sections of <code>DECISIONS.md</code> are complete, and the git history shows <code>Before results</code> and <code>Before test</code> committed before <code>train</code> and <code>test</code></label> {{help decisions-md}}</div></li>
-  <li><input type="checkbox" id="sub-5"><div class="item-body"><label for="sub-5">All four Canvas answers are submitted</label></div></li>
+  <li><input type="checkbox" id="sub-4"><div class="item-body"><label for="sub-4">All three sections of <code>DECISIONS.md</code> are complete, and the app shows your recommendations</label> {{help decisions-md}}</div></li>
+  <li><input type="checkbox" id="sub-5"><div class="item-body"><label for="sub-5">All three Canvas answers are submitted, with the AI tools you used (or “none”)</label></div></li>
 </ul>
 <p class="small muted">Ticks are saved in this browser only.</p>
 
 <h2 id="canvas">Canvas questions (preview)</h2>
-<p>Answer these on Canvas: 100–150 words each, in your own words, citing numbers from your app. Say which partition each number comes from: development (OOF) or test.</p>
+<p>Answer these on Canvas: 100–150 words each, in your own words, citing numbers from your app. Say which partition each number comes from: training or test.</p>
 <ol>
-  <li><strong>Does the readmission model help? (Section 1)</strong> Report the development accuracy of “always no” and of one trained model at 0.50. Give that model's TP, FP, and FN. Would accuracy alone lead a hospital to the right decision? Name the metric that changes your answer, and explain what it shows in patients per 100 discharges.</li>
-  <li><strong>What did your threshold change? (Section 2)</strong> For your diabetes model, compare 0.50 with your saved threshold. Report both confusion matrices, plus the sensitivity, precision, and number flagged per 100 adults. Who carries the extra work? Why did AUROC stay the same? Did the threshold reach 0.90 sensitivity on the test set?</li>
-  <li><strong>Is a good ranking a trustworthy probability? (Section 3)</strong> Pick two models on one dataset with similar AUROC. Compare their calibration plots. Would AUROC alone justify telling a patient “your risk is 80%”? Which model would you let quote a risk, and why? If the plots look alike, say so.</li>
-  <li><strong>Is the best model really better? (Section 4)</strong> On heart, compare the model with the highest CV AUROC to logistic regression. Is the lead within one SD? Which model does the lecture's rule favour? How does the small sample show up in the fold SD and the test result? Compare this with the prediction you saved before results.</li>
+  <li><strong>Does the readmission model help? (Section 1)</strong> Report the test accuracy of “always no” and of one trained model at 0.50. Give that model's TP, FP, and FN. Would accuracy alone lead a hospital to the right decision? Name the metric that changes your answer, and explain what it shows in patients per 100 discharges.</li>
+  <li><strong>What does a threshold for the job cost? (Section 2)</strong> For one diabetes model, compare 0.50 with a threshold that reaches at least 0.90 sensitivity on the test set. Report both confusion matrices, plus the sensitivity, precision, and number flagged per 100 adults. Who carries the extra work? Why did AUROC stay the same? Why might new adults get slightly less than 0.90?</li>
+  <li><strong>Which model would you trust on new patients? (Sections 3 and 4)</strong> On one dataset, compare random forest with logistic regression: their training AUROC, test AUROC and the gap. Which one memorised its training patients, and how can you tell? Which would you recommend to the clinical lead, and what would you warn them about?</li>
 </ol>
 
 <h2 id="rubric">Rubric <span class="tag optional">Suggested weights</span></h2>
 <div class="table-wrap"><table>
   <thead><tr><th scope="col">Component</th><th scope="col" class="num">Points</th><th scope="col">Full credit</th></tr></thead>
   <tbody>
-    <tr><td>Valid, reproducible analysis</td><td class="num">15</td><td>kNN and SVM pipelines correct, with scaling inside; <code>check.py</code> passes; test record matches saved decisions</td></tr>
-    <tr><td>Decisions and verification</td><td class="num">15</td><td>Specific, justified Before results entries; leak explained from “When is it known?”; real reason for the diabetes choice; correct hand calculation; meaningful check; AI disclosure</td></tr>
-    <tr><td>Diabetes threshold</td><td class="num">10</td><td>Rule applied correctly; counts and workload correct; development and test kept distinct</td></tr>
-    <tr><td>App</td><td class="num">20</td><td>All four required minimums met, readable cold by a clinical lead, labelled partitions, no false claims, recommendations shown</td></tr>
-    <tr><td>Canvas reasoning</td><td class="num">40</td><td>Own numbers, correct interpretation, tied to the job, uncertainty stated (10 each)</td></tr>
+    <tr><td>Valid analysis</td><td class="num">15</td><td>kNN pipeline correct, with scaling inside; <code>check.py</code> passes</td></tr>
+    <tr><td>Decisions</td><td class="num">10</td><td>Specific, justified Before results entries; recommendations tied to each job and to your results</td></tr>
+    <tr><td>App</td><td class="num">25</td><td>All four required minimums met, readable cold by a clinical lead, labelled partitions, no false claims, recommendations shown</td></tr>
+    <tr><td>Design choice and AI use</td><td class="num">5</td><td>One design choice of your own, visible in the app, with a reason tied to your clinical lead and the job; one AI suggestion you turned down, with a reason (or “no AI tools used”)</td></tr>
+    <tr><td>Canvas reasoning</td><td class="num">45</td><td>Own numbers, correct interpretation, tied to the job, uncertainty stated (15 each)</td></tr>
   </tbody>
 </table></div>
-<p>No points for higher AUROC, for choosing a particular model, for visual polish, or for a correct prediction before results.</p>
+<p>No points for higher AUROC, for choosing a particular model or for visual polish. The design-choice points reward a deliberate, explained decision, not a good-looking app: “I put flagged adults per 100 first because the clinical lead staffs the clinic” earns full credit in a plain app.</p>
+
+<h2 id="gallery">Class gallery <span class="tag optional">Ungraded</span></h2>
+<p>After the deadline, every app goes into a class gallery. Open a few of your classmates' apps and vote in three categories:</p>
+<ul>
+  <li><strong>The app a clinical lead would actually open</strong>: the reader could make the decision from it, cold.</li>
+  <li><strong>Most honest about uncertainty</strong>: it shows what the model can't do, not only what it can.</li>
+  <li><strong>Clearest threshold trade-off</strong>: it makes plain what moving the threshold gains, and who carries the cost.</li>
+</ul>
+<p>Votes don't change your grade. The winners are shown to the class, with their design choices.</p>
 
 <h2>False claims to avoid</h2>
 <p>None of these may appear anywhere in your app:</p>
 <ul>
   <li>AUROC described as “accuracy” {{help auroc}}</li>
-  <li>an SVM score described as a probability {{help raw-score}}</li>
-  <li>a CV result labelled as a test result {{help cv-auroc}}</li>
+  <li>a training result labelled as a test result {{help training-auroc}}</li>
   <li>a causal claim about a feature</li>
 </ul>

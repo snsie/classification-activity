@@ -23,7 +23,7 @@ from playwright.sync_api import expect, sync_playwright
 
 BASE = sys.argv[1].rstrip("/") + "/"
 PAGES = ["", "models.html", "analysis.html", "beyond-accuracy.html", "threshold.html", "ranking.html",
-         "fair-comparison.html", "data.html", "hosting.html", "submit.html", "glossary.html"]
+         "train-vs-test.html", "data.html", "hosting.html", "submit.html", "glossary.html"]
 AXE_URL = "https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.2/axe.min.js"
 CACHE = Path(__file__).resolve().parent / ".cache"
 failures: list[str] = []
@@ -84,8 +84,8 @@ with sync_playwright() as p:
             z = zipfile.ZipFile(io.BytesIO(body))
             names = z.namelist()
             need = ["judge-the-model/check.py", "judge-the-model/DECISIONS.md", "judge-the-model/analysis/models.py",
-                    "judge-the-model/app/m11.js", "judge-the-model/m11.py", "judge-the-model/streamlit_app.py",
-                    "judge-the-model/results/heart_dev.json", "judge-the-model/data/manifest.json", "judge-the-model/README.md"]
+                    "judge-the-model/m11.py", "judge-the-model/streamlit_app.py",
+                    "judge-the-model/results/diabetes.json", "judge-the-model/data/manifest.json", "judge-the-model/README.md"]
             check(z.testzip() is None and all(n in names for n in need), f"starter zip valid with {len(names)} files")
             check(not any("__pycache__" in n or "solution" in n or "reproduce" in n for n in names), "starter zip holds no caches or instructor files")
             readme = z.read("judge-the-model/README.md").decode()
@@ -102,7 +102,7 @@ with sync_playwright() as p:
     _, raw = fetch(BASE + "starter/data/manifest.json")
     man = json.loads(raw)["datasets"]
     page.goto(BASE + "data.html")
-    for key, name in [("readmission", "30-day readmission"), ("diabetes", "Diabetes screening"), ("heart", "Heart disease")]:
+    for key, name in [("readmission", "30-day readmission"), ("diabetes", "Diabetes screening")]:
         m = man[key]
         row = page.locator("table tr", has_text=name).first.inner_text()
         check(f"{m['n_rows']:,}" in row and f"{m['n_pos']:,}" in row and f"{m['prevalence'] * 100:.1f}%" in row,
@@ -207,14 +207,6 @@ with sync_playwright() as p:
     box = page.locator("#knn-svg").bounding_box()
     page.mouse.click(box["x"] + box["width"] * 0.2, box["y"] + box["height"] * 0.7)
     check("A = " in read.inner_text() and read.inner_text() != before, "kNN probe moves with a click or tap")
-    sread = page.locator("#svm-read")
-    check("Raw score" in sread.inner_text() and "not a probability" in sread.inner_text(), "SVM demo: raw score, not a probability")
-    s0 = sread.inner_text()
-    page.locator("#svm-probe").focus()
-    for _ in range(10):
-        page.keyboard.press("ArrowRight")
-    check(sread.inner_text() != s0 and "outcome side" in sread.inner_text(), "SVM probe moves with the arrow keys")
-
     # ---- checklists persist in this browser
     print("Checklists")
     page.goto(BASE + "submit.html")

@@ -1,0 +1,63 @@
+<!--meta {"title":"4. Training vs. Test","description":"App section brief: see why a model is judged on patients it never saw, and spot a model that memorised its training patients."} -->
+<p class="eyebrow">App section 4 · Lecture §13</p>
+<h1>Training vs. Test</h1>
+<p class="core-question">Does the model do as well on new patients as on the ones it learned from?</p>
+
+<dl class="facts">
+  <dt>Learning objective</dt><dd>After using it, the clinical lead can see why a model is judged on patients it never saw {{help test-set}}, and spot a model that memorised its training patients {{help overfitting}}.</dd>
+  <dt>Data</dt><dd>Each model's training AUROC {{help training-auroc}} and test AUROC.</dd>
+</dl>
+
+<h2>Required minimum <span class="tag required">Required</span></h2>
+<p class="checklist-status" data-for="s4-required"></p>
+<ul class="checklist" data-store="s4-required">
+  <li><input type="checkbox" id="s4-r1"><div class="item-body"><label for="s4-r1">A dataset selector (both datasets).</label></div></li>
+  <li><input type="checkbox" id="s4-r2"><div class="item-body"><label for="s4-r2">Training and test AUROC side by side for every model, with the gap between them.</label></div></li>
+  <li><input type="checkbox" id="s4-r3"><div class="item-body"><label for="s4-r3">The number of training and test patients, so the lead knows how much each AUROC rests on.</label></div></li>
+  <li><input type="checkbox" id="s4-r4"><div class="item-body"><label for="s4-r4">Every table and plot labelled <span class="partition">Training</span> or <span class="partition">Test</span>.</label></div></li>
+</ul>
+
+<h2>Done when</h2>
+<p class="checklist-status" data-for="s4-done"></p>
+<ul class="checklist" data-store="s4-done">
+  <li><input type="checkbox" id="s4-d1"><div class="item-body"><label for="s4-d1">It works for both datasets, on your public link.</label></div></li>
+  <li><input type="checkbox" id="s4-d2"><div class="item-body"><label for="s4-d2">Nothing from the training rows is called a test result, or presented as what to expect on new patients.</label></div></li>
+  <li><input type="checkbox" id="s4-d3"><div class="item-body"><label for="s4-d3">The AUROCs and gaps come from <code>m11.auroc_summary</code>.</label></div></li>
+  <li><input type="checkbox" id="s4-d4"><div class="item-body"><label for="s4-d4">Someone who hasn't seen your app can do the reviewer task below without help.</label></div></li>
+</ul>
+
+<div class="callout">
+  <p class="callout-title">Reviewers will try</p>
+  <p><strong>Readmission:</strong> which model looks best on its training patients, and does it stay best on the test patients?</p>
+</div>
+
+<div class="callout">
+  <p class="callout-title">Never in your app</p>
+  <ul>
+    <li>AUROC described as “accuracy”.</li>
+    <li>A training result labelled as a test result.</li>
+    <li>A causal claim about a feature.</li>
+  </ul>
+</div>
+
+<h2>Ideas, not templates <span class="tag optional">Optional</span></h2>
+<ul>
+  <li>One row per model: a grey dot for training AUROC, a coloured dot for test AUROC, and a line between them, so the gap is something you can see.</li>
+  <li>Sort the models by test AUROC, not training AUROC, and say why.</li>
+  <li>Say the gap in plain words: “on patients it had already seen, it ranked almost perfectly; on new patients, it ranked like the others”.</li>
+</ul>
+<p class="small muted">Accurate, readable tables meet every required minimum. Custom visuals are optional.</p>
+
+<h2>Where your numbers come from</h2>
+<ul>
+  <li><code>m11.auroc_summary(res)</code>: for each model, <code>train</code> (AUROC on the rows it learned from), <code>test</code> (AUROC on rows it never saw) and <code>gap</code> (training − test).</li>
+  <li><code>res["train"]</code> and <code>res["test"]</code>: <code>n</code> and <code>n_pos</code>, for the patient counts.</li>
+</ul>
+
+<h2>Common questions</h2>
+<details><summary>The random forest's training AUROC is almost 1. Is it the best model?</summary><div class="details-body">
+  <p>No. Its trees can memorise the training patients, so it ranks them almost perfectly. That says little about new patients. Judge every model by its test AUROC.</p></div></details>
+<details><summary>One model's test AUROC is a little higher than its training AUROC. Did something go wrong?</summary><div class="details-body">
+  <p>Not necessarily. A simple model like logistic regression barely overfits, and with a test set of about a thousand patients, its test AUROC can land a little above or below its training AUROC by chance.</p></div></details>
+<details><summary>Why not keep trying models until the test AUROC is highest?</summary><div class="details-body">
+  <p>Every choice made by looking at the test set makes its score more optimistic (lecture §13). The models here are fixed, so the test set stays a fair check.</p></div></details>

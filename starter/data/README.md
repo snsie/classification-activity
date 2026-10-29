@@ -1,10 +1,9 @@
 # The data
 
-Three public health datasets. One row is one patient or adult. Every file has the same layout:
+Two public health datasets. One row is one patient or adult. Every file has the same layout:
 
 - `row_id`: a row number.
-- `split`: `dev` (development, 80%: train models and make choices) or `test` (20%: locked, used once by `python -m analysis test`).
-- `fold`: 1–5 for development rows. Every model uses these folds. Never reshuffle them.
+- `split`: `train` (80%: the models learn from these rows) or `test` (20%: used only to evaluate the models). Never reshuffle it.
 - the predictors, then `target` (1 = the positive class).
 
 Blank cells are missing values. **When is it known?** says when each value exists, relative to the prediction point. A column known only at or after the outcome would leak the answer, so those columns are left out (listed under **Excluded**).
@@ -18,14 +17,13 @@ Blank cells are missing values. **When is it known?** says when each value exist
 - **Prediction point:** At discharge
 - **Positive class (`target` = 1):** Readmitted within 30 days
 - **Framing:** Results apply to this historical inpatient cohort involving diabetes, not to all discharges.
-- **Split:** 16,000 development rows (1,437 positive) in 5 folds; 4,000 test rows (359 positive).
+- **Split:** 16,000 training rows (1,437 positive); 4,000 test rows (359 positive).
 - **Source:** UCI Machine Learning Repository: Diabetes 130-US Hospitals for Years 1999–2008 (CC BY 4.0). Strack B, DeShazo JP, Gennings C, et al. Impact of HbA1c measurement on hospital readmission rates: analysis of 70,000 clinical database patient records. BioMed Research International 2014;2014:781670.
 
 | Column | Meaning | Units | Categories / missing | When is it known? |
 |---|---|---|---|---|
 | `row_id` | Row number in this file |  |  | Assigned by the course |
-| `split` | `dev` (development: train and choose) or `test` (locked test set, used once) |  |  | Assigned by the course |
-| `fold` | Cross-validation fold 1–5 for development rows; blank for test rows |  | blank on test rows | Assigned by the course |
+| `split` | `train` (the models learn from these rows) or `test` (used only to evaluate them) |  |  | Assigned by the course |
 | `age` | Age band midpoint (the file gives 10-year bands, e.g. [70-80) → 75) | years |  | At admission |
 | `female` | 1 = female, 0 = male | 0/1 |  | At admission |
 | `time_in_hospital` | Length of stay | days |  | At discharge |
@@ -57,14 +55,13 @@ One row per person, so each person's records are already kept together.
 - **Prediction point:** At the survey examination, before the blood test results
 - **Positive class (`target` = 1):** Diabetes (reported doctor diagnosis or HbA1c ≥ 6.5%)
 - **Framing:** The label is “reported doctor diagnosis or HbA1c ≥ 6.5%”. It includes adults who were already diagnosed. It identifies the label at one time point and does not predict future diabetes. Results describe adults in this sample.
-- **Split:** 4,205 development rows (797 positive) in 5 folds; 1,052 test rows (200 positive).
+- **Split:** 4,205 training rows (797 positive); 1,052 test rows (200 positive).
 - **Source:** CDC/NCHS National Health and Nutrition Examination Survey (NHANES) 2017–2018, public-use files (Public domain). Centers for Disease Control and Prevention, National Center for Health Statistics. National Health and Nutrition Examination Survey 2017–2018.
 
 | Column | Meaning | Units | Categories / missing | When is it known? |
 |---|---|---|---|---|
 | `row_id` | Row number in this file |  |  | Assigned by the course |
-| `split` | `dev` (development: train and choose) or `test` (locked test set, used once) |  |  | Assigned by the course |
-| `fold` | Cross-validation fold 1–5 for development rows; blank for test rows |  | blank on test rows | Assigned by the course |
+| `split` | `train` (the models learn from these rows) or `test` (used only to evaluate them) |  |  | Assigned by the course |
 | `age` | Age (80 means 80 or older) | years |  | At the interview |
 | `female` | 1 = female, 0 = male | 0/1 |  | At the interview |
 | `bmi` | Body mass index | kg/m² | blank = not recorded (86 rows) | At the examination |
@@ -84,42 +81,5 @@ One row per person, so each person's records are already kept together.
 | `told_diabetes` | “Has a doctor ever told you that you have diabetes?” (DIQ010) | At the interview; a yes defines the label |
 | `insulin` | Now taking insulin (DIQ050) | At the interview; only people already treated for diabetes answer yes |
 | `pills` | Now taking diabetes pills (DIQ070) | At the interview; only people already treated for diabetes answer yes |
-
-One row per person, so each person's records are already kept together.
-
-## `heart.csv`: heart disease (303 patients, 139 positive, 45.9%)
-
-- **Cohort:** UCI Heart Disease, Cleveland Clinic Foundation: patients referred for coronary angiography (processed file, 14 attributes).
-- **Job:** Classify disease within a diagnostic-workup cohort.
-- **Prediction point:** After the clinical and noninvasive tests, before angiography
-- **Positive class (`target` = 1):** Angiographic heart disease (any major vessel with > 50% narrowing; label > 0)
-- **Framing:** This is a selected cohort already in diagnostic workup, not the general population.
-- **Split:** 242 development rows (111 positive) in 5 folds; 61 test rows (28 positive).
-- **Source:** UCI Machine Learning Repository: Heart Disease (Cleveland), processed.cleveland.data (CC BY 4.0). Detrano R, Janosi A, Steinbrunn W, et al. International application of a new probability algorithm for the diagnosis of coronary artery disease. Am J Cardiol 1989;64(5):304–10.
-
-| Column | Meaning | Units | Categories / missing | When is it known? |
-|---|---|---|---|---|
-| `row_id` | Row number in this file |  |  | Assigned by the course |
-| `split` | `dev` (development: train and choose) or `test` (locked test set, used once) |  |  | Assigned by the course |
-| `fold` | Cross-validation fold 1–5 for development rows; blank for test rows |  | blank on test rows | Assigned by the course |
-| `age` | Age | years |  | At the visit |
-| `male` | 1 = male, 0 = female | 0/1 |  | At the visit |
-| `chest_pain` | Chest pain type |  | `atypical angina`; `no symptoms`; `non-anginal pain`; `typical angina` | At the visit (history) |
-| `rest_bp` | Resting systolic blood pressure on admission | mmHg |  | At the visit |
-| `chol` | Serum cholesterol | mg/dL |  | From a blood test before angiography |
-| `high_fasting_glucose` | 1 = fasting blood sugar > 120 mg/dL | 0/1 |  | From a blood test before angiography |
-| `rest_ecg` | Resting ECG result |  | `ST-T wave abnormality`; `left ventricular hypertrophy`; `normal` | At the visit |
-| `max_hr` | Maximum heart rate on the exercise test | beats/min |  | Exercise test, before angiography |
-| `exercise_angina` | 1 = chest pain brought on by the exercise test | 0/1 |  | Exercise test, before angiography |
-| `st_depression` | ST depression on exercise, relative to rest | mm |  | Exercise test, before angiography |
-| `st_slope` | Slope of the peak-exercise ST segment |  | `downsloping`; `flat`; `upsloping` | Exercise test, before angiography |
-| `thal` | Thallium stress scan result (blank = not recorded) |  | `fixed defect`; `normal`; `reversible defect`; blank = not recorded (2 rows) | Thallium stress test, before angiography |
-| `target` | **Target:** 1 = angiographic disease (UCI `num` 1–4), 0 = none (`num` 0) | 0/1 |  | At coronary angiography (the outcome) |
-
-**Excluded (leaked) columns, not in the file:**
-
-| Column | Meaning | When is it known? |
-|---|---|---|
-| `ca` | Number of major vessels (0–3) coloured by fluoroscopy | During the procedure that defines the outcome |
 
 One row per person, so each person's records are already kept together.

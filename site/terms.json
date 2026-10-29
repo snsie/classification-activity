@@ -131,12 +131,6 @@
     "short": "A threshold chosen with the people who act on the flag: their capacity, what a missed case costs, or a target sensitivity.",
     "more": "The best cut-off depends on the job, not on accuracy. The most accurate thresholds often flag almost no one. Lecture §7."
   },
-  "diabetes-rule": {
-    "term": "The diabetes threshold rule",
-    "group": "Thresholds",
-    "short": "Among development out-of-fold thresholds where sensitivity is at least 0.90, choose the one with the highest specificity.",
-    "more": "If two thresholds tie on specificity, m11 chooses the one with the higher sensitivity. The rule is applied to development data only, never to the test set (lecture §15)."
-  },
   "roc-curve": {
     "term": "ROC curve",
     "group": "Ranking and probabilities",
@@ -173,41 +167,23 @@
     "short": "Many decision trees, each grown on a resample of the patients and choosing each split from a random subset of features; the probability is the average of the trees' probabilities.",
     "more": "Lecture §11. Here: 300 trees, at least 3 training patients per leaf."
   },
-  "gradient-boosting": {
-    "term": "Gradient boosting",
-    "group": "Models",
-    "short": "Trees added in sequence, each one learning a correction to the current model's score that reduces its loss.",
-    "more": "Corrections add up on the log-odds scale and can lower a prediction as well as raise it; the final score becomes a probability. Lecture §11. Here: LightGBM with its default settings, as in the lecture."
-  },
   "knn": {
     "term": "k-nearest neighbours (kNN)",
     "group": "Models",
     "short": "A patient's probability is the share of positives among the k most similar training patients. Here k = 25.",
     "more": "“Similar” means close in distance across all features, so features are scaled first: scaling stops a feature's units from dominating the distance, but doesn't make every feature equally informative. Small k follows individual patients closely; large k smooths."
   },
-  "svm": {
-    "term": "Support vector machine (SVM)",
-    "group": "Models",
-    "short": "Draws a straight boundary between the two classes with as wide a margin as possible. A patient's raw score is positive on one side of the boundary and negative on the other.",
-    "more": "The raw score is not a probability, and it isn't the geometric distance either (that is the score divided by the length of the weights). Higher means “more likely positive”, but you can't read it as a chance; the supplied helper converts it. Lecture §1 warns about scores like this."
-  },
-  "raw-score": {
-    "term": "Raw score",
-    "group": "Models",
-    "short": "A number a model outputs that ranks patients but is not a probability, such as an SVM's score (0 on its boundary).",
-    "more": "Higher still means “more likely”, but don't read it as a chance. Lecture §1."
-  },
   "pipeline": {
     "term": "Pipeline",
     "group": "Models",
-    "short": "One object that holds every step that learns from data (encoding, filling in missing values, scaling) plus the model, so cross-validation refits all of them inside each training fold.",
+    "short": "One object that holds every step that learns from data (encoding, filling in missing values, scaling) plus the model, so all of them learn from the training rows only.",
     "more": "In scikit-learn: make_pipeline(...). Lecture §14, rule 2."
   },
   "scaling": {
     "term": "Scaling",
     "group": "Models",
     "short": "Putting every feature on the same scale (here: subtract the training mean, divide by the training standard deviation).",
-    "more": "kNN and SVM use distances, so a feature measured in large units would otherwise dominate. The scaler must learn its means from training rows only, inside the pipeline."
+    "more": "kNN uses distances, so a feature measured in large units would otherwise dominate. The scaler must learn its means from training rows only, inside the pipeline."
   },
   "imputation": {
     "term": "Imputation",
@@ -215,89 +191,59 @@
     "short": "Filling in missing values. Here each blank becomes the median of that feature in the training rows.",
     "more": "Learned from data, so it belongs inside the pipeline. Lecture §14."
   },
-  "training-auroc": {
-    "term": "Training AUROC",
-    "group": "Fair comparison",
-    "short": "AUROC on the patients a model learned from. It flatters every model.",
-    "more": "A big gap between training and CV AUROC means the model memorised its training patients. Lecture §13."
-  },
-  "development-set": {
-    "term": "Development set",
-    "group": "Fair comparison",
-    "short": "The 80% of rows you train on and make every choice with: models, thresholds, everything.",
-    "more": "Marked split = dev in each CSV, with a fold number 1–5."
+  "training-set": {
+    "term": "Training set",
+    "group": "Training and testing",
+    "short": "The 80% of rows the models learn from. Encoding, imputation and scaling also learn from these rows only.",
+    "more": "Marked split = train in each CSV."
   },
   "test-set": {
     "term": "Test set",
-    "group": "Fair comparison",
-    "short": "The 20% of rows locked at the start and used once, at the end, to confirm the choices you already made.",
-    "more": "Once you've looked at it and changed something, it is no longer unseen. Lecture §13."
+    "group": "Training and testing",
+    "short": "The 20% of rows no model learns from. Scoring the models on them shows how they do on patients they never saw.",
+    "more": "Marked split = test in each CSV. Every choice made by looking at it makes its score more optimistic. Lecture §13."
   },
-  "cross-validation": {
-    "term": "Cross-validation (CV)",
-    "group": "Fair comparison",
-    "short": "Splitting the development rows into 5 folds and training 5 times: each time one fold is held out and scored by a model that never saw it.",
-    "more": "Every development patient is validated exactly once. Cross-validation is for choosing; the test set is for confirming. Lecture §13."
+  "training-auroc": {
+    "term": "Training AUROC",
+    "group": "Training and testing",
+    "short": "AUROC on the patients a model learned from. It flatters every model.",
+    "more": "Compare it with the test AUROC: a big gap means the model memorised its training patients. Lecture §13."
   },
-  "fold": {
-    "term": "Fold",
-    "group": "Fair comparison",
-    "short": "One of the 5 groups the development rows are split into. The fold column in each CSV is fixed: every model uses the same folds.",
-    "more": "Lecture §14, rule 1: same splits, same metrics."
-  },
-  "oof": {
-    "term": "Out-of-fold (OOF) prediction",
-    "group": "Fair comparison",
-    "short": "A development patient's probability from the cross-validation round in which their fold was held out, so the model never saw them.",
-    "more": "Your app's development results are all out-of-fold: label them “Development (OOF)”."
-  },
-  "cv-auroc": {
-    "term": "CV AUROC",
-    "group": "Fair comparison",
-    "short": "AUROC on each held-out fold, summarised as the mean ± SD of the 5 folds.",
-    "more": "A cross-validated result, never a test result. Lecture §13 and §16."
-  },
-  "fold-sd": {
-    "term": "Mean ± SD across folds",
-    "group": "Fair comparison",
-    "short": "The average of the 5 fold AUROCs, and their standard deviation: how much the score moves from one fold to another.",
-    "more": "A small dataset gives a wide SD. Lecture §16."
-  },
-  "within-one-sd": {
-    "term": "Within one SD",
-    "group": "Fair comparison",
-    "short": "A model's lead over logistic regression is no bigger than logistic regression's fold-to-fold SD. A lead that small is within the noise: weak evidence that one model is better.",
-    "more": "Lecture §16: when results are close, prefer the simpler model. The order used here, simplest first: logreg, kNN, SVM, random forest, gradient boosting."
+  "overfitting": {
+    "term": "Overfitting",
+    "group": "Training and testing",
+    "short": "A model that learns its training patients too closely, noise included, so it scores far better on them than on new patients.",
+    "more": "The sign is a big gap between training and test AUROC. A random forest can rank its own training patients almost perfectly and new ones no better than logistic regression. Lecture §13."
   },
   "five-rules": {
     "term": "Five rules for a fair comparison",
-    "group": "Fair comparison",
-    "short": "Same folds for every model; preprocessing inside a pipeline; no leaked columns; each patient's records kept together; test set locked until the end.",
+    "group": "Training and testing",
+    "short": "Same split for every model; preprocessing inside a pipeline; no leaked columns; each patient's records kept together; no model fitted on the test rows.",
     "more": "Without them, the “winner” may just be the model that saw more of the answers. None of these mistakes raises an error. Lecture §14."
   },
   "leaked-column": {
     "term": "Leaked column",
-    "group": "Fair comparison",
+    "group": "Training and testing",
     "short": "A column derived from, or recorded after, the outcome. It gives the model the answer, so the score looks far better than it will be on new patients.",
     "more": "Example: HbA1c defines the diabetes label. Check every column's “When is it known?” entry against the prediction point. Lecture §14."
   },
   "when-known": {
     "term": "When is it known?",
-    "group": "Fair comparison",
+    "group": "Training and testing",
     "short": "The data dictionary's entry saying when each value exists, relative to the moment the prediction is made.",
     "more": "A predictor must be known at the prediction point. Anything known only at or after the outcome is a leak."
   },
   "records-together": {
     "term": "Records kept together",
-    "group": "Fair comparison",
-    "short": "If a patient has several records, all of them go in the same fold. Otherwise the model is tested on people it has already seen.",
+    "group": "Training and testing",
+    "short": "If a patient has several records, all of them go in the same set, training or test. Otherwise the model is tested on people it has already seen.",
     "more": "Each dataset here has one row per person, so this rule is met by design. Lecture §14."
   },
   "peeking": {
     "term": "Peeking",
-    "group": "Fair comparison",
+    "group": "Training and testing",
     "short": "Setting a threshold, a model or any other choice while looking at the test patients. It promises a result you won't get on new patients.",
-    "more": "Set the threshold on development data only. Lecture §15."
+    "more": "In a real project, choices are made on separate data before the test set is used. Lecture §15."
   },
   "clinical-lead": {
     "term": "Clinical lead",
@@ -308,8 +254,8 @@
   "decisions-md": {
     "term": "DECISIONS.md",
     "group": "This activity",
-    "short": "The file where you save each decision before you see the results it depends on, in four fixed sections.",
-    "more": "The workflow reads it, and refuses to train or test until the right section is filled in and committed."
+    "short": "The file where you write what matters for each job before you see the results, and your recommendations and one design choice after.",
+    "more": "python -m analysis copies it to results/decisions.json, so your app can show your recommendations."
   },
   "results-files": {
     "term": "Results files",
@@ -320,19 +266,13 @@
   "public-link": {
     "term": "Public app link",
     "group": "This activity",
-    "short": "A web address anyone can open without signing in, such as https://you.github.io/judge-the-model/.",
+    "short": "A web address anyone can open without signing in, such as https://judge-the-model.streamlit.app/.",
     "more": "Test it in a private or incognito window."
   },
   "github-backup": {
     "term": "Public GitHub repository",
     "group": "This activity",
     "short": "Your code, data, results and DECISIONS.md, pushed to GitHub. It is your backup and what you submit.",
-    "more": "A commit on your laptop isn't a backup until it's pushed. The git history also shows that you saved your decisions before each stage."
-  },
-  "static-site": {
-    "term": "Static site",
-    "group": "This activity",
-    "short": "A website made only of files (HTML, CSS, JavaScript and data). GitHub Pages hosts these; it can't run Python.",
-    "more": "That's why the analysis runs on your computer and the app reads the exported results."
+    "more": "A commit on your laptop isn't a backup until it's pushed. Streamlit Community Cloud also runs your app from it."
   }
 }

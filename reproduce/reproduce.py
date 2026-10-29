@@ -28,8 +28,8 @@ import build_results  # noqa: E402
 import make_data  # noqa: E402
 import sources  # noqa: E402
 
-GENERATED = ["data/readmission.csv", "data/diabetes.csv", "data/heart.csv", "data/datasets.json", "data/README.md",
-             "results/readmission_dev.json", "results/diabetes_dev.json", "results/heart_dev.json", "results/decisions.json"]
+GENERATED = ["data/readmission.csv", "data/diabetes.csv", "data/datasets.json", "data/README.md",
+             "results/readmission.json", "results/diabetes.json", "results/decisions.json"]
 
 
 def same_json(a, b, path="") -> list[str]:
@@ -91,7 +91,7 @@ def main() -> None:
         ref = build_results.reference_run(target)
         problems = check_reference(ref)
         if not a.check:
-            (HERE / "reference.json").write_text(json.dumps({"logreg_mean_cv_auroc": ref, "tolerance": 0.005}, indent=2) + "\n")
+            (HERE / "reference.json").write_text(json.dumps({"logreg_test_auroc": ref, "tolerance": 0.005}, indent=2) + "\n")
             print(f"Rebuilt {len(GENERATED) + 1} files in {STARTER}.")
             if problems:
                 print("Update check.py: " + problems[0])
