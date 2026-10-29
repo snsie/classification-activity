@@ -49,14 +49,15 @@
 <p class="small muted">Accurate, readable tables meet every required minimum. Custom visuals are optional.</p>
 
 <h2>Where your numbers come from</h2>
+<p class="small">Building the Node app? The same functions are in <code>web/m11.js</code>, with camelCase names (<code>m11.majorityAccuracy</code>, <code>m11.aurocSummary</code>) and <code>null</code> where Python has <code>None</code>.</p>
 <ul>
   <li><code>m11.auroc_summary(res)</code>: for each model, <code>train</code> (AUROC on the rows it learned from), <code>test</code> (AUROC on rows it never saw) and <code>gap</code> (training − test).</li>
   <li><code>res["train"]</code> and <code>res["test"]</code>: <code>n</code> and <code>n_pos</code>, for the patient counts.</li>
 </ul>
 
 <h2>Common questions</h2>
-<details><summary>The random forest's training AUROC is almost 1. Is it the best model?</summary><div class="details-body">
-  <p>No. Its trees can memorise the training patients, so it ranks them almost perfectly. That says little about new patients. Judge every model by its test AUROC.</p></div></details>
+<details><summary>The random forest's training AUROC is almost 1, and gradient boosting's is not far behind. Is either the best model?</summary><div class="details-body">
+  <p>No. Their trees can memorise the training patients, so they rank them almost perfectly. That says little about new patients. Judge every model by its test AUROC.</p></div></details>
 <details><summary>One model's test AUROC is a little higher than its training AUROC. Did something go wrong?</summary><div class="details-body">
   <p>Not necessarily. A simple model like logistic regression barely overfits, and with a test set of about a thousand patients, its test AUROC can land a little above or below its training AUROC by chance.</p></div></details>
 <details><summary>Why not keep trying models until the test AUROC is highest?</summary><div class="details-body">

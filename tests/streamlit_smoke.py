@@ -30,7 +30,7 @@ def texts(at) -> str:
 
 for section in SECTIONS:
     for dataset in ["readmission", "diabetes"]:
-        for model in ["baseline", "logreg", "knn", "rf"]:
+        for model in ["baseline", "logreg", "knn", "rf", "lgbm"]:
             at = AppTest.from_file(str(folder / "streamlit_app.py"), default_timeout=120).run()
             at.sidebar.radio[0].set_value(section).run()
             at.sidebar.selectbox[0].set_value(dataset).run()

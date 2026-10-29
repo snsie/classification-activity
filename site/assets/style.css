@@ -269,9 +269,9 @@ mark.todo { background: var(--illustrative-soft); color: var(--illustrative); fo
 :is(.illus, .chart, .legend) .neg-ring { fill: none; stroke: var(--down); stroke-width: 2; }
 :is(.illus, .chart, .legend, .key-inline) .probe { fill: var(--surface); stroke: var(--text); stroke-width: 2.5; }
 .key-inline { vertical-align: -0.25em; }
-:is(.chart, .legend) .ring { fill: none; stroke: var(--text); stroke-width: 2; }
+:is(.illus, .chart, .legend) .ring { fill: none; stroke: var(--text); stroke-width: 2; }
 :is(.chart, .legend) .nbr { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3; }
-:is(.illus, .legend) .threshold { stroke: var(--text); stroke-width: 1.5; stroke-dasharray: 6 4; }
+:is(.illus, .chart, .legend) .threshold { stroke: var(--text); stroke-width: 1.5; stroke-dasharray: 6 4; }
 :is(.illus, .chart, .legend) .region-pos { fill: var(--up); opacity: 0.1; }
 :is(.illus, .chart, .legend) .region-neg { fill: var(--down); opacity: 0.1; }
 :is(.illus, .legend) .bar-up { fill: var(--up); }

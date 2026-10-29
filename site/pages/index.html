@@ -1,7 +1,7 @@
 <!--meta {"title":"Overview","description":"A take-home activity: run a supplied Python workflow on two health datasets, train on a training set and evaluate on a test set, and build one app that helps a clinical lead judge whether any classifier is fit for each job."} -->
 <p class="eyebrow">M11 take-home activity</p>
 <h1>Judge the Model</h1>
-<p class="lead">Run a supplied Python workflow that trains three classifiers on two health datasets and evaluates them on a test set. Then build one Streamlit app that helps a clinical lead {{help clinical-lead}} decide whether any model is fit for each job.</p>
+<p class="lead">Run a supplied Python workflow that trains four classifiers on two health datasets and evaluates them on a test set. Then build one app, in Streamlit or Node.js, that helps a clinical lead {{help clinical-lead}} decide whether any model is fit for each job.</p>
 
 <p class="core-question">Which classifier would you trust for this job, at what threshold, and with what limits?</p>
 
@@ -9,8 +9,8 @@
 <dl class="facts">
   <dt>Who</dt><dd>Individual, take-home</dd>
   <dt>Analyze</dt><dd>Run a supplied Python workflow that fits each model on a training set {{help training-set}} and evaluates it on a test set {{help test-set}}. You write one model pipeline {{help pipeline}}. <a href="analysis.html">Analysis</a></dd>
-  <dt>Build</dt><dd>One Streamlit app with four sections that helps a clinical lead judge whether any model is fit for each job. It reads the results your Python analysis exports {{help results-files}}.</dd>
-  <dt>Host</dt><dd>Streamlit Community Cloud, with your code in a public GitHub repository. <a href="hosting.html">Publish &amp; back up</a></dd>
+  <dt>Build</dt><dd>One app with four sections, in Streamlit (Python) or Node.js (JavaScript), that helps a clinical lead judge whether any model is fit for each job. It reads the results your Python analysis exports {{help results-files}}.</dd>
+  <dt>Host</dt><dd>Streamlit Community Cloud or Render, with your code in a public GitHub repository. <a href="hosting.html">Publish &amp; back up</a></dd>
   <dt>Data</dt><dd>Readmission and diabetes, supplied as CSVs with a fixed train/test split. <a href="data.html">Data &amp; files</a></dd>
   <dt>Submit</dt><dd>Your public GitHub repository link (app link on the first line of the README), plus three Canvas answers. <a href="submit.html">Submit</a></dd>
   <dt>Audience</dt><dd>A clinical lead who knows the clinical problem but not the metrics, and who must decide whether to use a model</dd>
@@ -52,7 +52,7 @@
   <li><strong>Set up</strong>
     <ul>
       <li>Download the starter, create a public GitHub repository {{help github-backup}}, install the requirements, and run <code>python check.py --stage setup</code>.</li>
-      <li>Publish the untouched starter app on Streamlit Community Cloud and open it in a private window.</li>
+      <li>Choose <a href="hosting.html#choose">Streamlit or Node.js</a>, publish the untouched starter app (Streamlit Community Cloud or Render) and open it in a private window.</li>
     </ul>
     <span class="done-when"><strong>Done when:</strong> the check passes and your app link loads.</span></li>
   <li><strong>Decide what matters</strong>

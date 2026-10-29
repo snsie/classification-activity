@@ -27,13 +27,14 @@ HERE = Path(__file__).resolve().parent
 RESULTS = HERE / "results"
 
 DATASETS = ["readmission", "diabetes"]
-MODELS = ["baseline", "logreg", "knn", "rf"]
-FITTED = ["logreg", "knn", "rf"]
+MODELS = ["baseline", "logreg", "knn", "rf", "lgbm"]
+FITTED = ["logreg", "knn", "rf", "lgbm"]
 MODEL_LABEL = {
     "baseline": "Prevalence baseline",
     "logreg": "Logistic regression",
     "knn": "k-nearest neighbours",
     "rf": "Random forest",
+    "lgbm": "Gradient boosting",
 }
 DATASET_LABEL = {"readmission": "30-day readmission", "diabetes": "Diabetes screening"}
 PARTITION_LABEL = {"train": "Training", "test": "Test"}

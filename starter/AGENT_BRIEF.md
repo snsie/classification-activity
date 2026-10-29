@@ -3,7 +3,7 @@
 Read this before changing any code. The student makes every decision; your job is to build what they ask for **without breaking the rules below**.
 
 ## The project
-A take-home activity. The student runs a supplied Python workflow that trains three classifiers (plus a prevalence baseline) on two health datasets, then builds **one Streamlit app with four sections** that helps **a clinical lead** judge whether any model is fit for each job. The clinical lead knows the clinical problem but not the metrics, and must decide whether to use a model.
+A take-home activity. The student runs a supplied Python workflow that trains four classifiers (plus a prevalence baseline) on two health datasets, then builds **one app with four sections**, in Streamlit (Python) or Node.js (JavaScript), that helps **a clinical lead** judge whether any model is fit for each job. The clinical lead knows the clinical problem but not the metrics, and must decide whether to use a model.
 
 **Central question:** Which classifier would you trust for this job, at what threshold, and with what limits?
 
@@ -19,13 +19,16 @@ A take-home activity. The student runs a supplied Python workflow that trains th
 | 3. Ranking vs. Being Right | read an ROC curve, say what AUROC does and doesn't mean, and tell good ranking apart from trustworthy probabilities |
 | 4. Training vs. Test | see why a model is judged on patients it never saw, and spot a model that memorised its training patients |
 
-Every section has a dataset selector (both datasets) and a model selector (all three models plus the baseline). A **Recommendations** panel at the top shows the lines from `results/decisions.json`. The activity website lists each section's required minimum.
+Every section has a dataset selector (both datasets) and a model selector (all four models plus the baseline). A **Recommendations** panel at the top shows the lines from `results/decisions.json`. The activity website lists each section's required minimum.
 
 ## Files
-- `analysis/`: the workflow (`python -m analysis`). `analysis/models.py` holds the four models.
+- `analysis/`: the workflow (`python -m analysis`). `analysis/models.py` holds the five models.
 - `m11.py`: the shared metric helpers. `load`, `preds`, `confusion`, `metrics`, `majority_accuracy`, `auroc`, `roc`, `calibration`, `auroc_summary`.
+- `web/m11.js`: the same helpers ported to JavaScript for the Node app (`preds`, `confusion`, `metrics`, `majorityAccuracy`, `auroc`, `roc`, `calibration`, `aurocSummary`). Undefined values are `null`.
 - `results/<dataset>.json`: for each model, the training and test probabilities and AUROCs. `results/decisions.json`: the exported `DECISIONS.md`.
-- `streamlit_app.py`: plain starter sections that already read the results.
+- The app, in **one** of two forms. Ask the student which one they chose and change only that one:
+  - **Streamlit:** `streamlit_app.py`, plain starter sections that already read the results. Hosted on Streamlit Community Cloud.
+  - **Node.js:** `web/app.js` (with `web/index.html` and `web/style.css`), the same plain sections. `web/server.mjs` serves `web/` and `results/`; run it with `npm start`. Hosted on Render. Keep it free of npm dependencies unless the student asks for one, and then list it in `package.json`.
 - `data/`: the CSVs and the dictionary (`data/README.md`), with a "When is it known?" entry for every column.
 
 ## Rules for the analysis (do not break these)
@@ -35,9 +38,9 @@ Every section has a dataset selector (both datasets) and a model selector (all t
 4. Never add a column as a predictor, and never use `row_id`, `split` or `target` as one.
 
 ## Rules for the numbers
-5. **Compute every number through `m11`.** Never type, hard-code, estimate or invent a number. If a number isn't in `results/`, say so instead of making one up.
+5. **Compute every number through `m11`** (`m11.py` in Streamlit, `web/m11.js` in Node). Never type, hard-code, estimate or invent a number. If a number isn't in `results/`, say so instead of making one up.
 6. The app reads **only** the files in `results/`. It never retrains a model.
-7. Undefined values (0 ÷ 0) are `None`. Show them as "undefined", never as 0.
+7. Undefined values (0 ÷ 0) are `None` (Python) or `null` (JavaScript). Show them as "undefined", never as 0.
 8. Label every table and plot **Training** or **Test**. A training result is never a test result.
 
 ## Rules for decisions
@@ -53,7 +56,7 @@ Every section has a dataset selector (both datasets) and a model selector (all t
 ## How to work with the student
 - **Offer options, not one answer.** When the student asks how to show something, give two or three different designs with a sentence on each, and let them choose. Their design choice must be their own idea, and they record one of your suggestions they turned down.
 - After writing app code, explain it in **three sentences**: what it shows, where its numbers come from, and how to check one of them.
-- List every Python import in `requirements.txt`, so Streamlit Community Cloud can install it.
+- Streamlit: list every Python import in `requirements.txt`, so Streamlit Community Cloud can install it. Node: list any npm package in `package.json`, so Render can install it.
 - Never commit passwords, tokens or API keys.
 
 ## Before you say you're done

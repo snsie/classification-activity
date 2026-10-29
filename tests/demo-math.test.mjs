@@ -1,7 +1,7 @@
 // Checks the Models page demos' math (node --test tests/). All demo data is made up.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { KNN_DEMO, distance, knnPoints, knnPredict, scaler } from "../site/assets/demo-math.js";
+import { KNN_DEMO, LOGREG_DEMO, distance, knnPoints, knnPredict, knnSurface, logregScore, scaler, sigmoid } from "../site/assets/demo-math.js";
 
 test("kNN points are deterministic and contain both classes", () => {
   const a = knnPoints(), b = knnPoints();
@@ -36,4 +36,27 @@ test("without scaling, Feature A decides almost alone", () => {
   // Unscaled neighbours sit in a narrow band of A but spread across B.
   assert.ok(spread(raw, "a") < spread(scaled, "a"));
   assert.ok(spread(raw, "b") > spread(scaled, "b"));
+});
+
+test("kNN surface matches knnPredict at every sampled cell centre, for every k", () => {
+  const pts = knnPoints();
+  const [fa, fb] = KNN_DEMO.features;
+  const nx = 17, ny = 12;
+  for (const scaled of [false, true]) {
+    const surf = knnSurface(pts, scaled, nx, ny);
+    for (let j = 0; j < ny; j++) {
+      for (let i = 0; i < nx; i++) {
+        const probe = { a: fa.min + ((i + 0.5) / nx) * (fa.max - fa.min), b: fb.min + ((j + 0.5) / ny) * (fb.max - fb.min) };
+        for (const k of KNN_DEMO.kValues) assert.equal(surf.probability(j * nx + i, k), knnPredict(pts, probe, k, scaled).probability);
+      }
+    }
+  }
+});
+
+test("logistic regression demo: the starting line misplaces one patient on each side", () => {
+  const { points, slope, intercept } = LOGREG_DEMO;
+  const wrong = points.filter((p) => (logregScore(p, slope.start, intercept.start) >= 0 ? 1 : 0) !== p.y);
+  assert.deepEqual(wrong.map((p) => p.y).sort(), [0, 1]);
+  assert.equal(sigmoid(0), 0.5);
+  for (const p of points) assert.ok(p.f1 >= 0 && p.f1 <= 10 && p.f2 >= 0 && p.f2 <= 10);
 });

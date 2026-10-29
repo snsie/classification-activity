@@ -167,6 +167,12 @@
     "short": "Many decision trees, each grown on a resample of the patients and choosing each split from a random subset of features; the probability is the average of the trees' probabilities.",
     "more": "Lecture §11. Here: 300 trees, at least 3 training patients per leaf."
   },
+  "gradient-boosting": {
+    "term": "Gradient boosting",
+    "group": "Models",
+    "short": "Trees added in sequence, each one learning a correction to the current model's score that reduces its loss.",
+    "more": "Corrections add up on the log-odds scale and can lower a prediction as well as raise it; the final score becomes a probability. Lecture §11. Here: LightGBM with its default settings, as in the lecture."
+  },
   "knn": {
     "term": "k-nearest neighbours (kNN)",
     "group": "Models",
@@ -266,13 +272,13 @@
   "public-link": {
     "term": "Public app link",
     "group": "This activity",
-    "short": "A web address anyone can open without signing in, such as https://judge-the-model.streamlit.app/.",
+    "short": "A web address anyone can open without signing in, such as https://judge-the-model.streamlit.app/ or https://judge-the-model.onrender.com/.",
     "more": "Test it in a private or incognito window."
   },
   "github-backup": {
     "term": "Public GitHub repository",
     "group": "This activity",
     "short": "Your code, data, results and DECISIONS.md, pushed to GitHub. It is your backup and what you submit.",
-    "more": "A commit on your laptop isn't a backup until it's pushed. Streamlit Community Cloud also runs your app from it."
+    "more": "A commit on your laptop isn't a backup until it's pushed. Your host (Streamlit Community Cloud or Render) also runs your app from it."
   }
 }

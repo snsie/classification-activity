@@ -1,4 +1,4 @@
-<!--meta {"title":"Publish & back up","description":"Publish your app on Streamlit Community Cloud, and back up everything to a public GitHub repository."} -->
+<!--meta {"title":"Publish & back up","description":"Publish your app on Streamlit Community Cloud or Render, and back up everything to a public GitHub repository."} -->
 <p class="eyebrow">Resources</p>
 <h1>Publish &amp; back up</h1>
 <p class="lead">You need <strong>both</strong>: a public app link {{help public-link}} that anyone can open, and a public GitHub repository {{help github-backup}}. Publish the untouched starter first, in step 1.</p>
@@ -8,12 +8,24 @@
   <p>A repository alone isn't a hosted app, and a hosted app alone isn't a backup. Your repository is also what you submit.</p>
 </div>
 
-<p>Your app is a Streamlit app (<code>streamlit_app.py</code>), hosted free on Streamlit Community Cloud. Your Python analysis runs on your computer, and the hosted app only reads the files it exported to <code>results/</code>.</p>
+<h2 id="choose">Choose Streamlit or Node.js</h2>
+<p>The starter has the same four plain sections twice. Pick the one you'd rather build in, and build and host only that one. Both earn the same credit. Either way, your Python analysis runs on your computer, and the hosted app only reads the files it exported to <code>results/</code>.</p>
+<div class="table-wrap"><table>
+  <thead><tr><th scope="col"></th><th scope="col">Streamlit (Python)</th><th scope="col">Node.js (JavaScript)</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Your app</th><td><code>streamlit_app.py</code></td><td><code>web/app.js</code>, with <code>web/index.html</code> and <code>web/style.css</code></td></tr>
+    <tr><th scope="row">Metric helpers</th><td><code>m11.py</code></td><td><code>web/m11.js</code>: the same functions, ported</td></tr>
+    <tr><th scope="row">Run on your computer</th><td><code>streamlit run streamlit_app.py</code></td><td><code>npm start</code>, then open <code>http://localhost:8766/</code></td></tr>
+    <tr><th scope="row">Free hosting</th><td>Streamlit Community Cloud</td><td>Render</td></tr>
+    <tr><th scope="row">Good if you…</th><td>prefer Python, and want widgets and charts in a few lines</td><td>know some HTML and JavaScript, and want full control of the page</td></tr>
+  </tbody>
+</table></div>
+<p>If you like, delete the app you don't use (<code>streamlit_app.py</code>, or <code>web/</code> and <code>package.json</code>). Keep <code>m11.py</code>: the analysis and <code>check.py</code> use it.</p>
 
 <h2>1. Put the starter on GitHub</h2>
 <ol class="steps">
   <li>Download and unzip the starter from <a href="data.html">Data &amp; files</a>.</li>
-  <li>Install Python 3.11 or newer and git. In the starter folder, run:
+  <li>Install Python 3.11 or newer and git, plus <a href="https://nodejs.org">Node.js</a> 20 or newer if you chose Node. In the starter folder, run:
 <pre><code>python -m venv .venv
 source .venv/bin/activate            # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
@@ -28,12 +40,22 @@ git push -u origin main</code></pre></li>
 </ol>
 
 <h2>2. Publish the untouched starter</h2>
+<h3 id="streamlit">Streamlit: Streamlit Community Cloud</h3>
 <ol>
   <li>Go to <a href="https://share.streamlit.io">share.streamlit.io</a> and sign in with GitHub.</li>
   <li>Click <strong>Create app</strong>, then pick your repository, branch <code>main</code> and file <code>streamlit_app.py</code>.</li>
   <li>Click <strong>Deploy</strong>. It installs the pinned packages in <code>requirements.txt</code>; list any package you add there too.</li>
 </ol>
 <p>To try it on your computer first: <code>streamlit run streamlit_app.py</code></p>
+
+<h3 id="node">Node.js: Render</h3>
+<ol>
+  <li>Go to <a href="https://render.com">render.com</a> and sign in with GitHub.</li>
+  <li>Click <strong>New</strong>, then <strong>Web Service</strong>, and pick your repository.</li>
+  <li>Set Language <strong>Node</strong>, Branch <code>main</code>, Build Command <code>npm install</code>, Start Command <code>npm start</code> and Instance Type <strong>Free</strong>.</li>
+  <li>Click <strong>Deploy</strong>. Your link ends in <code>.onrender.com</code>. The starter needs no npm packages; list any you add in <code>package.json</code>.</li>
+</ol>
+<p>To try it on your computer first: <code>npm start</code>, then open <code>http://localhost:8766/</code></p>
 
 <h2>3. Test it in a private window</h2>
 <ul>
@@ -47,17 +69,24 @@ git push -u origin main</code></pre></li>
 <pre><code>git add .
 git commit -m "Section 2 works"
 git push</code></pre>
-<p>Streamlit updates a minute or two after you push. A commit on your laptop is not a backup until it's pushed. Never commit passwords, tokens or API keys.</p>
+<p>Your host updates a minute or two after you push. A commit on your laptop is not a backup until it's pushed. Never commit passwords, tokens or API keys.</p>
 
 <h2>Troubleshooting</h2>
 <details><summary>The app says there are no results</summary><div class="details-body">
   <ul>
     <li>Check that <code>results/</code> is committed and pushed: open your repository on GitHub and look for <code>results/diabetes.json</code>.</li>
-    <li>Load results through <code>m11.load(...)</code>, which finds <code>results/</code> next to <code>m11.py</code>.</li>
+    <li>Streamlit: load results through <code>m11.load(...)</code>, which finds <code>results/</code> next to <code>m11.py</code>.</li>
+    <li>Node: fetch <code>results/&lt;name&gt;.json</code> the way the starter's <code>load()</code> in <code>web/app.js</code> does, and start the app with <code>npm start</code> from the repository's top folder.</li>
   </ul></div></details>
 <details><summary>The Streamlit app is asleep</summary><div class="details-body">
   <p>Apps on Streamlit Community Cloud sleep after a few days without visitors. Open the link and click the button to wake it. Open it again just before you submit.</p></div></details>
 <details><summary>Streamlit says "ModuleNotFoundError"</summary><div class="details-body">
   <p>Add the missing package to <code>requirements.txt</code> with a pinned version, commit and push. Streamlit redeploys automatically.</p></div></details>
+<details><summary>The Render app takes a minute to open</summary><div class="details-body">
+  <p>Free Render apps sleep after 15 minutes without visitors, and the next visit wakes them in about a minute. Open your link once just before you submit.</p></div></details>
+<details><summary>The Node app shows a blank page or no numbers</summary><div class="details-body">
+  <p>Open the browser's developer console (F12) and read the first error: it names the file and line in <code>web/</code>. If Render's log says <code>Cannot find module</code>, add the package to <code>package.json</code> and push.</p></div></details>
+<details><summary><code>import lightgbm</code> fails on a Mac</summary><div class="details-body">
+  <p>If the message mentions <code>libomp</code>, run <code>brew install libomp</code>, then try again.</p></div></details>
 <details><summary>Nothing works</summary><div class="details-body">
-  <p>Run the app on your computer with <code>streamlit run streamlit_app.py</code> and read the first error. Tell your instructor if your link breaks after you submit.</p></div></details>
+  <p>Run the app on your computer (<code>streamlit run streamlit_app.py</code> or <code>npm start</code>) and read the first error. Tell your instructor if your link breaks after you submit.</p></div></details>

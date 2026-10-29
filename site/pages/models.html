@@ -1,7 +1,7 @@
-<!--meta {"title":"Models","description":"The three classifiers and the prevalence baseline: one core idea, a tiny illustration and one practical limitation each. kNN is new.","scripts":["demos.js"]} -->
+<!--meta {"title":"Models","description":"The four classifiers and the prevalence baseline: one core idea, a tiny illustration and one practical limitation each. kNN is new.","scripts":["demos.js"]} -->
 <p class="eyebrow">The work</p>
 <h1>Models</h1>
-<p class="lead">Three classifiers plus a baseline, all fixed. Everyone compares the same models with the same settings: you don't tune anything. Logistic regression and random forest are from the lecture (§11–12). kNN is new, and you write its pipeline {{help pipeline}}.</p>
+<p class="lead">Four classifiers plus a baseline, all fixed. Everyone compares the same models with the same settings: you don't tune anything. Logistic regression, random forest and gradient boosting are from the lecture (§11–12). kNN is new, and you write its pipeline {{help pipeline}}.</p>
 
 <div class="table-wrap"><table>
   <thead><tr><th scope="col">Key</th><th scope="col">Model</th><th scope="col">Pipeline</th><th scope="col">Written by</th></tr></thead>
@@ -10,6 +10,7 @@
     <tr><td><code>logreg</code></td><td>Logistic regression</td><td>impute → scale → <code>LogisticRegression(max_iter=5000)</code></td><td>Supplied (worked example)</td></tr>
     <tr><td><code>knn</code></td><td>k-nearest neighbours</td><td>impute → scale → <code>KNeighborsClassifier(n_neighbors=25)</code></td><td><strong>You</strong></td></tr>
     <tr><td><code>rf</code></td><td>Random forest</td><td>impute → <code>RandomForestClassifier(n_estimators=300, min_samples_leaf=3, random_state=0)</code></td><td>Supplied</td></tr>
+    <tr><td><code>lgbm</code></td><td>Gradient boosting</td><td>LightGBM with the lecture's settings: <code>LGBMClassifier(random_state=0)</code>, defaults otherwise</td><td>Supplied</td></tr>
   </tbody>
 </table></div>
 <p class="small">Every pipeline starts with the supplied <code>encode()</code> step, which turns each text category into 0/1 columns, learned from the training rows only. “Impute” fills each missing value with the training median {{help imputation}}; “scale” puts every feature on the same scale {{help scaling}}.</p>
@@ -28,7 +29,7 @@
   <li><strong>Keep scaling inside the pipeline.</strong> Never scale the whole dataset first: the scaler would learn from the test rows. <code>python check.py --stage results</code> checks this.</li>
 </ul>
 
-<h2>The four models</h2>
+<h2>The five models</h2>
 
 <article class="card model-card" id="baseline">
   <p class="eyebrow">Supplied</p>
@@ -65,37 +66,39 @@
   <p class="eyebrow">Supplied · worked example · lecture §12</p>
   <h3>Logistic regression {{help logistic-regression}}</h3>
   <p><strong>Core idea:</strong> a weighted sum of the features plus an intercept gives each patient a score. An S-shaped curve (the sigmoid) maps that score to a probability between 0 and 1.</p>
-  <div class="illus illus-row">
-    <svg viewBox="0 0 300 205" role="img" aria-label="An S-shaped curve: as the model score rises from minus 6 to plus 6, the predicted probability rises from near 0 to near 1, crossing the dashed 0.5 threshold at a score of 0">
-      <line class="axis" x1="60" x2="285" y1="160" y2="160"/><line class="axis" x1="60" x2="60" y1="20" y2="160"/>
-      <line class="threshold" x1="60" x2="285" y1="90" y2="90"/>
-      <path class="ink" d="M60.0,159.7 L64.7,159.6 L69.4,159.4 L74.1,159.3 L78.8,159.1 L83.4,158.8 L88.1,158.5 L92.8,158.0 L97.5,157.5 L102.2,156.8 L106.9,155.9 L111.6,154.8 L116.2,153.4 L120.9,151.6 L125.6,149.4 L130.3,146.7 L135.0,143.3 L139.7,139.3 L144.4,134.5 L149.1,128.8 L153.8,122.3 L158.4,115.1 L163.1,107.1 L167.8,98.7 L172.5,90.0 L177.2,81.3 L181.9,72.9 L186.6,64.9 L191.2,57.7 L195.9,51.2 L200.6,45.5 L205.3,40.7 L210.0,36.7 L214.7,33.3 L219.4,30.6 L224.1,28.4 L228.8,26.6 L233.4,25.2 L238.1,24.1 L242.8,23.2 L247.5,22.5 L252.2,22.0 L256.9,21.5 L261.6,21.2 L266.2,20.9 L270.9,20.7 L275.6,20.6 L280.3,20.4 L285.0,20.3"/>
-      <text x="54" y="24" text-anchor="end">1</text><text x="54" y="94" text-anchor="end">0.5</text><text x="54" y="164" text-anchor="end">0</text>
-      <text x="60" y="176" text-anchor="middle">−6</text><text x="116" y="176" text-anchor="middle">−3</text><text x="172.5" y="176" text-anchor="middle">0</text><text x="229" y="176" text-anchor="middle">3</text><text x="285" y="176" text-anchor="middle">6</text>
-      <text x="282" y="84" text-anchor="end">threshold 0.5</text>
-      <text x="165" y="196" text-anchor="middle">Model score: weighted sum + intercept</text>
-      <text transform="translate(16 90) rotate(-90)" text-anchor="middle">Predicted probability</text>
-      <text transform="translate(31 90) rotate(-90)" text-anchor="middle">of the outcome</text>
-    </svg>
-    <svg viewBox="0 0 300 205" role="img" aria-label="Twelve made-up patients on two features, split by a straight diagonal decision boundary where the predicted probability is 0.5 (score 0); one patient on each side is on the wrong side">
-      <polygon class="region-pos" points="50,20 285,20 285,160"/><polygon class="region-neg" points="50,20 285,160 50,160"/>
-      <line class="axis" x1="50" x2="285" y1="160" y2="160"/><line class="axis" x1="50" x2="50" y1="20" y2="160"/>
-      <line class="threshold" x1="50" x2="285" y1="20" y2="160"/>
-      <circle class="pos" cx="214.5" cy="76" r="5"/><circle class="pos" cx="238" cy="104" r="5"/><circle class="pos" cx="191" cy="48" r="5"/><circle class="pos" cx="261.5" cy="62" r="5"/><circle class="pos" cx="250" cy="132" r="5"/><circle class="pos" cx="132" cy="104" r="5"/>
-      <circle class="neg-ring" cx="85.25" cy="118" r="5"/><circle class="neg-ring" cx="120.5" cy="104" r="5"/><circle class="neg-ring" cx="73.5" cy="90" r="5"/><circle class="neg-ring" cx="155.75" cy="125" r="5"/><circle class="neg-ring" cx="85" cy="62" r="5"/><circle class="neg-ring" cx="203" cy="90" r="5"/>
-      <text class="strong" x="279" y="36" text-anchor="end">predicted ≥ 0.5</text>
-      <text class="strong" x="56" y="153">predicted &lt; 0.5</text>
-      <text transform="translate(70 31.9) rotate(30.8)" dy="-5">decision boundary</text>
-      <text x="167.5" y="178" text-anchor="middle">Feature 1 (made up)</text>
-      <text transform="translate(36 90) rotate(-90)" text-anchor="middle">Feature 2 (made up)</text>
-    </svg>
+  <div id="demo-logreg">
+    <div class="illus illus-row">
+      <svg viewBox="0 0 300 205" role="img" aria-label="An S-shaped curve: as the model score rises from minus 6 to plus 6, the predicted probability rises from near 0 to near 1, crossing the dashed 0.5 threshold at a score of 0">
+        <line class="axis" x1="60" x2="285" y1="160" y2="160"/><line class="axis" x1="60" x2="60" y1="20" y2="160"/>
+        <line class="threshold" x1="60" x2="285" y1="90" y2="90"/>
+        <path class="ink" d="M60.0,159.7 L64.7,159.6 L69.4,159.4 L74.1,159.3 L78.8,159.1 L83.4,158.8 L88.1,158.5 L92.8,158.0 L97.5,157.5 L102.2,156.8 L106.9,155.9 L111.6,154.8 L116.2,153.4 L120.9,151.6 L125.6,149.4 L130.3,146.7 L135.0,143.3 L139.7,139.3 L144.4,134.5 L149.1,128.8 L153.8,122.3 L158.4,115.1 L163.1,107.1 L167.8,98.7 L172.5,90.0 L177.2,81.3 L181.9,72.9 L186.6,64.9 L191.2,57.7 L195.9,51.2 L200.6,45.5 L205.3,40.7 L210.0,36.7 L214.7,33.3 L219.4,30.6 L224.1,28.4 L228.8,26.6 L233.4,25.2 L238.1,24.1 L242.8,23.2 L247.5,22.5 L252.2,22.0 L256.9,21.5 L261.6,21.2 L266.2,20.9 L270.9,20.7 L275.6,20.6 L280.3,20.4 L285.0,20.3"/>
+        <text x="54" y="24" text-anchor="end">1</text><text x="54" y="94" text-anchor="end">0.5</text><text x="54" y="164" text-anchor="end">0</text>
+        <text x="60" y="176" text-anchor="middle">−6</text><text x="116" y="176" text-anchor="middle">−3</text><text x="172.5" y="176" text-anchor="middle">0</text><text x="229" y="176" text-anchor="middle">3</text><text x="285" y="176" text-anchor="middle">6</text>
+        <text x="282" y="84" text-anchor="end">threshold 0.5</text>
+        <text x="165" y="196" text-anchor="middle">Model score: weighted sum + intercept</text>
+        <text transform="translate(16 90) rotate(-90)" text-anchor="middle">Predicted probability</text>
+        <text transform="translate(31 90) rotate(-90)" text-anchor="middle">of the outcome</text>
+      </svg>
+      <svg viewBox="0 0 300 205" role="img" aria-label="Twelve made-up patients on two features, split by a straight diagonal decision boundary where the predicted probability is 0.5 (score 0); one patient on each side is on the wrong side">
+        <polygon class="region-pos" points="50,20 285,20 285,160"/><polygon class="region-neg" points="50,20 285,160 50,160"/>
+        <line class="axis" x1="50" x2="285" y1="160" y2="160"/><line class="axis" x1="50" x2="50" y1="20" y2="160"/>
+        <line class="threshold" x1="50" x2="285" y1="20" y2="160"/>
+        <circle class="pos" cx="214.5" cy="76" r="5"/><circle class="pos" cx="238" cy="104" r="5"/><circle class="pos" cx="191" cy="48" r="5"/><circle class="pos" cx="261.5" cy="62" r="5"/><circle class="pos" cx="250" cy="132" r="5"/><circle class="pos" cx="132" cy="104" r="5"/>
+        <circle class="neg-ring" cx="85.25" cy="118" r="5"/><circle class="neg-ring" cx="120.5" cy="104" r="5"/><circle class="neg-ring" cx="73.5" cy="90" r="5"/><circle class="neg-ring" cx="155.75" cy="125" r="5"/><circle class="neg-ring" cx="85" cy="62" r="5"/><circle class="neg-ring" cx="203" cy="90" r="5"/>
+        <text class="strong" x="279" y="36" text-anchor="end">predicted ≥ 0.5</text>
+        <text class="strong" x="56" y="153">predicted &lt; 0.5</text>
+        <text transform="translate(70 31.9) rotate(30.8)" dy="-5">decision boundary</text>
+        <text x="167.5" y="178" text-anchor="middle">Feature 1 (made up)</text>
+        <text transform="translate(36 90) rotate(-90)" text-anchor="middle">Feature 2 (made up)</text>
+      </svg>
+    </div>
+    <ul class="legend">
+      <li><svg class="key" viewBox="0 0 22 22" aria-hidden="true"><line class="threshold" x1="0" x2="22" y1="11" y2="11"/></svg>probability = 0.5: the threshold (left) and the decision boundary it makes (right)</li>
+      <li><svg class="key" viewBox="0 0 22 22" aria-hidden="true"><circle class="pos" cx="11" cy="11" r="5"/></svg>had the outcome</li>
+      <li><svg class="key" viewBox="0 0 22 22" aria-hidden="true"><circle class="neg-ring" cx="11" cy="11" r="5"/></svg>didn't</li>
+    </ul>
   </div>
-  <ul class="legend">
-    <li><svg class="key" viewBox="0 0 22 22" aria-hidden="true"><line class="threshold" x1="0" x2="22" y1="11" y2="11"/></svg>probability = 0.5: the threshold (left) and the decision boundary it makes (right)</li>
-    <li><svg class="key" viewBox="0 0 22 22" aria-hidden="true"><circle class="pos" cx="11" cy="11" r="5"/></svg>had the outcome</li>
-    <li><svg class="key" viewBox="0 0 22 22" aria-hidden="true"><circle class="neg-ring" cx="11" cy="11" r="5"/></svg>didn't</li>
-  </ul>
-  <p class="small"><span class="tag illustrative">Illustrative</span> Made-up numbers. The curve only converts scores into probabilities. Because the score is a weighted sum of the features, all the patients with probability 0.5 lie on a straight line (a flat surface, with more features): the activity's model has a straight decision boundary in its input feature space.</p>
+  <p class="small"><span class="tag illustrative">Illustrative</span> Made-up numbers. Move the sliders to tilt or slide the decision boundary and watch each patient's score move along the curve. The curve only converts scores into probabilities. Because the score is a weighted sum of the features, all the patients with probability 0.5 lie on a straight line (a flat surface, with more features): the activity's model has a straight decision boundary in its input feature space. Here you place the line by hand; the real model learns it from the training patients, choosing the weights that make its probabilities fit their outcomes best.</p>
   <p><strong>Limitation:</strong> it misses curved or combined effects unless you add them as features.</p>
 </article>
 
@@ -129,6 +132,35 @@
   </div>
   <p class="small"><span class="tag illustrative">Illustrative</span> <strong>Forest probability</strong> = average of the trees = (0.20 + 0.40 + 0.30) ÷ 3 = <strong>0.30</strong>. The activity's forest averages 300 trees.</p>
   <p><strong>Limitation:</strong> can overfit: compare its training and test AUROC in Section 4 {{help overfitting}}. One prediction is hard to explain.</p>
+</article>
+
+<article class="card model-card" id="lgbm">
+  <p class="eyebrow">Supplied · lecture §11</p>
+  <h3>Gradient boosting {{help gradient-boosting}}</h3>
+  <p><strong>Core idea:</strong> trees added in sequence. Each new tree learns a correction intended to reduce the current model's loss (how wrong its predictions are on the training patients). The corrections add up on the score scale, and the final score becomes a probability.</p>
+  <div class="illus">
+    <svg viewBox="0 0 320 230" role="img" aria-label="Waterfall chart of one made-up patient's model score in log-odds: start at minus 1.39 (probability 0.20), tree 1 adds 0.80, tree 2 subtracts 0.35, tree 3 adds 0.45, final score minus 0.49 (probability 0.38)">
+      <line class="axis" x1="62" x2="62" y1="40" y2="190"/><line class="axis" x1="62" x2="312" y1="60" y2="60"/>
+      <text x="58" y="64" text-anchor="end">0</text><text x="58" y="104" text-anchor="end">−0.5</text><text x="58" y="144" text-anchor="end">−1</text><text x="58" y="184" text-anchor="end">−1.5</text>
+      <text transform="translate(18 115) rotate(-90)" text-anchor="middle">Model score (log-odds)</text>
+      <rect class="bar" x="79" y="60" width="32" height="111.2"/>
+      <rect class="bar-up" x="124" y="107.2" width="32" height="64"/>
+      <rect class="bar-down" x="169" y="107.2" width="32" height="28"/>
+      <rect class="bar-up" x="214" y="99.2" width="32" height="36"/>
+      <rect class="bar" x="259" y="60" width="32" height="39.2"/>
+      <line class="step" x1="111" x2="124" y1="171.2" y2="171.2"/><line class="step" x1="156" x2="169" y1="107.2" y2="107.2"/><line class="step" x1="201" x2="214" y1="135.2" y2="135.2"/><line class="step" x1="246" x2="259" y1="99.2" y2="99.2"/>
+      <text class="strong" x="95" y="185" text-anchor="middle">−1.39</text><text class="strong" x="140" y="101" text-anchor="middle">+0.80</text><text class="strong" x="185" y="149" text-anchor="middle">−0.35</text><text class="strong" x="230" y="93" text-anchor="middle">+0.45</text><text class="strong" x="275" y="113" text-anchor="middle">−0.49</text>
+      <text x="95" y="206" text-anchor="middle">start</text><text x="140" y="206" text-anchor="middle">tree 1</text><text x="185" y="206" text-anchor="middle">tree 2</text><text x="230" y="206" text-anchor="middle">tree 3</text><text x="275" y="206" text-anchor="middle">final</text>
+      <text x="95" y="224" text-anchor="middle">p = 0.20</text><text class="strong" x="275" y="224" text-anchor="middle">p = 0.38</text>
+    </svg>
+  </div>
+  <ul class="legend">
+    <li><svg class="key" viewBox="0 0 22 22" aria-hidden="true"><rect class="bar" x="5" y="3" width="12" height="16"/></svg>starting and final score</li>
+    <li><svg class="key" viewBox="0 0 22 22" aria-hidden="true"><rect class="bar-up" x="5" y="3" width="12" height="16"/></svg>tree raises the score</li>
+    <li><svg class="key" viewBox="0 0 22 22" aria-hidden="true"><rect class="bar-down" x="5" y="3" width="12" height="16"/></svg>tree lowers the score</li>
+  </ul>
+  <p class="small"><span class="tag illustrative">Illustrative</span> One made-up patient. The start is the log-odds of the training prevalence, 0.20: ln(0.20 ÷ 0.80) = −1.39. Final score: −1.39 + 0.80 − 0.35 + 0.45 = −0.49, so the probability is 1 ÷ (1 + e<sup>0.49</sup>) = <strong>0.38</strong>. Each correction is on the log-odds scale, not a probability, and a tree can lower a patient's prediction as well as raise it.</p>
+  <p><strong>Limitation:</strong> with many trees it can fit noise in the training patients; it has several settings, all left at LightGBM's defaults here.</p>
 </article>
 
 <h2>Common questions</h2>

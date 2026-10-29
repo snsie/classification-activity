@@ -2,7 +2,9 @@
 # Start the activity app (or the website) for a local look.
 #
 #   ./start.sh                      starter Streamlit app
+#   ./start.sh starter-node         starter Node app (the other route students can take)
 #   ./start.sh solution             private full-solution Streamlit app
+#   ./start.sh solution-node        private full-solution Node app (also works through dev tunnels)
 #   ./start.sh site                 the student website (builds it first)
 #   ./start.sh ... --port 9000      choose the port (default: the first free one from 8765)
 #
@@ -16,9 +18,9 @@ PORT=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    starter|solution|site) TARGET="$1" ;;
+    starter|starter-node|solution|solution-node|site) TARGET="$1" ;;
     --port) PORT="${2:?--port needs a number}"; shift ;;
-    -h|--help) sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "Unknown option: $1 (try ./start.sh --help)" >&2; exit 1 ;;
   esac
   shift
@@ -42,10 +44,11 @@ EOF
 fi
 
 case "$TARGET" in
-  starter) DIR="$ROOT/starter" ;;
-  solution)
+  starter|starter-node) DIR="$ROOT/starter" ;;
+  solution|solution-node)
     DIR="$ROOT/instructor/solution/judge-the-model"
     [[ -d "$DIR" ]] || { echo "No solution yet. Build it: $PY instructor/make_solution.py" >&2; exit 1; }
+    [[ -f "$DIR/web/server.mjs" ]] || { echo "Solution is out of date. Rebuild: $PY instructor/make_solution.py" >&2; exit 1; }
     ;;
   site)
     cd "$ROOT"
@@ -56,5 +59,6 @@ case "$TARGET" in
 esac
 
 cd "$DIR"
+[[ "$TARGET" == *-node ]] && exec node web/server.mjs "$PORT"
 echo "Streamlit app ($TARGET): http://localhost:$PORT/"
 exec "$PY" -m streamlit run streamlit_app.py --server.port "$PORT" --server.headless true

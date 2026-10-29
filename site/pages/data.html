@@ -32,7 +32,7 @@
 <p>The full dictionary, with every category and missing-value count, is {{dl data/README.md}}. Sources, licences, versions, row counts and SHA-256 fingerprints are in {{dl data/manifest.json}}.</p>
 
 <h2 id="starter">Using the starter</h2>
-<p>You edit <code>streamlit_app.py</code>, which reads <code>results/</code> through the metric helpers in <code>m11.py</code>. Run it on your computer with <code>streamlit run streamlit_app.py</code>. Have your AI agent read {{dl AGENT_BRIEF.md}} first.</p>
+<p>The starter has the same plain app twice; you build <a href="hosting.html#choose">one of them</a>. Streamlit: you edit <code>streamlit_app.py</code>, which reads <code>results/</code> through the metric helpers in <code>m11.py</code>; run it with <code>streamlit run streamlit_app.py</code>. Node.js: you edit <code>web/app.js</code>, which reads <code>results/</code> through the same helpers ported to <code>web/m11.js</code>; run it with <code>npm start</code>. Have your AI agent read {{dl AGENT_BRIEF.md}} first.</p>
 
 <h2 id="files">All files</h2>
 {{files}}

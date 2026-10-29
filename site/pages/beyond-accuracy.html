@@ -12,7 +12,7 @@
 <h2>Required minimum <span class="tag required">Required</span></h2>
 <p class="checklist-status" data-for="s1-required"></p>
 <ul class="checklist" data-store="s1-required">
-  <li><input type="checkbox" id="s1-r1"><div class="item-body"><label for="s1-r1">A dataset selector (both datasets) and a model selector (all three models plus the baseline).</label></div></li>
+  <li><input type="checkbox" id="s1-r1"><div class="item-body"><label for="s1-r1">A dataset selector (both datasets) and a model selector (all four models plus the baseline).</label></div></li>
   <li><input type="checkbox" id="s1-r2"><div class="item-body"><label for="s1-r2">Prevalence and baseline accuracy: the accuracy of “the most common class for everyone”.</label> {{help prevalence}} {{help majority-baseline}}</div></li>
   <li><input type="checkbox" id="s1-r3"><div class="item-body"><label for="s1-r3">A labelled confusion matrix at 0.50, with rows = actual and columns = predicted.</label> {{help tp}} {{help fn}} {{help fp}} {{help tn}}</div></li>
   <li><input type="checkbox" id="s1-r4"><div class="item-body"><label for="s1-r4">Sensitivity, specificity and precision, each with its “of the patients who…” denominator in words.</label> {{help sensitivity}} {{help specificity}} {{help precision}}</div></li>
@@ -51,6 +51,7 @@
 <p class="small muted">Accurate, readable tables meet every required minimum. Custom visuals are optional.</p>
 
 <h2>Where your numbers come from</h2>
+<p class="small">Building the Node app? The same functions are in <code>web/m11.js</code>, with camelCase names (<code>m11.majorityAccuracy</code>, <code>m11.aurocSummary</code>) and <code>null</code> where Python has <code>None</code>.</p>
 <ul>
   <li><code>m11.preds(res, model)</code>: the test probabilities and labels.</li>
   <li><code>m11.confusion(p, y, 0.5)</code>: TP, FN, FP and TN. A patient is flagged when <code>p &gt;= 0.5</code>.</li>

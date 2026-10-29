@@ -88,7 +88,7 @@ def check_setup(r: Report) -> bool:
     if sys.version_info < (3, 11):
         r.fail(f"Python {sys.version.split()[0]} is too old; install Python 3.11 or newer and recreate your environment.")
     try:
-        import numpy, pandas, sklearn  # noqa: F401, E401
+        import lightgbm, numpy, pandas, sklearn  # noqa: F401, E401
         r.ok("Python packages import")
     except ImportError as e:
         r.fail(f"Package {e.name} is missing; run `pip install -r requirements.txt` in your environment.")
@@ -167,6 +167,7 @@ EXPECTED = {  # final estimator class and settings that must not change
     "logreg": ("LogisticRegression", {"max_iter": 5000, "C": 1.0}),
     "knn": ("KNeighborsClassifier", {"n_neighbors": 25}),
     "rf": ("RandomForestClassifier", {"n_estimators": 300, "min_samples_leaf": 3, "random_state": 0}),
+    "lgbm": ("LGBMClassifier", {"random_state": 0, "n_estimators": 100, "learning_rate": 0.1, "num_leaves": 31}),
 }
 
 

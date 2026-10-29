@@ -1,4 +1,4 @@
-"""The four models. Everyone compares the same models with the same settings.
+"""The five models. Everyone compares the same models with the same settings.
 
 Every model is built fresh by a function, as one scikit-learn Pipeline. The whole pipeline is
 fitted on the training rows only, so filling in missing values and scaling learn from training
@@ -10,6 +10,7 @@ Don't change the other models or any settings: `python check.py` compares them w
 
 from __future__ import annotations
 
+from lightgbm import LGBMClassifier
 from sklearn.compose import make_column_selector, make_column_transformer
 from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import RandomForestClassifier
@@ -64,5 +65,10 @@ def rf():
     )
 
 
+def lgbm():
+    """Gradient boosting with LightGBM's defaults, as in the lecture (it handles missing values itself)."""
+    return make_pipeline(encode(), LGBMClassifier(random_state=SEED, verbose=-1, n_jobs=8))
+
+
 # Name → builder. The order is the order results are written and shown.
-MODELS = {"baseline": baseline, "logreg": logreg, "knn": knn, "rf": rf}
+MODELS = {"baseline": baseline, "logreg": logreg, "knn": knn, "rf": rf, "lgbm": lgbm}

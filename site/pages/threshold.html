@@ -12,7 +12,7 @@
 <h2>Required minimum <span class="tag required">Required</span></h2>
 <p class="checklist-status" data-for="s2-required"></p>
 <ul class="checklist" data-store="s2-required">
-  <li><input type="checkbox" id="s2-r1"><div class="item-body"><label for="s2-r1">A dataset selector (both datasets) and a model selector (all three models plus the baseline).</label></div></li>
+  <li><input type="checkbox" id="s2-r1"><div class="item-body"><label for="s2-r1">A dataset selector (both datasets) and a model selector (all four models plus the baseline).</label></div></li>
   <li><input type="checkbox" id="s2-r2"><div class="item-body"><label for="s2-r2">A threshold slider, with the confusion matrix and metrics updating live.</label></div></li>
   <li><input type="checkbox" id="s2-r3"><div class="item-body"><label for="s2-r3">A side-by-side comparison of 0.50 and the slider's threshold, including the number flagged per 100.</label> {{help flagged-per-100}}</div></li>
   <li><input type="checkbox" id="s2-r4"><div class="item-body"><label for="s2-r4">Every table and plot labelled <span class="partition">Test</span>.</label></div></li>
@@ -49,6 +49,7 @@
 <p class="small muted">Accurate, readable tables meet every required minimum. Custom visuals are optional.</p>
 
 <h2>Where your numbers come from</h2>
+<p class="small">Building the Node app? The same functions are in <code>web/m11.js</code>, with camelCase names (<code>m11.majorityAccuracy</code>, <code>m11.aurocSummary</code>) and <code>null</code> where Python has <code>None</code>.</p>
 <ul>
   <li><code>m11.preds(res, model)</code>: the test probabilities and labels.</li>
   <li><code>m11.confusion(p, y, t)</code> and <code>m11.metrics(...)</code> at the slider's value.</li>

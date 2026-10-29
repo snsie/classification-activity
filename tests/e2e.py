@@ -84,7 +84,7 @@ with sync_playwright() as p:
             z = zipfile.ZipFile(io.BytesIO(body))
             names = z.namelist()
             need = ["judge-the-model/check.py", "judge-the-model/DECISIONS.md", "judge-the-model/analysis/models.py",
-                    "judge-the-model/m11.py", "judge-the-model/streamlit_app.py",
+                    "judge-the-model/m11.py", "judge-the-model/streamlit_app.py", "judge-the-model/web/app.js", "judge-the-model/package.json",
                     "judge-the-model/results/diabetes.json", "judge-the-model/data/manifest.json", "judge-the-model/README.md"]
             check(z.testzip() is None and all(n in names for n in need), f"starter zip valid with {len(names)} files")
             check(not any("__pycache__" in n or "solution" in n or "reproduce" in n for n in names), "starter zip holds no caches or instructor files")
@@ -190,12 +190,22 @@ with sync_playwright() as p:
     # ---- demos (illustrative numbers from demo-math.js)
     print("Demos")
     page.goto(BASE + "models.html")
+    lr = page.locator("#lr-read")
+    check("10 of 12" in lr.inner_text(), "logistic regression demo starts with one patient wrong on each side")
+    page.locator("#lr-slope").fill("1.5")
+    page.locator("#lr-int").fill("-3")
+    check("4 of 12" in lr.inner_text() and "1.5 × Feature 1 − 3.0" in lr.inner_text(), "logistic regression demo: sliders move the boundary")
+    page.locator("#lr-reset").click()
+    check("10 of 12" in lr.inner_text(), "logistic regression demo: reset restores the line")
     read = page.locator("#knn-read")
+    shaded = lambda: page.locator("#knn-svg path.region-pos").get_attribute("d")
+    before_shade = shaded()
     check("of its 7 nearest neighbours" in read.inner_text(), "kNN demo starts at k = 7")
     page.locator("#knn-k").fill("0")
     check("of its 1 nearest neighbours" in read.inner_text() and "always 0 or 1" in read.inner_text(), "kNN demo: k = 1 explained")
     page.locator("#knn-k").fill("6")
     check("of its 25 nearest neighbours" in read.inner_text(), "kNN demo: k = 25")
+    check(shaded() != before_shade, "kNN demo: the shaded prediction changes with k")
     page.locator("#knn-scale").uncheck()
     check("decides almost alone" in read.inner_text(), "kNN demo: unscaled distances explained")
     page.locator("#knn-scale").check()

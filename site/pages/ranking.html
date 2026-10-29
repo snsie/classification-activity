@@ -11,8 +11,8 @@
 <h2>Required minimum <span class="tag required">Required</span></h2>
 <p class="checklist-status" data-for="s3-required"></p>
 <ul class="checklist" data-store="s3-required">
-  <li><input type="checkbox" id="s3-r1"><div class="item-body"><label for="s3-r1">A dataset selector (both datasets) and a model selector (all three models plus the baseline).</label></div></li>
-  <li><input type="checkbox" id="s3-r2"><div class="item-body"><label for="s3-r2">ROC curves and AUROC for all three models.</label></div></li>
+  <li><input type="checkbox" id="s3-r1"><div class="item-body"><label for="s3-r1">A dataset selector (both datasets) and a model selector (all four models plus the baseline).</label></div></li>
+  <li><input type="checkbox" id="s3-r2"><div class="item-body"><label for="s3-r2">ROC curves and AUROC for all four models.</label></div></li>
   <li><input type="checkbox" id="s3-r3"><div class="item-body"><label for="s3-r3">Every table and plot labelled <span class="partition">Test</span>, with labelled axes.</label></div></li>
 </ul>
 
@@ -48,6 +48,7 @@
 <p class="small muted">Accurate, readable tables meet every required minimum. Custom visuals are optional.</p>
 
 <h2>Where your numbers come from</h2>
+<p class="small">Building the Node app? The same functions are in <code>web/m11.js</code>, with camelCase names (<code>m11.majorityAccuracy</code>, <code>m11.aurocSummary</code>) and <code>null</code> where Python has <code>None</code>.</p>
 <ul>
   <li><code>m11.roc(p, y)</code>: <code>fpr</code>, <code>tpr</code>, <code>thr</code> (one point per distinct threshold) and <code>auroc</code>.</li>
   <li><code>m11.calibration(p, y)</code>: 10 equal-size groups, each with <code>mean_pred</code>, <code>observed</code> and <code>n</code>.</li>

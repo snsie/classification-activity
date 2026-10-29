@@ -33,7 +33,7 @@ def now() -> str:
 
 
 def versions() -> dict:
-    return {"python": platform.python_version(), **{p: version(p) for p in ["numpy", "pandas", "scikit-learn"]}}
+    return {"python": platform.python_version(), **{p: version(p) for p in ["numpy", "pandas", "scikit-learn", "lightgbm"]}}
 
 
 def write(name: str, obj: dict) -> None:
