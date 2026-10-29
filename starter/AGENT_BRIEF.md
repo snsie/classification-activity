@@ -14,7 +14,7 @@ A take-home activity. The student runs a supplied Python workflow that trains fo
 
 | Section | After using it, the reader can… |
 |---|---|
-| 1. Beyond Accuracy | name the positive class, see why accuracy alone misleads, and read a confusion matrix as four groups of patients |
+| 1. Beyond Accuracy | name the positive class, see why accuracy alone misleads, read a confusion matrix as four groups of patients, and compare every model at 0.50 (a confusion matrix each; accuracy, sensitivity/recall/TPR, specificity, FPR, precision, F1) |
 | 2. A Threshold for the Job | see that the threshold is a decision separate from the model, and what moving it gains and gives up compared with 0.50 |
 | 3. Ranking vs. Being Right | read an ROC curve, say what AUROC does and doesn't mean, and tell good ranking apart from trustworthy probabilities |
 | 4. Training vs. Test | see why a model is judged on patients it never saw, and spot a model that memorised its training patients |

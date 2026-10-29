@@ -4,7 +4,7 @@
 <p class="core-question">Does a high accuracy mean the model helps?</p>
 
 <dl class="facts">
-  <dt>Learning objective</dt><dd>After using it, the clinical lead can name the positive class {{help positive-class}}, see why accuracy {{help accuracy}} alone misleads, and read a confusion matrix {{help confusion-matrix}} as four groups of patients.</dd>
+  <dt>Learning objective</dt><dd>After using it, the clinical lead can name the positive class {{help positive-class}}, see why accuracy {{help accuracy}} alone misleads, and read a confusion matrix {{help confusion-matrix}} as four groups of patients, and compare the models on more than accuracy.</dd>
   <dt>Reader</dt><dd>A clinical lead {{help clinical-lead}} who knows the clinical problem but not the metrics.</dd>
   <dt>Data</dt><dd>Test-set probabilities {{help test-set}}, at threshold 0.50.</dd>
 </dl>
@@ -16,6 +16,7 @@
   <li><input type="checkbox" id="s1-r2"><div class="item-body"><label for="s1-r2">Prevalence and baseline accuracy: the accuracy of “the most common class for everyone”.</label> {{help prevalence}} {{help majority-baseline}}</div></li>
   <li><input type="checkbox" id="s1-r3"><div class="item-body"><label for="s1-r3">A labelled confusion matrix at 0.50, with rows = actual and columns = predicted.</label> {{help tp}} {{help fn}} {{help fp}} {{help tn}}</div></li>
   <li><input type="checkbox" id="s1-r4"><div class="item-body"><label for="s1-r4">Sensitivity, specificity and precision, each with its “of the patients who…” denominator in words.</label> {{help sensitivity}} {{help specificity}} {{help precision}}</div></li>
+  <li><input type="checkbox" id="s1-r7"><div class="item-body"><label for="s1-r7">A comparison of all five at 0.50: a small labelled confusion matrix for each, and one table row each with accuracy, sensitivity (recall, TPR), specificity, FPR (1 − specificity), precision and F1.</label> {{help accuracy}} {{help fpr}} {{help f1}}</div></li>
   <li><input type="checkbox" id="s1-r5"><div class="item-body"><label for="s1-r5">Undefined values shown as “undefined”, never as 0.</label> {{help undefined}}</div></li>
   <li><input type="checkbox" id="s1-r6"><div class="item-body"><label for="s1-r6">Every table and plot labelled <span class="partition">Test</span>.</label></div></li>
 </ul>
@@ -31,6 +32,7 @@
 <div class="callout">
   <p class="callout-title">Reviewers will try</p>
   <p><strong>Readmission, best model at 0.50:</strong> how many readmissions does it catch, and how does its accuracy compare with “always no”?</p>
+  <p><strong>Diabetes, every model at 0.50:</strong> which model has the highest F1, and how far apart are the models' accuracies?</p>
 </div>
 
 <div class="callout">
@@ -47,6 +49,7 @@
   <li>Draw 100 patients as dots, sorted into the four cells, so “of the patients who…” is something you can count.</li>
   <li>Put “always no” and the model side by side: same accuracy, very different catches.</li>
   <li>Say each metric as the clinical lead's question: “Of the patients we flag, how many come back?”</li>
+  <li>Let the comparison follow Section 2's slider, so the lead can compare the models at the job's threshold too.</li>
 </ul>
 <p class="small muted">Accurate, readable tables meet every required minimum. Custom visuals are optional.</p>
 
