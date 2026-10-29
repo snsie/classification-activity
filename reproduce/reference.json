@@ -1,0 +1,8 @@
+{
+  "logreg_mean_cv_auroc": {
+    "readmission": 0.6325,
+    "diabetes": 0.8059,
+    "heart": 0.8699
+  },
+  "tolerance": 0.005
+}

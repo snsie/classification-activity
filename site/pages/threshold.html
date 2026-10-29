@@ -1,0 +1,68 @@
+<!--meta {"title":"2. A Threshold for the Job","description":"App section brief: the threshold is a decision separate from the model; show what the job's rule gains and gives up compared with 0.50."} -->
+<p class="eyebrow">App section 2 · Lecture §6–7, 15</p>
+<h1>A Threshold for the Job</h1>
+<p class="core-question">What does reaching the job's sensitivity target cost?</p>
+
+<dl class="facts">
+  <dt>Learning objective</dt><dd>After using it, the clinical lead can see that the threshold {{help threshold}} is a decision separate from the model, and what the job's rule gains and gives up compared with 0.50.</dd>
+  <dt>The job's rule</dt><dd><strong>Diabetes:</strong> among development out-of-fold thresholds where sensitivity is at least 0.90, choose the one with the highest specificity. {{help diabetes-rule}}</dd>
+  <dt>Data</dt><dd>Development out-of-fold probabilities {{help oof}}. The rule is never applied to the test set {{help peeking}}.</dd>
+</dl>
+
+<h2>Required minimum <span class="tag required">Required</span></h2>
+<p class="checklist-status" data-for="s2-required"></p>
+<ul class="checklist" data-store="s2-required">
+  <li><input type="checkbox" id="s2-r1"><div class="item-body"><label for="s2-r1">A dataset selector (all three datasets) and a model selector (all five models plus the baseline).</label></div></li>
+  <li><input type="checkbox" id="s2-r2"><div class="item-body"><label for="s2-r2">A threshold slider over development OOF probabilities, with the confusion matrix and metrics updating live.</label></div></li>
+  <li><input type="checkbox" id="s2-r3"><div class="item-body"><label for="s2-r3">Your saved diabetes threshold marked, with its rule.</label> {{help threshold-for-the-job}}</div></li>
+  <li><input type="checkbox" id="s2-r4"><div class="item-body"><label for="s2-r4">A side-by-side comparison of 0.50 and the saved threshold, including the number flagged per 100.</label> {{help flagged-per-100}}</div></li>
+  <li><input type="checkbox" id="s2-r5"><div class="item-body"><label for="s2-r5">Every table and plot labelled <span class="partition">Development (OOF)</span> or <span class="partition">Test</span>.</label></div></li>
+</ul>
+
+<h2>Done when</h2>
+<p class="checklist-status" data-for="s2-done"></p>
+<ul class="checklist" data-store="s2-done">
+  <li><input type="checkbox" id="s2-d1"><div class="item-body"><label for="s2-d1">It works for every dataset and every model, on your public link.</label></div></li>
+  <li><input type="checkbox" id="s2-d2"><div class="item-body"><label for="s2-d2">The marked threshold equals <code>diabetes_threshold.threshold</code> in <code>results/test_record.json</code>.</label></div></li>
+  <li><input type="checkbox" id="s2-d3"><div class="item-body"><label for="s2-d3">Moving the slider changes no probability and no AUROC, and the app makes that clear.</label></div></li>
+  <li><input type="checkbox" id="s2-d4"><div class="item-body"><label for="s2-d4">Someone who hasn't seen your app can do the reviewer task below without help.</label></div></li>
+</ul>
+
+<div class="callout">
+  <p class="callout-title">Reviewers will try</p>
+  <p><strong>Diabetes:</strong> what does reaching 0.90 sensitivity cost in false alarms per 100 adults?</p>
+</div>
+
+<div class="callout">
+  <p class="callout-title">Never in your app</p>
+  <ul>
+    <li>AUROC described as “accuracy”.</li>
+    <li>An SVM score described as a probability.</li>
+    <li>A CV result labelled as a test result.</li>
+    <li>A causal claim about a feature.</li>
+  </ul>
+</div>
+
+<h2>Ideas, not templates <span class="tag optional">Optional</span></h2>
+<ul>
+  <li>Two strips of dots, one for adults with diabetes and one without, with the threshold as a line you drag.</li>
+  <li>Say the trade in the lead's units: “per 100 adults screened, <em>N</em> more follow-up tests to find <em>M</em> more cases”, with <em>N</em> and <em>M</em> computed by <code>m11</code>.</li>
+  <li>For readmission and heart, there is no fixed rule: show what each threshold gains and gives up, and let the lead choose.</li>
+</ul>
+<p class="small muted">Accurate, readable tables meet every required minimum. Custom visuals are optional.</p>
+
+<h2>Where your numbers come from</h2>
+<ul>
+  <li><code>m11.confusion(p, y, t)</code> and <code>m11.metrics(...)</code> at the slider's value.</li>
+  <li><code>m11.thresholdForRule(p, y)</code> / <code>m11.threshold_for_rule(p, y)</code>: the rule's threshold for any model (development only).</li>
+  <li><code>results/test_record.json</code> → <code>diabetes_threshold</code>: your saved model, threshold and rule. <code>m11.load("test_record")</code> returns <code>null</code> before you run the test.</li>
+  <li>After the test: <code>m11.testPreds(test, model)</code> gives the test probabilities, if you show how the saved threshold did on new adults (label it <span class="partition">Test</span>).</li>
+</ul>
+
+<h2>Common questions</h2>
+<details><summary>Before I run the test, there is no saved threshold. What do I mark?</summary><div class="details-body">
+  <p>Show the rule's threshold for the selected model, labelled “not saved yet”. Once <code>test_record.json</code> exists, mark the saved one.</p></div></details>
+<details><summary>Why not set the threshold on the test set, where I can see it reach 0.90?</summary><div class="details-body">
+  <p>That is peeking (lecture §15): set on the test patients, a threshold always reaches its target there, and promises more than new patients will get.</p></div></details>
+<details><summary>Should the slider snap to the saved threshold?</summary><div class="details-body">
+  <p>It can. A 0.01-step slider may not land exactly on it, so show the saved threshold's numbers in their own column.</p></div></details>

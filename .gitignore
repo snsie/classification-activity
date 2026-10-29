@@ -1,0 +1,12 @@
+dist/
+node_modules/
+__pycache__/
+.DS_Store
+.venv/
+reproduce/raw/
+# Instructor-only: the private full solution, expected results and test fixtures stay off GitHub.
+instructor/
+tests/.cache/
+# Build brief for the activity (not published).
+M11_Website_Build_Prompt.md
+.pytest_cache/

@@ -1,0 +1,11 @@
+{
+  "name": "classification-activity",
+  "private": true,
+  "type": "module",
+  "description": "Student website and starter for the M11 'Judge the Model' activity",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "preview": "node scripts/serve.mjs",
+    "test": "node --test tests/"
+  }
+}

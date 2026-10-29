@@ -1,0 +1,128 @@
+<!--meta {"title":"Models","description":"The five classifiers and the prevalence baseline: one core idea, a tiny illustration and one practical limitation each. kNN and SVM are new.","scripts":["demos.js"]} -->
+<p class="eyebrow">The work</p>
+<h1>Models</h1>
+<p class="lead">Five classifiers plus a baseline, all fixed. Everyone compares the same models with the same settings: you don't tune anything. Logistic regression, random forest and gradient boosting are from the lecture (§11–12). kNN and SVM are new, and you write their pipelines {{help pipeline}}.</p>
+
+<div class="table-wrap"><table>
+  <thead><tr><th scope="col">Key</th><th scope="col">Model</th><th scope="col">Pipeline</th><th scope="col">Written by</th></tr></thead>
+  <tbody>
+    <tr><td><code>baseline</code></td><td>Prevalence baseline</td><td><code>DummyClassifier(strategy="prior")</code></td><td>Supplied</td></tr>
+    <tr><td><code>logreg</code></td><td>Logistic regression</td><td>impute → scale → <code>LogisticRegression(max_iter=5000)</code></td><td>Supplied (worked example)</td></tr>
+    <tr><td><code>knn</code></td><td>k-nearest neighbours</td><td>impute → scale → <code>KNeighborsClassifier(n_neighbors=25)</code></td><td><strong>You</strong></td></tr>
+    <tr><td><code>rf</code></td><td>Random forest</td><td>impute → <code>RandomForestClassifier(n_estimators=300, min_samples_leaf=3, random_state=0)</code></td><td>Supplied</td></tr>
+    <tr><td><code>lgbm</code></td><td>Gradient boosting</td><td>LightGBM with the lecture's settings: <code>LGBMClassifier(random_state=0)</code>, defaults otherwise</td><td>Supplied</td></tr>
+    <tr><td><code>svm</code></td><td>Support vector machine</td><td>impute → scale → <code>LinearSVC()</code>, passed to the supplied <code>with_probabilities()</code> helper</td><td><strong>You</strong> (pipeline only)</td></tr>
+  </tbody>
+</table></div>
+<p class="small">Every pipeline starts with the supplied <code>encode()</code> step, which turns each text category into 0/1 columns, learned from the training rows only. “Impute” fills each missing value with the training median {{help imputation}}; “scale” puts every feature on the same scale {{help scaling}}.</p>
+<p class="small"><strong>Simplicity order</strong>, used by the §16 rule {{help within-one-sd}}: logreg &lt; kNN &lt; SVM &lt; random forest &lt; gradient boosting.</p>
+
+<h2>Write your two pipelines</h2>
+<p>Open <code>analysis/models.py</code>. Copy the shape of <code>logreg()</code>:</p>
+<pre><code>def logreg():
+    return make_pipeline(
+        encode(),                              # 1. text categories → 0/1 columns
+        SimpleImputer(strategy="median"),      # 2. fill missing values with the training median
+        StandardScaler(),                      # 3. put every feature on the same scale
+        LogisticRegression(max_iter=5000),     # 4. the classifier
+    )</code></pre>
+<ul>
+  <li><strong>kNN:</strong> the same four steps, ending in <code>KNeighborsClassifier(n_neighbors=25)</code>.</li>
+  <li><strong>SVM:</strong> the same four steps, ending in <code>LinearSVC()</code>. Pass the whole pipeline to <code>with_probabilities(...)</code> and return that.</li>
+  <li><strong>Keep scaling inside the pipeline.</strong> Never scale the whole dataset first: the scaler would learn from rows each fold should never see. <code>python check.py --stage train</code> checks this.</li>
+</ul>
+
+<h2>The six models</h2>
+
+<article class="card model-card" id="baseline">
+  <p class="eyebrow">Supplied</p>
+  <h3>Prevalence baseline {{help prevalence-baseline}}</h3>
+  <p><strong>Core idea:</strong> every patient gets the same probability: the share of positives in the training rows.</p>
+  <div class="illus"><svg viewBox="0 0 320 90" role="img" aria-label="Ten made-up patients, with and without the outcome, all given the same probability: a flat line">
+    <line class="axis" x1="20" x2="300" y1="70" y2="70"/>
+    <line class="ink" x1="20" x2="300" y1="40" y2="40"/>
+    <circle class="pos" cx="40" cy="40" r="5"/><circle class="neg-ring" cx="68" cy="40" r="5"/><circle class="neg-ring" cx="96" cy="40" r="5"/><circle class="neg-ring" cx="124" cy="40" r="5"/><circle class="pos" cx="152" cy="40" r="5"/>
+    <circle class="neg-ring" cx="180" cy="40" r="5"/><circle class="neg-ring" cx="208" cy="40" r="5"/><circle class="neg-ring" cx="236" cy="40" r="5"/><circle class="neg-ring" cx="264" cy="40" r="5"/><circle class="neg-ring" cx="292" cy="40" r="5"/>
+    <text x="20" y="25">everyone: the same probability</text><text x="20" y="86">patients (made up)</text>
+  </svg></div>
+  <p><strong>Limitation:</strong> it ranks no one above anyone else, so its AUROC is 0.5. It is the yardstick, not a model to use.</p>
+</article>
+
+<article class="card model-card" id="logreg">
+  <p class="eyebrow">Supplied · worked example · lecture §12</p>
+  <h3>Logistic regression {{help logistic-regression}}</h3>
+  <p><strong>Core idea:</strong> a weighted sum of the features, squeezed into a probability between 0 and 1 by an S-shaped curve.</p>
+  <div class="illus"><svg viewBox="0 0 320 120" role="img" aria-label="An S-shaped curve rising from near 0 to near 1 as the weighted sum of features increases">
+    <line class="axis" x1="30" x2="300" y1="100" y2="100"/><line class="axis" x1="30" x2="30" y1="10" y2="100"/>
+    <path class="ink" d="M30,98 C120,97 140,96 165,55 C190,14 210,13 300,12"/>
+    <text x="34" y="20">1</text><text x="34" y="96">0</text><text x="120" y="116">weighted sum of features →</text>
+  </svg></div>
+  <p><strong>Limitation:</strong> it misses curved or combined effects unless you add them as features.</p>
+</article>
+
+<article class="card model-card" id="knn">
+  <p class="eyebrow">New · you write the pipeline</p>
+  <h3>k-nearest neighbours (kNN) {{help knn}}</h3>
+  <p><strong>Core idea:</strong> a new patient's probability is the share of positives among the k most similar training patients. Here k = 25.</p>
+  <dl>
+    <dt>Why scaling matters</dt>
+    <dd>“Similar” means close in distance across all features. A feature measured in large units (length of stay in days, lab counts in the dozens) would swamp one measured in small units (a 0/1 flag). Scaling puts every feature on the same footing, so each one counts.</dd>
+    <dt>The effect of k</dt>
+    <dd>A small k follows individual training patients closely, so its probabilities jump around. A large k averages more patients, so its probabilities are smoother but blur real differences. With k = 25, every probability is a multiple of 1/25 = 0.04.</dd>
+  </dl>
+  <details class="demo" open>
+    <summary>Try it: drag a new patient and watch its neighbours</summary>
+    <div class="details-body"><div id="demo-knn"></div></div>
+  </details>
+  <p><strong>Limitation:</strong> it memorises the training patients rather than learning a formula, so it must search them all for every prediction, and it is easily misled by features that don't matter.</p>
+</article>
+
+<article class="card model-card" id="svm">
+  <p class="eyebrow">New · you write the pipeline</p>
+  <h3>Support vector machine (SVM) {{help svm}}</h3>
+  <p><strong>Core idea:</strong> draw the straight boundary that separates the two classes with the widest possible gap. A few training patients right at the edge of the gap, the support vectors, fix where it goes.</p>
+  <dl>
+    <dt>The separating boundary</dt>
+    <dd>Patients on one side are scored as more likely positive, on the other side less likely. <code>LinearSVC</code> draws a straight boundary (a flat one, with more than two features), like logistic regression, but chooses it by the gap rather than by probabilities.</dd>
+    <dt>Its raw score is not a probability</dt>
+    <dd>An SVM outputs a raw score {{help raw-score}}: how far a patient is from the boundary, and on which side. Higher means more likely positive, but you can't read it as a chance. The supplied <code>with_probabilities()</code> helper converts it into a probability, so your SVM can be compared with the others.</dd>
+  </dl>
+  <details class="demo" open>
+    <summary>Try it: a boundary on two features</summary>
+    <div class="details-body"><div id="demo-svm"></div></div>
+  </details>
+  <p><strong>Limitation:</strong> a straight boundary misses curved patterns, and the converted probability is only as good as the helper's conversion: check it with a calibration plot {{help calibration-plot}}.</p>
+</article>
+
+<article class="card model-card" id="rf">
+  <p class="eyebrow">Supplied · lecture §11</p>
+  <h3>Random forest {{help random-forest}}</h3>
+  <p><strong>Core idea:</strong> many decision trees, each grown on a different sample of patients; the probability is the average of the trees' probabilities.</p>
+  <div class="illus"><svg viewBox="0 0 320 110" role="img" aria-label="Three small trees give probabilities 0.20, 0.40 and 0.30 for one patient; the forest averages them to 0.30">
+    <g transform="translate(20 10)"><circle class="soft" cx="40" cy="10" r="8"/><circle class="soft" cx="20" cy="40" r="8"/><circle class="soft" cx="60" cy="40" r="8"/><line class="axis" x1="40" y1="18" x2="20" y2="32"/><line class="axis" x1="40" y1="18" x2="60" y2="32"/><text x="22" y="72">0.20</text></g>
+    <g transform="translate(110 10)"><circle class="soft" cx="40" cy="10" r="8"/><circle class="soft" cx="20" cy="40" r="8"/><circle class="soft" cx="60" cy="40" r="8"/><line class="axis" x1="40" y1="18" x2="20" y2="32"/><line class="axis" x1="40" y1="18" x2="60" y2="32"/><text x="22" y="72">0.40</text></g>
+    <g transform="translate(200 10)"><circle class="soft" cx="40" cy="10" r="8"/><circle class="soft" cx="20" cy="40" r="8"/><circle class="soft" cx="60" cy="40" r="8"/><line class="axis" x1="40" y1="18" x2="20" y2="32"/><line class="axis" x1="40" y1="18" x2="60" y2="32"/><text x="22" y="72">0.30</text></g>
+    <text x="20" y="104">average of the trees (made up): (0.20 + 0.40 + 0.30) ÷ 3 = 0.30</text>
+  </svg></div>
+  <p><strong>Limitation:</strong> it nearly memorises its training patients (training AUROC close to 1), and one prediction is hard to explain.</p>
+</article>
+
+<article class="card model-card" id="lgbm">
+  <p class="eyebrow">Supplied · lecture §11</p>
+  <h3>Gradient boosting {{help gradient-boosting}}</h3>
+  <p><strong>Core idea:</strong> trees added in sequence, each one fixing the errors the earlier trees left.</p>
+  <div class="illus"><svg viewBox="0 0 320 110" role="img" aria-label="A bar chart: a starting guess, then three small corrections that move the prediction step by step">
+    <line class="axis" x1="20" x2="300" y1="90" y2="90"/>
+    <rect class="bar" x="30" y="60" width="50" height="30"/><rect class="bar" x="100" y="48" width="50" height="42" opacity="0.8"/><rect class="bar" x="170" y="40" width="50" height="50" opacity="0.65"/><rect class="bar" x="240" y="36" width="50" height="54" opacity="0.5"/>
+    <text x="30" y="106">start</text><text x="100" y="106">+ tree 1</text><text x="170" y="106">+ tree 2</text><text x="240" y="106">+ tree 3</text>
+  </svg></div>
+  <p><strong>Limitation:</strong> with many trees it can fit noise in the training patients; it has several settings, all left at LightGBM's defaults here.</p>
+</article>
+
+<h2>Common questions</h2>
+<details><summary>Why can't I tune k, or the SVM's settings?</summary><div class="details-body">
+  <p>Everyone compares the same fixed models, so differences come from the data and the comparison, not from tuning effort. Tuning is outside this activity.</p></div></details>
+<details><summary>Do I need to know how <code>with_probabilities()</code> works?</summary><div class="details-body">
+  <p>No. It turns the SVM's raw score into a probability between 0 and 1, learned from the training rows only. Check the result in Section 3 like any other model's probabilities.</p></div></details>
+<details><summary>My pipeline runs, but <code>check.py</code> says scaling isn't inside it.</summary><div class="details-body">
+  <p>Return one <code>make_pipeline(...)</code> with <code>encode()</code>, <code>SimpleImputer</code> and <code>StandardScaler</code> as steps before the classifier. Don't transform <code>X</code> yourself before training.</p></div></details>

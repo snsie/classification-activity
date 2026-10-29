@@ -1,0 +1,118 @@
+<!--meta {"title":"Overview","description":"A take-home activity: run a supplied Python workflow on three health datasets, save your decisions before the results, and build one app that helps a clinical lead judge whether any classifier is fit for each job."} -->
+<p class="eyebrow">M11 take-home activity</p>
+<h1>Judge the Model</h1>
+<p class="lead">Run a supplied Python workflow that trains five classifiers on three health datasets. Save each decision before you see the results it depends on. Then build one app that helps a clinical lead {{help clinical-lead}} decide whether any model is fit for each job.</p>
+
+<p class="core-question">Which classifier would you trust for this job, at what threshold, and with what limits?</p>
+
+<h2>At a glance</h2>
+<dl class="facts">
+  <dt>Who</dt><dd>Individual, take-home</dd>
+  <dt>Analyze</dt><dd>Run a supplied Python workflow that trains five classifiers on three health datasets. You write two of the model pipelines {{help pipeline}} and save your decisions before seeing the results they depend on. <a href="analysis.html">Analysis</a></dd>
+  <dt>Build</dt><dd>One app with four sections that helps a clinical lead judge whether any model is fit for each job. It reads the results your Python analysis exports {{help results-files}}.</dd>
+  <dt>App route</dt><dd>Streamlit (Python), hosted on Streamlit Community Cloud, <strong>or</strong> a JavaScript app (plain or built with Node), hosted on GitHub Pages. <a href="hosting.html">Publish &amp; back up</a></dd>
+  <dt>Data</dt><dd>Readmission, diabetes, and heart disease, supplied as CSVs with fixed folds {{help fold}}. <a href="data.html">Data &amp; files</a></dd>
+  <dt>Submit</dt><dd>Your public GitHub repository link (app link on the first line of the README), plus four Canvas answers. <a href="submit.html">Submit</a></dd>
+  <dt>Audience</dt><dd>A clinical lead who knows the clinical problem but not the metrics, and who must decide whether to use a model</dd>
+  <dt>Effort</dt><dd>About four hours in total. Each step below has a time guide.</dd>
+</dl>
+
+<h2 id="judged">How your work is judged</h2>
+<p>Most of the credit is for reasoning: <strong>40 points</strong> for your four Canvas answers, each using your own numbers, tied to the job and stating the uncertainty. Your app earns <strong>20</strong> for meeting the four required minimums in a way a clinical lead can read cold. A valid, reproducible analysis earns <strong>15</strong>, your decisions and verification <strong>15</strong>, and the diabetes threshold <strong>10</strong>. You get no points for a higher AUROC, for choosing a particular model, for visual polish, or for a correct prediction before results. <a href="submit.html#rubric">Full rubric</a></p>
+
+<h2>The four app sections</h2>
+<div class="card-grid">
+  <article class="card">
+    <p class="eyebrow">Lecture §1–5</p>
+    <h3>1. Beyond Accuracy</h3>
+    <p>Why accuracy alone misleads, and the confusion matrix as four groups of patients.</p>
+    <a class="card-link" href="beyond-accuracy.html">Open the brief</a>
+  </article>
+  <article class="card">
+    <p class="eyebrow">Lecture §6–7, 15</p>
+    <h3>2. A Threshold for the Job</h3>
+    <p>The threshold is a decision separate from the model. What does the job's rule gain and give up?</p>
+    <a class="card-link" href="threshold.html">Open the brief</a>
+  </article>
+  <article class="card">
+    <p class="eyebrow">Lecture §8–10</p>
+    <h3>3. Ranking vs. Being Right</h3>
+    <p>What AUROC does and doesn't mean, and good ranking vs trustworthy probabilities.</p>
+    <a class="card-link" href="ranking.html">Open the brief</a>
+  </article>
+  <article class="card">
+    <p class="eyebrow">Lecture §13–16</p>
+    <h3>4. A Fair Comparison</h3>
+    <p>Is one model really better than another? Why is the test set opened only once?</p>
+    <a class="card-link" href="fair-comparison.html">Open the brief</a>
+  </article>
+</div>
+
+<h2 id="start">Start here</h2>
+<ol class="steps">
+  <li><strong>Set up</strong> <span class="time">(~20 min)</span>
+    <ul>
+      <li>Download the starter, create a public GitHub repository {{help github-backup}}, install the requirements, and run <code>python check.py --stage setup</code>.</li>
+      <li>Publish the untouched starter app on your chosen route and open it in a private window.</li>
+    </ul>
+    <span class="done-when"><strong>Done when:</strong> the check passes and your app link loads.</span></li>
+  <li><strong>Decide before results</strong> <span class="time">(~15 min)</span>
+    <ul>
+      <li>Fill in <code>Before results</code> in <code>DECISIONS.md</code> {{help decisions-md}}. Commit and push.</li>
+    </ul>
+    <span class="done-when"><strong>Done when:</strong> the commit is on GitHub.</span></li>
+  <li><strong>Write two pipelines and train</strong> <span class="time">(~30 min)</span>
+    <ul>
+      <li>Complete the kNN and SVM <code>TODO</code>s in <code>analysis/models.py</code>, following the logistic regression example. <a href="models.html">Models</a></li>
+      <li>Run <code>python -m analysis train</code>.</li>
+    </ul>
+    <span class="done-when"><strong>Done when:</strong> <code>python check.py --stage train</code> passes.</span></li>
+  <li><strong>Choose the diabetes model</strong> <span class="time">(~20 min)</span>
+    <ul>
+      <li>Run <code>python -m analysis explore</code>, or use your app's Section 2.</li>
+      <li>Choose a model. It doesn't have to have the highest specificity. If models are close, or one is better calibrated, you may prefer it.</li>
+      <li>Fill in <code>Before test</code>. Commit and push.</li>
+    </ul>
+    <span class="done-when"><strong>Done when:</strong> the commit is on GitHub.</span></li>
+  <li><strong>Run the test once and record</strong> <span class="time">(~15 min)</span>
+    <ul>
+      <li>Run <code>python -m analysis test</code> once. Don't change any decision afterwards; explain surprises in Canvas.</li>
+      <li>Fill in <code>Verification</code> and <code>Recommendations</code>, then run <code>python -m analysis export</code>.</li>
+    </ul>
+    <span class="done-when"><strong>Done when:</strong> <code>python check.py</code> passes.</span></li>
+  <li><strong>Build your app</strong> <span class="time">(~90 min)</span>
+    <ul>
+      <li>Build the four sections to their required minimums for a clinical lead.</li>
+      <li>Commit and push, then test in a private window.</li>
+    </ul>
+    <span class="done-when"><strong>Done when:</strong> every section works for every dataset and model.</span></li>
+  <li><strong>Answer the Canvas questions</strong> <span class="time">(~60 min)</span>
+    <ul>
+      <li>Four answers of 100–150 words each, citing numbers from your app. <a href="submit.html#canvas">The questions</a></li>
+      <li>Submit your repository link.</li>
+    </ul></li>
+</ol>
+<p>{{zip}}</p>
+
+<div class="callout">
+  <p class="callout-title">New to these ideas?</p>
+  <p>Look for the <span class="help" aria-hidden="true" style="cursor:default">?</span> buttons. Each one opens a short, plain-language explanation of the term next to it, in the lecture's words. The <a href="glossary.html">glossary</a> lists them all. Each section brief names the lecture sections it builds on.</p>
+</div>
+
+<h2 id="fair-play">Fair play</h2>
+<h3>The protocol</h3>
+<ul>
+  <li><strong>Use the supplied folds.</strong> Never reshuffle, and never fit on test rows. {{help five-rules}}</li>
+  <li><strong>Decide first.</strong> Commit each section of <code>DECISIONS.md</code> before the stage that depends on it. The workflow refuses to run until you do, and <code>check.py</code> reads the git history.</li>
+  <li><strong>Open the test set once.</strong> {{help test-set}} Don't change any decision afterwards. A forced second run is logged.</li>
+  <li><strong>Never edit results by hand.</strong> Your app computes every number from <code>results/</code> through <code>m11</code>.</li>
+</ul>
+<h3>AI use</h3>
+<ul>
+  <li>You may use an AI agent to write app code, debug, explain the starter, and help with the two pipelines.</li>
+  <li>You make every decision in <code>DECISIONS.md</code> yourself, and you write your Canvas answers in your own words.</li>
+  <li>Check what the agent gives you, and report one check under <code>Verification</code>.</li>
+  <li>Follow the course AI policy for anything not covered here.</li>
+  <li>Optional and ungraded: save your prompts in <code>prompts/</code>, one file per session.</li>
+</ul>
+<p>Have your agent read <code>AGENT_BRIEF.md</code> first. It holds the rules that keep the analysis fair and the numbers right.</p>

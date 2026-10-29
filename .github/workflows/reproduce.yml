@@ -1,0 +1,33 @@
+# Rebuilds the starter data and baseline results from the raw UCI and CDC files, checks they match
+# the committed versions, and runs the m11 parity tests. Run from the Actions tab, or on pipeline changes.
+name: Reproduce data
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "reproduce/**"
+      - "starter/analysis/**"
+      - "starter/m11.py"
+      - "starter/app/m11.js"
+      - "starter/check.py"
+      - ".github/workflows/reproduce.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: pip install -r reproduce/requirements.txt pytest
+      - run: python reproduce/reproduce.py --check
+      - run: python -m pytest tests/test_parity.py tests/test_demos.py

@@ -1,0 +1,40 @@
+{
+  "exported_at": null,
+  "commit": null,
+  "words": 0,
+  "word_limit": 250,
+  "sections": {
+    "before_results": {
+      "readmission": "",
+      "diabetes": "",
+      "heart": "",
+      "prediction": "",
+      "leak": ""
+    },
+    "before_test": {
+      "model": "",
+      "reason": ""
+    },
+    "verification": {
+      "hand_calculation": "",
+      "check": "",
+      "ai_help": ""
+    },
+    "recommendations": {
+      "readmission": "",
+      "diabetes": "",
+      "heart": ""
+    }
+  },
+  "complete": {
+    "before_results": false,
+    "before_test": false,
+    "verification": false,
+    "recommendations": false
+  },
+  "recommendations": {
+    "readmission": "",
+    "diabetes": "",
+    "heart": ""
+  }
+}

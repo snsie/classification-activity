@@ -1,0 +1,69 @@
+<!--meta {"title":"1. Beyond Accuracy","description":"App section brief: name the positive class, see why accuracy alone misleads, and read a confusion matrix as four groups of patients."} -->
+<p class="eyebrow">App section 1 · Lecture §1–5</p>
+<h1>Beyond Accuracy</h1>
+<p class="core-question">Does a high accuracy mean the model helps?</p>
+
+<dl class="facts">
+  <dt>Learning objective</dt><dd>After using it, the clinical lead can name the positive class {{help positive-class}}, see why accuracy {{help accuracy}} alone misleads, and read a confusion matrix {{help confusion-matrix}} as four groups of patients.</dd>
+  <dt>Reader</dt><dd>A clinical lead {{help clinical-lead}} who knows the clinical problem but not the metrics.</dd>
+  <dt>Data</dt><dd>Development out-of-fold probabilities {{help oof}}, at threshold 0.50.</dd>
+</dl>
+
+<h2>Required minimum <span class="tag required">Required</span></h2>
+<p class="checklist-status" data-for="s1-required"></p>
+<ul class="checklist" data-store="s1-required">
+  <li><input type="checkbox" id="s1-r1"><div class="item-body"><label for="s1-r1">A dataset selector (all three datasets) and a model selector (all five models plus the baseline).</label></div></li>
+  <li><input type="checkbox" id="s1-r2"><div class="item-body"><label for="s1-r2">Prevalence and baseline accuracy: the accuracy of “the most common class for everyone”.</label> {{help prevalence}} {{help majority-baseline}}</div></li>
+  <li><input type="checkbox" id="s1-r3"><div class="item-body"><label for="s1-r3">A labelled confusion matrix at 0.50, with rows = actual and columns = predicted.</label> {{help tp}} {{help fn}} {{help fp}} {{help tn}}</div></li>
+  <li><input type="checkbox" id="s1-r4"><div class="item-body"><label for="s1-r4">Sensitivity, specificity, precision, FPR, and F1, each with its “of the patients who…” denominator in words.</label> {{help sensitivity}} {{help specificity}} {{help precision}} {{help fpr}} {{help f1}}</div></li>
+  <li><input type="checkbox" id="s1-r5"><div class="item-body"><label for="s1-r5">Undefined values shown as “undefined”, never as 0.</label> {{help undefined}}</div></li>
+  <li><input type="checkbox" id="s1-r6"><div class="item-body"><label for="s1-r6">Every table and plot labelled <span class="partition">Development (OOF)</span>.</label></div></li>
+</ul>
+
+<h2>Done when</h2>
+<p class="checklist-status" data-for="s1-done"></p>
+<ul class="checklist" data-store="s1-done">
+  <li><input type="checkbox" id="s1-d1"><div class="item-body"><label for="s1-d1">It works for every dataset and every model, on your public link.</label></div></li>
+  <li><input type="checkbox" id="s1-d2"><div class="item-body"><label for="s1-d2">Every number comes from <code>results/</code> through <code>m11</code>; you typed none of them.</label></div></li>
+  <li><input type="checkbox" id="s1-d3"><div class="item-body"><label for="s1-d3">Someone who hasn't seen your app can do the reviewer task below without help.</label></div></li>
+  <li><input type="checkbox" id="s1-d4"><div class="item-body"><label for="s1-d4">Your hand calculation in <code>Verification</code> matches what this section shows.</label></div></li>
+</ul>
+
+<div class="callout">
+  <p class="callout-title">Reviewers will try</p>
+  <p><strong>Readmission, best model at 0.50:</strong> how many readmissions does it catch, and how does its accuracy compare with “always no”?</p>
+</div>
+
+<div class="callout">
+  <p class="callout-title">Never in your app</p>
+  <ul>
+    <li>AUROC described as “accuracy”.</li>
+    <li>An SVM score described as a probability.</li>
+    <li>A CV result labelled as a test result.</li>
+    <li>A causal claim about a feature.</li>
+  </ul>
+</div>
+
+<h2>Ideas, not templates <span class="tag optional">Optional</span></h2>
+<ul>
+  <li>Draw 100 patients as dots, sorted into the four cells, so “of the patients who…” is something you can count.</li>
+  <li>Put “always no” and the model side by side: same accuracy, very different catches.</li>
+  <li>Say each metric as the clinical lead's question: “Of the patients we flag, how many come back?”</li>
+</ul>
+<p class="small muted">Accurate, readable tables meet every required minimum. Custom visuals are optional.</p>
+
+<h2>Where your numbers come from</h2>
+<ul>
+  <li><code>m11.oof(dev, model)</code>: the probabilities and labels.</li>
+  <li><code>m11.confusion(p, y, 0.5)</code>: TP, FN, FP and TN. A patient is flagged when <code>p &gt;= 0.5</code>.</li>
+  <li><code>m11.metrics(counts)</code>: every metric, plus <code>prevalence</code> and <code>flagged_per_100</code>. <code>null</code>/<code>None</code> means undefined.</li>
+  <li><code>m11.majorityAccuracy(y)</code> / <code>m11.majority_accuracy(y)</code>: “the most common class for everyone”.</li>
+</ul>
+
+<h2>Common questions</h2>
+<details><summary>Which way round does the matrix go?</summary><div class="details-body">
+  <p>The course layout: rows are what actually happened, columns are what the model said, positives first. scikit-learn's <code>confusion_matrix</code> uses another order, so label both axes.</p></div></details>
+<details><summary>The baseline flags no one. Is precision 0?</summary><div class="details-body">
+  <p>No: with no one flagged, precision is 0 ÷ 0, which is undefined. Show “undefined”.</p></div></details>
+<details><summary>Can I say a feature raises the risk of readmission?</summary><div class="details-body">
+  <p>No. The models learned associations in historical data. Say “patients with more past admissions tended to get higher probabilities”, never “admissions cause readmission”.</p></div></details>
