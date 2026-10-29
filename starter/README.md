@@ -9,12 +9,7 @@ An app that helps a clinical lead judge whether any classifier is fit for each j
 Submit the link to **this repository** on Canvas, plus your five Canvas answers.
 
 ## Quick start
-```bash
-python -m venv .venv
-source .venv/bin/activate            # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-python check.py --stage setup
-```
+- Use `uv` to create a virtual environment (Python 3.11 or newer) with the packages in `requirements.txt`, then run `python check.py --stage setup`.
 
 | Step | Command | Before you run it |
 |---|---|---|

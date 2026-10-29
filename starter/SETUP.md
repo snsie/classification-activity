@@ -21,13 +21,7 @@ The activity website has the same steps with troubleshooting: <https://snsie.git
 Either way, your Python analysis runs on your computer, and the hosted app only reads the `results/` files it exported.
 
 ## 1. Install
-You need Python 3.11 or newer and git, plus Node.js 20 or newer if you choose the Node app.
-```bash
-python -m venv .venv
-source .venv/bin/activate            # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-python check.py --stage setup
-```
+- In the starter folder, use `uv` to create a virtual environment (Python 3.11 or newer) with the packages in `requirements.txt`, then run `python check.py --stage setup`. You also need git, plus Node.js 20 or newer if you choose the Node app.
 
 ## 2. Make your repository
 1. Unzip this starter. Its folder is your project.

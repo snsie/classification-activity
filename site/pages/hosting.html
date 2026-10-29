@@ -20,11 +20,7 @@
 <h2>1. Put the starter on GitHub</h2>
 <ol class="steps">
   <li>Download and unzip the starter from <a href="data.html">Data &amp; files</a>.</li>
-  <li>Install Python 3.11 or newer and git, plus <a href="https://nodejs.org">Node.js</a> 20 or newer if you chose Node. In the starter folder, run:
-<pre><code>python -m venv .venv
-source .venv/bin/activate            # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-python check.py --stage setup</code></pre></li>
+  <li>In the starter folder, use <code>uv</code> to create a virtual environment (Python 3.11 or newer) with the packages in <code>requirements.txt</code>, then run <code>python check.py --stage setup</code>. You also need git, plus <a href="https://nodejs.org">Node.js</a> 20 or newer if you chose Node.</li>
   <li>On GitHub, create a <strong>new public repository</strong> (for example <code>judge-the-model</code>). Don't add a README; the starter has one.</li>
   <li>In the starter folder, run:
 <pre><code>git init -b main

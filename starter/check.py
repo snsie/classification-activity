@@ -86,12 +86,12 @@ def rows(key: str, split: str) -> tuple[list[int], list[int]]:
 def check_setup(r: Report) -> bool:
     print("Setup")
     if sys.version_info < (3, 11):
-        r.fail(f"Python {sys.version.split()[0]} is too old; install Python 3.11 or newer and recreate your environment.")
+        r.fail(f"Python {sys.version.split()[0]} is too old; recreate your environment with uv and Python 3.11 or newer.")
     try:
         import lightgbm, numpy, pandas, sklearn  # noqa: F401, E401
         r.ok("Python packages import")
     except ImportError as e:
-        r.fail(f"Package {e.name} is missing; run `pip install -r requirements.txt` in your environment.")
+        r.fail(f"Package {e.name} is missing; run `uv pip install -r requirements.txt` in your environment.")
         return False
     manifest = json.loads((ROOT / "data" / "manifest.json").read_text(encoding="utf-8"))
     good = True
