@@ -6,7 +6,7 @@ An app that helps a clinical lead judge whether any classifier is fit for each j
 
 **Central question:** Which classifier would you trust for this job, at what threshold, and with what limits?
 
-Submit the link to **this repository** on Canvas, plus your three Canvas answers.
+Submit the link to **this repository** on Canvas, plus your five Canvas answers.
 
 ## Quick start
 ```bash

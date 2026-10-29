@@ -2,7 +2,7 @@
 
 **Website: <https://snsie.github.io/classification-activity/>**
 
-Students run a supplied Python workflow that trains four classifiers (plus a prevalence baseline) on the training rows of two health datasets and scores them on the test rows, write their decisions in `DECISIONS.md`, and build one app with four sections, in Streamlit or Node.js (their choice), that helps a clinical lead judge whether any model is fit for each job. They submit a public GitHub repository (app link on the README's first line) and three Canvas answers.
+Students run a supplied Python workflow that trains four classifiers (plus a prevalence baseline) on the training rows of two health datasets and scores them on the test rows, write their decisions in `DECISIONS.md`, and build one app with four sections, in Streamlit or Node.js (their choice), that helps a clinical lead judge whether any model is fit for each job. They submit a public GitHub repository (app link on the README's first line) and five Canvas answers.
 
 **Central question:** Which classifier would you trust for this job, at what threshold, and with what limits?
 
