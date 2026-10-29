@@ -3,175 +3,170 @@
     "term": "Classification",
     "group": "Basics",
     "short": "Predicting a category (readmitted or not) rather than a number. Many classifiers first estimate a probability, then a threshold turns it into a class.",
-    "more": "Lecture §1. Two classes is binary classification, the focus of this activity."
+    "more": "Two classes is binary classification, the focus of this activity."
   },
   "positive-class": {
     "term": "Positive class",
     "group": "Basics",
     "short": "The outcome of interest: the event we want the model to find, such as “readmitted within 30 days”.",
-    "more": "“Positive” does not mean good. Like a positive test result, it means the thing we were looking for was found. Name the positive class first: every metric except accuracy changes meaning if you flip it. Lecture §3."
+    "more": "“Positive” does not mean good. Like a positive test result, it means the thing we were looking for was found. Name the positive class first: every metric except accuracy changes meaning if you flip it."
   },
   "prevalence": {
     "term": "Prevalence",
     "group": "Basics",
     "short": "The share of patients in the positive class. For example, 9% of discharges were readmitted within 30 days.",
-    "more": "Precision depends on prevalence: the same model gives fewer real flags out of every 100 when the outcome is rarer. Lecture §4."
+    "more": "Precision depends on prevalence: the same model gives fewer real flags out of every 100 when the outcome is rarer."
   },
   "probability": {
     "term": "Estimated probability",
     "group": "Basics",
     "short": "The classifier's estimate of a patient's chance of the positive class, between 0 and 1.",
-    "more": "It is an estimate. Whether a predicted 30% really means about 30 in 100 such patients needs its own check: a calibration plot. Lecture §1 and §10."
+    "more": "It is an estimate. Whether a predicted 30% really means about 30 in 100 such patients needs its own check: a calibration plot."
   },
   "threshold": {
     "term": "Threshold",
     "group": "Basics",
     "short": "The cut-off that turns a probability into a class: predict positive (“flag”) when the probability is at or above it.",
-    "more": "0.50 is a choice people make, not something the model learns. Moving the threshold changes no probability and needs no retraining. Lecture §1 and §6."
+    "more": "0.50 is a choice people make, not something the model learns. Moving the threshold changes no probability and needs no retraining."
   },
   "accuracy": {
     "term": "Accuracy",
     "group": "Basics",
     "short": "The fraction of predictions that were correct: (TP + TN) ÷ all patients.",
-    "more": "Accuracy can be useful when the classes are roughly balanced and both kinds of mistake matter about equally. It cannot tell you which mistakes the model makes. Lecture §2."
+    "more": "Accuracy can be useful when the classes are roughly balanced and both kinds of mistake matter about equally. It cannot tell you which mistakes the model makes."
   },
   "accuracy-trap": {
     "term": "The accuracy trap",
     "group": "Basics",
     "short": "With imbalanced classes, a model that finds no one can still score high accuracy. If 91% were not readmitted, saying “no” to everyone is 91% accurate.",
-    "more": "Lecture §2. Always compare an accuracy with the “most common class for everyone” baseline."
+    "more": "Always compare an accuracy with the “most common class for everyone” baseline."
   },
   "majority-baseline": {
     "term": "“Most common class for everyone” baseline",
     "group": "Basics",
     "short": "The simplest rule there is: predict the most common class for every patient, such as “not readmitted”. Its accuracy is the share of that class.",
-    "more": "Before trusting any accuracy number, compute what this rule scores. Lecture §2."
+    "more": "Before trusting any accuracy number, compute what this rule scores."
   },
   "class-imbalance": {
     "term": "Class imbalance",
     "group": "Basics",
-    "short": "One class is much more common than the other, such as 9 readmitted for every 91 not.",
-    "more": "Lecture §2."
+    "short": "One class is much more common than the other, such as 9 readmitted for every 91 not."
   },
   "confusion-matrix": {
     "term": "Confusion matrix",
     "group": "The confusion matrix",
     "short": "A 2 × 2 table comparing what the model said with what happened. In this course, rows are the actual class and columns the predicted class.",
-    "more": "Every patient lands in one of four groups: TP, FN, FP or TN. Correct results sit on the diagonal. scikit-learn's confusion_matrix(y, pred) uses another order ([[TN, FP], [FN, TP]]), so always read the labels before the numbers. Lecture §3."
+    "more": "Every patient lands in one of four groups: TP, FN, FP or TN. Correct results sit on the diagonal. scikit-learn's confusion_matrix(y, pred) uses another order ([[TN, FP], [FN, TP]]), so always read the labels before the numbers."
   },
   "tp": {
     "term": "True positive (TP)",
     "group": "The confusion matrix",
-    "short": "The model flagged the patient, and the patient had the outcome. A case caught.",
-    "more": "Lecture §3."
+    "short": "The model flagged the patient, and the patient had the outcome. A case caught."
   },
   "fn": {
     "term": "False negative (FN)",
     "group": "The confusion matrix",
-    "short": "The model did not flag the patient, but the patient had the outcome. A missed case.",
-    "more": "Lecture §3."
+    "short": "The model did not flag the patient, but the patient had the outcome. A missed case."
   },
   "fp": {
     "term": "False positive (FP)",
     "group": "The confusion matrix",
-    "short": "The model flagged the patient, but the patient did not have the outcome. A false alarm.",
-    "more": "Lecture §2–3."
+    "short": "The model flagged the patient, but the patient did not have the outcome. A false alarm."
   },
   "tn": {
     "term": "True negative (TN)",
     "group": "The confusion matrix",
-    "short": "The model did not flag the patient, and the patient did not have the outcome. Correctly left alone.",
-    "more": "Lecture §3."
+    "short": "The model did not flag the patient, and the patient did not have the outcome. Correctly left alone."
   },
   "sensitivity": {
     "term": "Sensitivity (recall, TPR)",
     "group": "The confusion matrix",
     "short": "Of the patients who actually had the outcome, the share the model flagged: TP ÷ (TP + FN).",
-    "more": "Three names, one metric: sensitivity, recall and true positive rate (TPR). Its denominator is the top row of the matrix. Lecture §4."
+    "more": "Three names, one metric: sensitivity, recall and true positive rate (TPR). Its denominator is the top row of the matrix."
   },
   "specificity": {
     "term": "Specificity",
     "group": "The confusion matrix",
     "short": "Of the patients who did not have the outcome, the share the model correctly left alone: TN ÷ (TN + FP).",
-    "more": "Its denominator is the bottom row of the matrix. Lecture §4."
+    "more": "Its denominator is the bottom row of the matrix."
   },
   "precision": {
     "term": "Precision",
     "group": "The confusion matrix",
     "short": "Of the patients the model flagged, the share who actually had the outcome: TP ÷ (TP + FP).",
-    "more": "It shares TP with sensitivity but not the denominator: everyone flagged, not everyone with the outcome. It falls when the outcome is rarer. Lecture §4."
+    "more": "It shares TP with sensitivity but not the denominator: everyone flagged, not everyone with the outcome. It falls when the outcome is rarer."
   },
   "fpr": {
     "term": "False positive rate (FPR)",
     "group": "The confusion matrix",
     "short": "Of the patients who did not have the outcome, the share who got a false alarm: FP ÷ (FP + TN). FPR = 1 − specificity.",
-    "more": "FPR is not “the share of flags that were wrong”; that is 1 − precision, with a different denominator. Lecture §4."
+    "more": "FPR is not “the share of flags that were wrong”; that is 1 − precision, with a different denominator."
   },
   "f1": {
     "term": "F1",
     "group": "The confusion matrix",
     "short": "The harmonic mean of precision and sensitivity: high only when both are high.",
-    "more": "What F1 leaves out: it ignores the true negatives, and it treats a missed case and a false alarm as equally costly. Lecture §5."
+    "more": "What F1 leaves out: it ignores the true negatives, and it treats a missed case and a false alarm as equally costly."
   },
   "undefined": {
     "term": "Undefined metric",
     "group": "The confusion matrix",
     "short": "A metric whose denominator is 0, such as precision when no one is flagged (0 ÷ 0). Show it as “undefined”, never as 0.",
-    "more": "m11 returns null (JavaScript) or None (Python) for these. Lecture §4 and §6."
+    "more": "m11 returns null (JavaScript) or None (Python) for these."
   },
   "flagged-per-100": {
     "term": "Flagged per 100",
     "group": "Thresholds",
     "short": "How many patients out of every 100 the model flags at a threshold: (TP + FP) ÷ all × 100. It is the workload the flag creates.",
-    "more": "Lecture §7 uses calls per 100 discharges to pick a threshold for a team's capacity."
+    "more": "The lecture uses calls per 100 discharges to pick a threshold for a team's capacity."
   },
   "threshold-for-the-job": {
     "term": "Threshold for the job",
     "group": "Thresholds",
     "short": "A threshold chosen with the people who act on the flag: their capacity, what a missed case costs, or a target sensitivity.",
-    "more": "The best cut-off depends on the job, not on accuracy. The most accurate thresholds often flag almost no one. Lecture §7."
+    "more": "The best cut-off depends on the job, not on accuracy. The most accurate thresholds often flag almost no one."
   },
   "roc-curve": {
     "term": "ROC curve",
     "group": "Ranking and probabilities",
     "short": "Every threshold at once: each one gives a (false positive rate, true positive rate) point, and the curve joins them.",
-    "more": "A useful model bows toward the top-left. The diagonal is random ranking: it catches patients with and without the outcome at the same rate. Lecture §8."
+    "more": "A useful model bows toward the top-left. The diagonal is random ranking: it catches patients with and without the outcome at the same rate."
   },
   "auroc": {
     "term": "AUROC",
     "group": "Ranking and probabilities",
     "short": "The area under the ROC curve: the chance that a random patient with the outcome gets a higher probability than a random patient without it. It describes ranking.",
-    "more": "0.5 is random ranking. AUROC is not accuracy, it doesn't choose the threshold, and it doesn't change when you move the threshold. There is no universal good value: it depends on the job. Lecture §9–10."
+    "more": "0.5 is random ranking. AUROC is not accuracy, it doesn't choose the threshold, and it doesn't change when you move the threshold. There is no universal good value: it depends on the job."
   },
   "calibration-plot": {
     "term": "Calibration plot",
     "group": "Ranking and probabilities",
     "short": "Patients sorted by predicted probability and cut into 10 equal-size groups. Each dot compares a group's mean prediction with the share who actually had the outcome.",
-    "more": "Dots near the diagonal mean the probabilities can be read as risks. Good ranking (high AUROC) does not guarantee this: halving every probability keeps AUROC but moves every dot off the diagonal. Lecture §10."
+    "more": "Dots near the diagonal mean the probabilities can be read as risks. Good ranking (high AUROC) does not guarantee this: halving every probability keeps AUROC but moves every dot off the diagonal."
   },
   "prevalence-baseline": {
     "term": "Prevalence baseline",
     "group": "Models",
     "short": "A “model” that gives every patient the same probability: the share of positives in its training rows. AUROC 0.5.",
-    "more": "Lecture §16 draws it as the chance line. In scikit-learn: DummyClassifier(strategy=\"prior\")."
+    "more": "The lecture draws it as the chance line. In scikit-learn: DummyClassifier(strategy=\"prior\")."
   },
   "logistic-regression": {
     "term": "Logistic regression",
     "group": "Models",
     "short": "A weighted sum of the features, squeezed into a probability between 0 and 1 by an S-shaped curve.",
-    "more": "A classifier despite its name. Simple and checkable; it misses curved or combined effects unless you add them. Lecture §11–12."
+    "more": "A classifier despite its name. Simple and checkable; it misses curved or combined effects unless you add them."
   },
   "random-forest": {
     "term": "Random forest",
     "group": "Models",
     "short": "Many decision trees, each grown on a resample of the patients and choosing each split from a random subset of features; the probability is the average of the trees' probabilities.",
-    "more": "Lecture §11. Here: 300 trees, at least 3 training patients per leaf."
+    "more": "Here: 300 trees, at least 3 training patients per leaf."
   },
   "gradient-boosting": {
     "term": "Gradient boosting",
     "group": "Models",
     "short": "Trees added in sequence, each one learning a correction to the current model's score that reduces its loss.",
-    "more": "Corrections add up on the log-odds scale and can lower a prediction as well as raise it; the final score becomes a probability. Lecture §11. Here: LightGBM with its default settings, as in the lecture."
+    "more": "Corrections add up on the log-odds scale and can lower a prediction as well as raise it; the final score becomes a probability. Here: LightGBM with its default settings, as in the lecture."
   },
   "knn": {
     "term": "k-nearest neighbours (kNN)",
@@ -183,7 +178,7 @@
     "term": "Pipeline",
     "group": "Models",
     "short": "One object that holds every step that learns from data (encoding, filling in missing values, scaling) plus the model, so all of them learn from the training rows only.",
-    "more": "In scikit-learn: make_pipeline(...). Lecture §14, rule 2."
+    "more": "In scikit-learn: make_pipeline(...)."
   },
   "scaling": {
     "term": "Scaling",
@@ -195,7 +190,7 @@
     "term": "Imputation",
     "group": "Models",
     "short": "Filling in missing values. Here each blank becomes the median of that feature in the training rows.",
-    "more": "Learned from data, so it belongs inside the pipeline. Lecture §14."
+    "more": "Learned from data, so it belongs inside the pipeline."
   },
   "training-set": {
     "term": "Training set",
@@ -207,31 +202,31 @@
     "term": "Test set",
     "group": "Training and testing",
     "short": "The 20% of rows no model learns from. Scoring the models on them shows how they do on patients they never saw.",
-    "more": "Marked split = test in each CSV. Every choice made by looking at it makes its score more optimistic. Lecture §13."
+    "more": "Marked split = test in each CSV. Every choice made by looking at it makes its score more optimistic."
   },
   "training-auroc": {
     "term": "Training AUROC",
     "group": "Training and testing",
     "short": "AUROC on the patients a model learned from. It flatters every model.",
-    "more": "Compare it with the test AUROC: a big gap means the model memorised its training patients. Lecture §13."
+    "more": "Compare it with the test AUROC: a big gap means the model memorised its training patients."
   },
   "overfitting": {
     "term": "Overfitting",
     "group": "Training and testing",
     "short": "A model that learns its training patients too closely, noise included, so it scores far better on them than on new patients.",
-    "more": "The sign is a big gap between training and test AUROC. A random forest can rank its own training patients almost perfectly and new ones no better than logistic regression. Lecture §13."
+    "more": "The sign is a big gap between training and test AUROC. A random forest can rank its own training patients almost perfectly and new ones no better than logistic regression."
   },
   "five-rules": {
     "term": "Five rules for a fair comparison",
     "group": "Training and testing",
     "short": "Same split for every model; preprocessing inside a pipeline; no leaked columns; each patient's records kept together; no model fitted on the test rows.",
-    "more": "Without them, the “winner” may just be the model that saw more of the answers. None of these mistakes raises an error. Lecture §14."
+    "more": "Without them, the “winner” may just be the model that saw more of the answers. None of these mistakes raises an error."
   },
   "leaked-column": {
     "term": "Leaked column",
     "group": "Training and testing",
     "short": "A column derived from, or recorded after, the outcome. It gives the model the answer, so the score looks far better than it will be on new patients.",
-    "more": "Example: HbA1c defines the diabetes label. Check every column's “When is it known?” entry against the prediction point. Lecture §14."
+    "more": "Example: HbA1c defines the diabetes label. Check every column's “When is it known?” entry against the prediction point."
   },
   "when-known": {
     "term": "When is it known?",
@@ -243,13 +238,13 @@
     "term": "Records kept together",
     "group": "Training and testing",
     "short": "If a patient has several records, all of them go in the same set, training or test. Otherwise the model is tested on people it has already seen.",
-    "more": "Each dataset here has one row per person, so this rule is met by design. Lecture §14."
+    "more": "Each dataset here has one row per person, so this rule is met by design."
   },
   "peeking": {
     "term": "Peeking",
     "group": "Training and testing",
     "short": "Setting a threshold, a model or any other choice while looking at the test patients. It promises a result you won't get on new patients.",
-    "more": "In a real project, choices are made on separate data before the test set is used. Lecture §15."
+    "more": "In a real project, choices are made on separate data before the test set is used."
   },
   "clinical-lead": {
     "term": "Clinical lead",

@@ -1,7 +1,7 @@
 <!--meta {"title":"Models","description":"The four classifiers and the prevalence baseline: one core idea, a tiny illustration and one practical limitation each. kNN is new.","scripts":["demos.js"]} -->
 <p class="eyebrow">The work</p>
 <h1>Models</h1>
-<p class="lead">Four classifiers plus a baseline, all fixed. Everyone compares the same models with the same settings: you don't tune anything. Logistic regression, random forest and gradient boosting are from the lecture (§11–12). kNN is new, and you write its pipeline {{help pipeline}}.</p>
+<p class="lead">Four classifiers plus a baseline, all fixed. Everyone compares the same models with the same settings: you don't tune anything. Logistic regression, random forest and gradient boosting are from the lecture. kNN is new, and you write its pipeline {{help pipeline}}.</p>
 
 <div class="table-wrap"><table>
   <thead><tr><th scope="col">Key</th><th scope="col">Model</th><th scope="col">Pipeline</th><th scope="col">Written by</th></tr></thead>
@@ -63,9 +63,15 @@
 </article>
 
 <article class="card model-card" id="logreg">
-  <p class="eyebrow">Supplied · worked example · lecture §12</p>
+  <p class="eyebrow">Supplied · worked example</p>
   <h3>Logistic regression {{help logistic-regression}}</h3>
   <p><strong>Core idea:</strong> a weighted sum of the features plus an intercept gives each patient a score. An S-shaped curve (the sigmoid) maps that score to a probability between 0 and 1.</p>
+  <p class="equation" role="math" aria-label="p equals 1 over 1 plus e to the minus z, where z equals b 0 plus b 1 x 1 plus b 2 x 2 and so on up to b k x k">
+    <span><var>p</var> = <span class="frac"><span>1</span><span>1 + <var>e</var><sup>−<var>z</var></sup></span></span></span>
+    <span class="eq-where">where</span>
+    <span><var>z</var> = <var>b</var><sub>0</sub> + <var>b</var><sub>1</sub><var>x</var><sub>1</sub> + <var>b</var><sub>2</sub><var>x</var><sub>2</sub> + ⋯ + <var>b</var><sub><var>k</var></sub><var>x</var><sub><var>k</var></sub></span>
+  </p>
+  <p class="small muted">The <var>x</var>s are a patient's features, the <var>b</var>s are the weights the model learns (<var>b</var><sub>0</sub> is the intercept), <var>z</var> is the score and <var>p</var> the predicted probability.</p>
   <div id="demo-logreg">
     <div class="illus illus-row">
       <svg viewBox="0 0 300 205" role="img" aria-label="An S-shaped curve: as the model score rises from minus 6 to plus 6, the predicted probability rises from near 0 to near 1, crossing the dashed 0.5 threshold at a score of 0">
@@ -121,7 +127,7 @@
 </article>
 
 <article class="card model-card" id="rf">
-  <p class="eyebrow">Supplied · lecture §11</p>
+  <p class="eyebrow">Supplied</p>
   <h3>Random forest {{help random-forest}}</h3>
   <p><strong>Core idea:</strong> many decision trees; the probability is the average of the trees' probabilities. Each tree is grown on a resample of the training patients (drawn with replacement), and each split considers only a random subset of the candidate features, so the trees differ.</p>
   <p class="small"><svg class="key-inline" viewBox="0 0 22 22" width="18" height="18" aria-hidden="true"><path class="probe" d="M11,3L19,11L11,19L3,11Z"/></svg> <strong>One new patient (made up):</strong> age 62, BMI 33, systolic blood pressure (BP) 128. The highlighted path is the route this patient takes through each tree.</p>
@@ -135,7 +141,7 @@
 </article>
 
 <article class="card model-card" id="lgbm">
-  <p class="eyebrow">Supplied · lecture §11</p>
+  <p class="eyebrow">Supplied</p>
   <h3>Gradient boosting {{help gradient-boosting}}</h3>
   <p><strong>Core idea:</strong> trees added in sequence. Each new tree learns a correction intended to reduce the current model's loss (how wrong its predictions are on the training patients). The corrections add up on the score scale, and the final score becomes a probability.</p>
   <div class="illus">

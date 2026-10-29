@@ -1,5 +1,5 @@
 <!--meta {"title":"4. Training vs. Test","description":"App section brief: see why a model is judged on patients it never saw, and spot a model that memorised its training patients."} -->
-<p class="eyebrow">App section 4 · Lecture §13</p>
+<p class="eyebrow">App section 4</p>
 <h1>Training vs. Test</h1>
 <p class="core-question">Does the model do as well on new patients as on the ones it learned from?</p>
 
@@ -61,4 +61,4 @@
 <details><summary>One model's test AUROC is a little higher than its training AUROC. Did something go wrong?</summary><div class="details-body">
   <p>Not necessarily. A simple model like logistic regression barely overfits, and with a test set of about a thousand patients, its test AUROC can land a little above or below its training AUROC by chance.</p></div></details>
 <details><summary>Why not keep trying models until the test AUROC is highest?</summary><div class="details-body">
-  <p>Every choice made by looking at the test set makes its score more optimistic (lecture §13). The models here are fixed, so the test set stays a fair check.</p></div></details>
+  <p>Every choice made by looking at the test set makes its score more optimistic. The models here are fixed, so the test set stays a fair check.</p></div></details>
