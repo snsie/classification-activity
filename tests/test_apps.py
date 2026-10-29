@@ -40,7 +40,7 @@ def test_app(which, app, tmp_path):
     r = subprocess.run([sys.executable, str(ROOT / "tests" / f"{app}_smoke.py"), str(copy)], capture_output=True, text=True, timeout=1800)
     assert r.returncode == 0, r.stderr[-2000:]
     out = json.loads(r.stdout.strip().splitlines()[-1])
-    assert out["runs"] == 4 * 2 * 5  # sections × datasets × models
+    assert out["runs"] == 3 * 2 * 5  # sections × datasets × models
     assert not out["exceptions"], out["exceptions"][:3]
     assert not out["unlabelled"], out["unlabelled"][:5]
     if which == "solution":

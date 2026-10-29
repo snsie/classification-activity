@@ -6,7 +6,7 @@ An app that helps a clinical lead judge whether any classifier is fit for each j
 
 **Central question:** Which classifier would you trust for this job, at what threshold, and with what limits?
 
-Submit the link to **this repository** on Canvas, plus your five Canvas answers.
+Submit the link to **this repository** on Canvas, plus your four Canvas answers.
 
 ## Quick start
 Your AI agent writes the code; you make the decisions, check the results and write your own answers. Open this folder in your agent and give it the starting prompt from the activity website (it begins "Read AGENT_BRIEF.md").
@@ -16,7 +16,7 @@ Your AI agent writes the code; you make the decisions, check the results and wri
 | 1 | Sets up the environment; writes `run_app.sh` | Run `python check.py --stage setup` and `bash run_app.sh` |
 | 2 | — | Fill in `Before results` in `DECISIONS.md`; commit and push |
 | 3 | Writes `analysis/models.py`; runs `python -m analysis` | Run `python check.py --stage results` and read the output |
-| 4 | Builds the four app sections | Run the app and do each reviewer task |
+| 4 | Builds the three app sections | Run the app and do each reviewer task |
 | 5 | Reruns `python -m analysis` once you have written them | Fill in `Recommendations` and `Design choice and AI use`; commit and push |
 | any | — | `python check.py` |
 

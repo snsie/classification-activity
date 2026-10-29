@@ -21,7 +21,7 @@
     "term": "Estimated probability",
     "group": "Basics",
     "short": "The classifier's estimate of a patient's chance of the positive class, between 0 and 1.",
-    "more": "It is an estimate. Whether a predicted 30% really means about 30 in 100 such patients needs its own check: a calibration plot."
+    "more": "It is an estimate. Whether a predicted 30% really means about 30 in 100 such patients needs its own check."
   },
   "threshold": {
     "term": "Threshold",
@@ -137,12 +137,6 @@
     "group": "Ranking and probabilities",
     "short": "The area under the ROC curve: the chance that a random patient with the outcome gets a higher probability than a random patient without it. It describes ranking.",
     "more": "0.5 is random ranking. AUROC is not accuracy, it doesn't choose the threshold, and it doesn't change when you move the threshold. There is no universal good value: it depends on the job."
-  },
-  "calibration-plot": {
-    "term": "Calibration plot",
-    "group": "Ranking and probabilities",
-    "short": "Patients sorted by predicted probability and cut into 10 equal-size groups. Each dot compares a group's mean prediction with the share who actually had the outcome.",
-    "more": "Dots near the diagonal mean the probabilities can be read as risks. Good ranking (high AUROC) does not guarantee this: halving every probability keeps AUROC but moves every dot off the diagonal."
   },
   "prevalence-baseline": {
     "term": "Prevalence baseline",

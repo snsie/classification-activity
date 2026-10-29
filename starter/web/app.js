@@ -1,4 +1,4 @@
-// Starter Node app: four plain sections that read results/ and show correct numbers.
+// Starter Node app: three plain sections that read results/ and show correct numbers.
 //
 // Run locally:  bash run_app.sh   (your agent writes it; it runs node web/server.mjs, then open http://localhost:8766/)
 // Build each section up to its required minimum (see the activity website). Keep every number
@@ -7,7 +7,7 @@ import * as m11 from "./m11.js";
 
 const TRAIN = "Training";
 const TEST = "Test";
-const SECTIONS = ["1. Beyond Accuracy", "2. A Threshold for the Job", "3. Ranking vs. Being Right", "4. Training vs. Test"];
+const SECTIONS = ["1. Beyond Accuracy", "2. A Threshold for the Job", "3. Training vs. Test"];
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
@@ -63,15 +63,7 @@ function threshold(res, model) {
                Precision: m11.fmtPct(m.precision), "Flagged per 100": m.flagged_per_100.toFixed(1) }]);
 }
 
-// ---- 3. Ranking vs. Being Right ------------------------------------------------
-function ranking(res) {
-  const rows = m11.MODELS.filter((m) => m in res.models)
-    .map((m) => ({ Model: m11.MODEL_LABEL[m], AUROC: m11.fmtNum(m11.auroc(...m11.preds(res, m))) }));
-  return starterNote("test AUROC of every model, in a table.")
-    + caption(`${TEST} · AUROC (ranking, not accuracy)`) + table(rows);
-}
-
-// ---- 4. Training vs. Test ------------------------------------------------------
+// ---- 3. Training vs. Test ------------------------------------------------------
 function trainVsTest(res) {
   const s = m11.aurocSummary(res);
   const rows = Object.entries(s).map(([m, v]) => ({ Model: m11.MODEL_LABEL[m],
@@ -80,7 +72,7 @@ function trainVsTest(res) {
     + caption(`${TRAIN} and ${TEST} · AUROC on the rows each model learned from, and on rows it never saw`) + table(rows);
 }
 
-const RENDER = Object.fromEntries(SECTIONS.map((s, i) => [s, [beyondAccuracy, threshold, ranking, trainVsTest][i]]));
+const RENDER = Object.fromEntries(SECTIONS.map((s, i) => [s, [beyondAccuracy, threshold, trainVsTest][i]]));
 
 // ---- page ----------------------------------------------------------------------
 async function render() {

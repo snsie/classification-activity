@@ -2,7 +2,7 @@
 
 **Website: <https://snsie.github.io/classification-activity/>**
 
-Students work with an AI coding agent: the agent writes the model-training module (`analysis/models.py`, to a fixed spec in `AGENT_BRIEF.md`), a Bash launcher (`run_app.sh`) and the app code; the students make the clinical decisions in `DECISIONS.md`, run the checks and the app themselves, and write their own answers. A supplied Python workflow trains four classifiers (plus a prevalence baseline) on the training rows of two health datasets and scores them on the test rows, and the app, with four sections in Streamlit or Node.js (their choice), helps a clinical lead judge whether any model is fit for each job. They submit a public GitHub repository (app link on the README's first line) and five Canvas answers.
+Students work with an AI coding agent: the agent writes the model-training module (`analysis/models.py`, to a fixed spec in `AGENT_BRIEF.md`), a Bash launcher (`run_app.sh`) and the app code; the students make the clinical decisions in `DECISIONS.md`, run the checks and the app themselves, and write their own answers. A supplied Python workflow trains four classifiers (plus a prevalence baseline) on the training rows of two health datasets and scores them on the test rows, and the app, with three sections in Streamlit or Node.js (their choice), helps a clinical lead judge whether any model is fit for each job. They submit a public GitHub repository (app link on the README's first line) and four Canvas answers.
 
 **Central question:** Which classifier would you trust for this job, at what threshold, and with what limits?
 

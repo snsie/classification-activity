@@ -17,7 +17,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 folder = Path(sys.argv[1]).resolve()
-SECTIONS = ["1. Beyond Accuracy", "2. A Threshold for the Job", "3. Ranking vs. Being Right", "4. Training vs. Test"]
+SECTIONS = ["1. Beyond Accuracy", "2. A Threshold for the Job", "3. Training vs. Test"]
 LABEL = {"readmission": "30-day readmission", "diabetes": "Diabetes screening"}
 out = {"runs": 0, "exceptions": [], "unlabelled": [], "slider": None}
 

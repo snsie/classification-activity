@@ -16,7 +16,7 @@ from streamlit.testing.v1 import AppTest
 folder = Path(sys.argv[1]).resolve()
 os.chdir(folder)
 sys.path.insert(0, str(folder))
-SECTIONS = ["1. Beyond Accuracy", "2. A Threshold for the Job", "3. Ranking vs. Being Right", "4. Training vs. Test"]
+SECTIONS = ["1. Beyond Accuracy", "2. A Threshold for the Job", "3. Training vs. Test"]
 out = {"runs": 0, "exceptions": [], "unlabelled": [], "slider": None}
 
 

@@ -22,7 +22,7 @@ from urllib.parse import urljoin, urlparse
 from playwright.sync_api import expect, sync_playwright
 
 BASE = sys.argv[1].rstrip("/") + "/"
-PAGES = ["", "models.html", "analysis.html", "beyond-accuracy.html", "threshold.html", "ranking.html",
+PAGES = ["", "models.html", "analysis.html", "beyond-accuracy.html", "threshold.html",
          "train-vs-test.html", "data.html", "hosting.html", "submit.html", "glossary.html"]
 AXE_URL = "https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.2/axe.min.js"
 CACHE = Path(__file__).resolve().parent / ".cache"
@@ -118,22 +118,22 @@ with sync_playwright() as p:
 
     # ---- help buttons: keyboard
     print("Help buttons")
-    page.goto(BASE + "ranking.html")
+    page.goto(BASE + "train-vs-test.html")
     helps = page.locator("button.help")
-    check(helps.count() >= 4, f"{helps.count()} help buttons on the ranking page")
+    check(helps.count() >= 3, f"{helps.count()} help buttons on the training vs. test page")
     for path in PAGES:
         page.goto(BASE + path)
         labels = page.locator("button.help").evaluate_all("bs => bs.map(b => b.getAttribute('aria-label'))")
         if labels:
             check(all(lb and lb.startswith("What is") for lb in labels), f"every help button on {path or 'index'} has an accessible label")
-    page.goto(BASE + "ranking.html")
+    page.goto(BASE + "train-vs-test.html")
     first = page.locator("button.help").first
     first.focus()
     page.keyboard.press("Enter")
     panel = page.locator("#" + first.get_attribute("aria-controls"))
     expect(panel).to_be_visible()
     check(first.get_attribute("aria-expanded") == "true", "Enter opens the explanation")
-    check("ROC curve" in panel.inner_text(), "panel shows the right term")
+    check("Test set" in panel.inner_text(), "panel shows the right term")
     panel.locator(".help-more").click()
     check(panel.locator(".more").is_visible(), "'Tell me more' reveals more detail")
     page.keyboard.press("Escape")

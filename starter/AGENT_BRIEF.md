@@ -3,7 +3,7 @@
 Read this before changing any code. **You write and debug the code**: the environment setup, `analysis/models.py`, the launcher and the app. **The student makes every decision**, checks your work, and writes their own answers. Build what they ask for without breaking the rules below.
 
 ## The project
-A take-home activity. A Python workflow trains four classifiers plus a baseline on two health datasets, and the student builds **one app with four sections**, in Streamlit (Python) or Node.js (JavaScript), that helps **a clinical lead** judge whether any model is fit for each job. The clinical lead knows the clinical problem but not the metrics, and must decide whether to use a model.
+A take-home activity. A Python workflow trains four classifiers plus a baseline on two health datasets, and the student builds **one app with three sections**, in Streamlit (Python) or Node.js (JavaScript), that helps **a clinical lead** judge whether any model is fit for each job. The clinical lead knows the clinical problem but not the metrics, and must decide whether to use a model.
 
 **Central question:** Which classifier would you trust for this job, at what threshold, and with what limits?
 
@@ -16,8 +16,7 @@ A take-home activity. A Python workflow trains four classifiers plus a baseline 
 |---|---|
 | 1. Beyond Accuracy | name the positive class, see why accuracy alone misleads, read a confusion matrix as four groups of patients, and compare every model at 0.50 (a confusion matrix each; accuracy, sensitivity/recall/TPR, specificity, FPR, precision, F1) |
 | 2. A Threshold for the Job | see that the threshold is a decision separate from the model, and what moving it gains and gives up compared with 0.50 |
-| 3. Ranking vs. Being Right | read an ROC curve, say what AUROC does and doesn't mean, and tell good ranking apart from trustworthy probabilities |
-| 4. Training vs. Test | see why a model is judged on patients it never saw, and spot a model that memorised its training patients |
+| 3. Training vs. Test | see why a model is judged on patients it never saw, and spot a model that memorised its training patients |
 
 Every section has a dataset selector (both datasets) and a model selector (the four classifiers plus a baseline). A **Recommendations** panel at the top shows the lines from `results/decisions.json`. The activity website lists each section's required minimum and reviewer tasks.
 
@@ -40,7 +39,7 @@ Every section has a dataset selector (both datasets) and a model selector (the f
    - Then tell the student: where to run it (a terminal in the project folder; on Windows, Git Bash or WSL, not PowerShell or Command Prompt), the prerequisites, the exact command (`bash run_app.sh`), the address to open, and how to stop it. **Don't run it for them: the student runs the launch command themselves.** Make clear it runs the app only on their computer; publishing is separate (`SETUP.md`).
 3. **Models: `analysis/models.py`**, the complete module the workflow imports (see Models below). Explain it, and how to run it, in a few sentences.
 4. **Analysis.** Once the student has committed `Before results` in `DECISIONS.md`, run `python -m analysis` and `python check.py --stage results`, and fix any error at its cause. Then explain what was exported to `results/`, which AUROCs are training and which are test, and show the student the check output so they can see whether it passes.
-5. **The four app sections**, built to the required minimums on the activity website, in the chosen app only.
+5. **The three app sections**, built to the required minimums on the activity website, in the chosen app only.
 
 ## Models: the spec for `analysis/models.py`
 Write one function per model that returns a fresh, unfitted `make_pipeline(...)`, and a `MODELS` dict mapping each key to its function, in exactly this order:

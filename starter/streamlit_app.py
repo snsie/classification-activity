@@ -1,4 +1,4 @@
-"""Starter app for Streamlit Community Cloud: four plain sections that read results/ and show correct numbers.
+"""Starter app for Streamlit Community Cloud: three plain sections that read results/ and show correct numbers.
 
 Run locally:  bash run_app.sh  (your agent writes it; it runs streamlit run streamlit_app.py)
 Build each section up to its required minimum (see the activity website). Keep every number
@@ -12,7 +12,7 @@ import m11
 
 TRAIN = "Training"
 TEST = "Test"
-SECTIONS = ["1. Beyond Accuracy", "2. A Threshold for the Job", "3. Ranking vs. Being Right", "4. Training vs. Test"]
+SECTIONS = ["1. Beyond Accuracy", "2. A Threshold for the Job", "3. Training vs. Test"]
 
 st.set_page_config(page_title="Judge the Model", layout="wide")
 
@@ -58,15 +58,7 @@ def threshold(res: dict, model: str) -> None:
                             "Precision": m11.fmt_pct(m["precision"]), "Flagged per 100": f"{m['flagged_per_100']:.1f}"}]))
 
 
-# ---- 3. Ranking vs. Being Right ------------------------------------------------
-def ranking(res: dict, model: str) -> None:
-    starter_note("test AUROC of every model, in a table.")
-    rows = [{"Model": m11.MODEL_LABEL[m], "AUROC": m11.fmt_num(m11.auroc(*m11.preds(res, m)))} for m in m11.MODELS if m in res["models"]]
-    st.caption(f"{TEST} · AUROC (ranking, not accuracy)")
-    st.table(pd.DataFrame(rows).set_index("Model"))
-
-
-# ---- 4. Training vs. Test ------------------------------------------------------
+# ---- 3. Training vs. Test ------------------------------------------------------
 def train_vs_test(res: dict, model: str) -> None:
     starter_note("training and test AUROC of every model, in a table.")
     s = m11.auroc_summary(res)
@@ -76,7 +68,7 @@ def train_vs_test(res: dict, model: str) -> None:
     st.table(pd.DataFrame(rows).set_index("Model"))
 
 
-RENDER = dict(zip(SECTIONS, [beyond_accuracy, threshold, ranking, train_vs_test]))
+RENDER = dict(zip(SECTIONS, [beyond_accuracy, threshold, train_vs_test]))
 
 st.title("Judge the Model")
 st.caption("Which classifier would you trust for this job, at what threshold, and with what limits?")
